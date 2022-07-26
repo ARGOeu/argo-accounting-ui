@@ -1,0 +1,19 @@
+<h1>Metrics Types</h1>
+
+
+<table class="dataTable table  border border-dark" id="TableTypes">
+    <thead>
+    <tr>
+        <th>Metric Type</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {%  for id, data in tabMetricsTypes %}
+        <tr>
+            <td>{{ id }} </td>
+        </tr>
+
+    {% endfor %}
+</table>
+

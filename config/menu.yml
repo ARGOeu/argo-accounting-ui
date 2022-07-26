@@ -1,0 +1,18 @@
+parameters:
+  menu:
+    #############################################################################################
+    #SF3
+    #############################################################################################
+    home:
+        title: Home
+        description: 'Generic information'
+        icon: fa-home
+        items:
+            - { title: Home, name: home}
+
+    accounting:
+        title: EOSC Accounting System UI
+        icon: fa-chart-area
+        description: 'EOSC Accounting System UI'
+        items:
+            - {title: 'EOSC Accounting System UI', name: metrics }

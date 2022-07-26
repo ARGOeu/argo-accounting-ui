@@ -1,6 +1,14 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
-
+    globals:
+        menu: "%menu%"
+        portalUrl: "accounting.eosc-portal.eu"
+        webMasterMail: 'cic-information@in2p3.fr'
+        lastRelease: {version: '1.0' , date: '2021-01-10'}
+        app_environment: '%env(APP_ENV)%'
+        maintenance_mode: '%env(MAINTENANCE_MODE)%'
+        maintenance_url: '%env(MAINTENANCE_URL)%'
+        maintenance_description: '%env(MAINTENANCE_DESCRIPTION)%'
 when@test:
     twig:
         strict_variables: true

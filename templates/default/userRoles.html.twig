@@ -1,0 +1,80 @@
+<div class="m-4 text-dark "  >
+    <h4 align="center"><a href="{{ path("userInfo") }}">Your roles <span style="font-size: 13px"
+                                                                         class="fa fa-new-window"></span></a>
+    </h4>
+    <hr/>
+
+
+
+    {% if opRoles["infos"] is defined %}
+        <ul>
+            {% for dn, roles in opRoles["infos"] %}
+                {% for role in roles %}
+                    <li><small>{{ role }}</small></li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
+    {% if isSU == true %}
+
+        <li class="dropdown-submenu"><strong>Operations Portal </strong>
+        </li>
+       <li> /  <span class="fa fa-star"></span>   Super User       </li>
+
+        <hr/>
+
+    {% endif %}
+
+
+
+    {% if opRoles["project"] is defined %}
+        <li class="dropdown-submenu"><strong>Project </strong></li>
+        {% for value, roles in opRoles["project"] %}
+            {% for role in roles %}
+                <li class="dropdown-header text-dark">
+                <li class="dropdown-header text-dark"><strong>{{ value }}:</strong> {{ role }}</li>
+                </li>
+            {% endfor %}
+        {% endfor %}
+        <hr>
+    {% endif %}
+    {% if opRoles["ngi"] is defined %}
+        <li class="dropdown-submenu"><strong>NGI</strong></li>
+        {% for ngi, roles in opRoles["ngi"] %}
+            {% for role in roles %}
+                <li class="dropdown-header text-dark"><strong>{{ ngi }}:</strong> {{ role }}</li>
+            {% endfor %}
+        {% endfor %}
+        <hr>
+    {% endif %}
+    {% if opRoles["site"] is defined %}
+        <li class="dropdown-submenu"><strong>Site</strong></li>
+        {% for site,roles in opRoles["site"] %}
+            {% for role in roles %}
+                <li class="dropdown-header text-dark"><strong>{{ site }}:</strong> {{ role }}</li>
+            {% endfor %}
+        {% endfor %}
+        <hr>
+    {% endif %}
+    {% if opRoles["service"] is defined %}
+        <li class="dropdown-submenu"><strong>Site</strong></li>
+        {% for site,roles in opRoles["site"] %}
+            {% for role in roles %}
+                <li class="dropdown-header text-dark"><strong>{{ site }}:</strong> {{ role }}</li>
+            {% endfor %}
+        {% endfor %}
+        <hr>
+    {% endif %}
+
+    {% if(opRoles["vo"] is defined) %}
+        <li class="dropdown-submenu"><strong>VO</strong></li>
+        {% for vo, roles in  opRoles["vo"] %}
+            {% for role in roles %}
+                <li class="dropdown-header text-dark"><strong>{{ vo }}:</strong> {{ role }}</li>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+</div>

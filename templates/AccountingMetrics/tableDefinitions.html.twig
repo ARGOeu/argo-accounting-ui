@@ -1,0 +1,260 @@
+<h1>Metrics Definitions</h1>
+
+<div class="toast m-2" id="toast-update-success">
+    <div class="toast-header">
+        <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+             preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+            <rect fill="#007a00" width="100%" height="100%"/>
+        </svg>
+        <strong class="me-auto">Status</strong>
+        <small>just now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast-update-success" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        The Metric description has been properly updated !
+    </div>
+</div>
+
+<div class="toast m-2" id="toast-update-failure">
+    <div class="toast-header">
+        <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+             preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+            <rect fill="#ff0000" width="100%" height="100%"/>
+        </svg>
+        <strong class="me-auto">Status</strong>
+        <small>just now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        The update has failed !
+    </div>
+</div>
+
+<div class="text-end">
+    <button class="btn btn-primary" id="addMetricDefinition" data-bs-toggle="modal" data-bs-target="#add_metric_desc"> <i class="bi bi-plus-square me-1"></i>Add a new metric definition
+    </button>
+</div>
+
+<!-- Modal ADD  -->
+<div class="modal fade" id="add_metric_desc" tabindex="-1" aria-labelledby="add_metric_desc_Label">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header  bg-light">
+                <h5 class="modal-title text-center">Add Metric Definition</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="form_add_metric_desc">
+
+                    <input type="hidden" value="0" name="metricId"/>
+                    <input type="hidden" name="type" value="addition"/>
+
+                    <div class="form-group m-2">
+                        <label for="metricName">Metric Name</label>
+                        <input type="text" class="form-control" name="metricName" id="metricName">
+                    </div>
+                    <div class="form-group m-2">
+                        <label for="metricDescription">Metric Description</label>
+                        <input type="text" class="form-control" id="metricDescription"
+                               name="metricDescription" aria-describedby="metricDescriptionHelp">
+                        <small id="metricDescriptionHelp" class="form-text text-muted">Please
+                            describe the usage and the perimeter of the metric</small>
+                    </div>
+
+                    <div class="form-group m-2">
+                        <label for="unit">Unit</label>
+                        <select id="unit" name="metricUnit">
+                            {% for unit in tabMetricsUnits %}
+                                <option value="{{ unit.symbol }}">{{ unit.unit }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group m-2">
+                        <label for="type">Metric Type</label>
+                        <select id="type" name="metricType">
+                            {% for  type, metricType in tabMetricsTypes %}
+                                <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button class='d-none spinner-border text-primary m-1 bg-white' role='status' id="loader_add"><span class='sr-only'>Loading...</span></button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<table class="dataTable table  border border-dark" id="Tabledefinitions">
+
+    <thead>
+    <tr>
+        <th>Metric Name</th>
+        <th>Metric Description</th>
+        <th>Unit</th>
+        <th>Metric Type</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for id, data in tabMetricsDef %}
+        <tr id="tr_{{ id }}">
+            <td class="metricName">{{ data.metric_name }} </td>
+            <td class="metricDescription">{{ data.metric_description }} </td>
+            <td class="metricUnit">{{ data.unit_type }} </td>
+            <td class="metricType">{{ data.metric_type }}</td>
+
+            <td>
+                <div class="btn-group dropstart">
+                    <button class="btn btn-white dropdown-toggle border border-light text-dark"
+                            type="button" id="dropdownActions" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownActions">
+
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update_{{ id }}">
+                            <i class="bi bi-pencil-square"></i>
+                            Update Metric Definition
+                        </a>
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#delete_{{ id }}">
+                            <i class="bi bi-x-circle"></i>
+                             Delete Metric Definition
+                        </a>
+
+                    </div>
+
+                    <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
+
+                    <!-- Modal delete  -->
+                    <div class="modal fade" id="delete_{{ id }}" tabindex="-1" aria-labelledby="delete_{{ id }}_Label">
+                        <div class="modal-dialog modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header  bg-light">
+                                    <h5 class="modal-title text-center">Delete Metric Definition</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form_delete_metric_desc">
+                                        <input type="hidden" name="type" value="delete"/>
+                                        <input type="hidden" value="{{ id }}" name="metricId"/>
+
+                                        <div class="form-group m-2">
+                                            <label for="metricName">Metric Name</label>
+                                            <input type="text" class="form-control" id="metricName" name="metricName"
+                                                   value="{{ data.metric_name }}">
+                                        </div>
+
+                                        <div class="form-group m-2">
+                                            <label for="metricDescription">Metric Description</label>
+                                            <input type="text" class="form-control" id="metricDescription" name="metricDefinition"
+                                                   value="{{ data.metric_description }}">
+                                        </div>
+
+
+                                <br/>
+                                <hr/>
+
+                                    <span class="mb-1 alert alert-danger">You are going to delete the metrics described previously !</span>
+                                        <br/>
+                                        <br/>
+                                    <button type="submit" class="btn btn-danger" value="submit">Delete Metric</button>
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                            aria-label="Close">Close
+                                    </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal update  -->
+                    <div class="modal fade" id="update_{{ id }}" tabindex="-1" aria-labelledby="update_{{ id }}_Label">
+                        <div class="modal-dialog modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header  bg-light">
+                                    <h5 class="modal-title text-center">Update Metric Definition</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form class="form_update_metric_desc">
+                                        <input type="hidden" name="type" value="update"/>
+
+                                        <input type="hidden" value="{{ id }}" name="metricId"/>
+                                        <div class="form-group m-2">
+                                            <label for="metricName">Metric Name</label>
+                                            <input type="text" class="form-control" id="metricName" name="metricName"
+                                                   value="{{ data.metric_name }}">
+                                        </div>
+                                        <div class="form-group m-2">
+                                            <label for="metricDescription">Metric Description</label>
+
+                                            <input type="text" class="form-control" id="metricDescription"
+                                                   name="metricDescription" aria-describedby="metricDescriptionHelp"
+                                                   value="{{ data.metric_description }}">
+                                            <small id="metricDescriptionHelp" class="form-text text-muted">Please
+                                                describe the usage and the perimeter of the metric</small>
+                                        </div>
+
+                                        <div class="form-group m-2">
+                                            <label for="unit">Unit</label>
+                                            <select id="unit" name="metricUnit">
+                                                {% for unit in tabMetricsUnits %}
+
+                                                    <option value="{{ unit.symbol }}"
+                                                            {% if unit.symbol==data.unit_type %}selected{% endif %}>{{ unit.unit }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group m-2">
+                                            <label for="type">Metric Type</label>
+                                            <select id="type" name="metricType">
+                                                {% for  type, metricType in tabMetricsTypes %}
+                                                    <option value="{{ type }}"
+                                                            {% if type==data.metric_type %}selected{% endif %}>{{ type }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+            </td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+
+
+
+

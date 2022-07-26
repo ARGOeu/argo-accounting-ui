@@ -1,0 +1,88 @@
+body {
+  background-color: white;
+  font-family: Verdana, Fira, Helvetica, Kalimati, sans-serif;
+  font-size: smaller;
+  margin:0;
+}
+
+.navbar {
+  font-family: Tahoma, Helvetica, Kalimati, sans-serif;
+}
+
+footer {
+  font-family: Verdana, Fira, Helvetica, Kalimati, sans-serif;
+}
+
+p {
+  font-family: Verdana, Fira, Helvetica, Kalimati, sans-serif;
+}
+
+
+#tableSOStats {
+  border: 1px solid #6C757D;
+
+}
+
+#tableSOStats tr {
+  border: 1px solid #6C757D;
+
+}
+
+.nav-tabs .nav-link {
+  border-color: #95b3d7;
+}
+
+.bg-green{
+  background-color: $bg-green;
+  color: #fff;
+  border-color: #198754;
+}
+
+.bg-violet {
+  background-color: $purple;
+  color: #fff;
+}
+
+/* partie concernant la page sombo tickets */
+
+body .chart-wrapper {
+  max-height: 250px;
+  position: relative;
+  margin-top: 50px;
+}
+body .chart-wrapper #myChart {
+  position: relative;
+  z-index: 10;
+  margin-left:80px;
+}
+body .chart-wrapper #chartjs-tooltip {
+  left: 0;
+  top: 0;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  right: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  position: absolute;
+  z-index: 0;
+  height: 100%;
+  padding: 0;
+  opacity: 1 !important;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  color: gray;
+  font-size: 25px !important;
+  font-weight: 600 !important;
+  max-width: 235px;
+  margin: auto 35.5%;
+  /*margin: auto calc(50% - 150px);*/
+}
+

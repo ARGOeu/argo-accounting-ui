@@ -1,0 +1,30 @@
+<h1>Metrics Table</h1>
+
+
+<table class="dataTable table  border border-dark" id="TableMetrics">
+
+    <thead>
+    <tr>
+{#        <th>Resource Id</th>#}
+        <th>Start</th>
+        <th>End</th>
+        <th>Value</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {%  for id, data in tabMetrics %}
+        <tr>
+{#            <td class="name">{{ data.resourceId }} </td>#}
+            <td class="start">{{ data.start }} </td>
+            <td class="end">{{ data.end }} </td>
+            <td class="value">{{ data.value }}</td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+

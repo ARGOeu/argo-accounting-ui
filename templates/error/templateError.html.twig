@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <section id="global">
+        <div class='panel panel-1' style="padding:50px;">
+            <div>
+                <h1>
+                    <i style="font-size:40px;"
+                       class="icon icon-{{ icon }} ">
+                        {{ title }} </i>
+                </h1>
+                {{ app.user.getDn }}
+                <hr/>
+            </div>
+            <p class='lead'>
+                {{ message }}
+            </p>
+            </br>
+
+            <div> For more information, please contact us at &nbsp;&nbsp;&nbsp;
+                <a href="mailto:{{ webMasterMail }}">
+                    <span class='label label-inverse'>{{ webMasterMail }}</a>
+                &nbsp;&nbsp;
+                </span>
+            </div>
+
+        </div>
+    </section>
+{% endblock %}

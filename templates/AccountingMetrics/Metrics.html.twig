@@ -1,0 +1,26 @@
+    <div class="m-4">
+
+        <div class="row">
+            <div class="text-start">
+                <label>Select a projet to browse associated metrics</label>
+                <select>
+                    {%  for project in tabProjects %}
+                        <option value="{{project.project_id}}">{{ project.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="text-start">
+                <label>or select a provider to browse associated metrics</label>
+                <select>
+                    {%  for provider in tabProviders %}
+                        <option value="{{provider.name}}">{{ provider.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+
+
+
+    </div>

@@ -1,0 +1,40 @@
+<h1>Projects Table</h1>
+
+
+<table class="dataTable table  border border-dark" id="TableProjects">
+
+    <thead>
+    <tr>
+        <th>Project Id</th>
+        <th>Acronym</th>
+        <th>Title</th>
+        <th>Providers</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    {%  for id, data in tabProjects %}
+        <tr>
+            <td class="id">
+                <a
+                   href="{{ path('accounting-metrics_byProject', {'projectId': data.project_id }) }}">
+                    {{ data.project_id }}
+                </a>
+            </td>
+            <td class="acronym">{{ data.acronym }} </td>
+            <td class="title">{{ data.title }} </td>
+            <td class="providers">
+            {% for provider in data  %}
+                {%  if provider.name is defined %}
+                {{ provider.name }} -
+                {% endif %}
+            {% endfor %}
+            </td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>

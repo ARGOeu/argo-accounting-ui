@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <section id="global">
+        <div class='card'>
+
+            <div class='card-header bg-danger text-white'>
+                <span class="card-title">You need to be authenticated to access this page</span>
+
+
+            </div>
+           <div class="card-body">
+               <a class="btn btn-primary " href="{{ path("hwi_oauth_connect") }}"><span
+                           class='fa fa-sign-in'> Sign in with EOSC AAI </span> </a>
+           </div>
+
+
+            <div class="card-footer">  For more information, please contact us at &nbsp;&nbsp;&nbsp;
+                <a href="mailto:{{ webMasterMail }}">
+                    <span class='label label-inverse'>{{ webMasterMail }}</a>
+                &nbsp;&nbsp;
+                </span>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

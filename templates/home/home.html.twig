@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+
+
+            <div class="row row-cols-1 row-cols-md-3 mb-2 text-center">
+                {% for key, module in menu %}
+                <div class="col-3">
+                    <div class="card m-5     shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 fw-normal">{{ module["title"] }}</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title"><i class="fas {{ module["icon"] }} fa-2x"></i></h1>
+                            <ul class="list-unstyled mt-2 mb-3">
+
+                                            {% for items in module["items"] %}
+                                                {% if items["parameter"] is not defined %}
+                                                    <button type="button" class="w-100 m-1 btn btn-lg btn-outline-light small btn-sm "><a class="text-dark" href="{{ path(items["name"]) }}">{{ items["title"] }}</a></button>
+                                                {% else %}
+                                                    <button type="button" class="w-100 m-1 btn btn-lg btn-outline-light small btn-sm "><a class="text-dark" href="{{ path(items["name"], { 'type':items["parameter"]["value"] } )}}">{{ items["title"] }}</a></button>
+                                                {% endif %}
+                                            {% endfor %}
+
+
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+
+
+
+
+
+
+
+{% endblock %}
+

@@ -1,0 +1,8 @@
+
+{%  for resource in tabResources %}
+  <div style="width: 900px;height:600px">
+      <h4>{{ resource }}</h4>
+    <canvas id="chart_{{ resource }}" class="ml-5"></canvas>
+  </div>
+
+{% endfor %}

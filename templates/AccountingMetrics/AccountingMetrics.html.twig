@@ -1,0 +1,235 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+    {%  endblock %}
+
+{% block body %}
+
+
+    <div class="row">
+        <div class="offset-2 col-8 mt-1 mb-3">
+
+            <ul id="mainTab" class="nav nav-tabs">
+                <li class="nav-item">
+                    <a href="#projects" class="nav-link" data-toggle="tab" data-target="#projects">Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#providers" class="nav-link" data-toggle="tab" data-target="#providers">Providers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#def" class="nav-link" data-toggle="tab" data-target="#def">Metrics Definitions</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#units" class="nav-link" data-toggle="tab" data-target="#units">Metrics Units</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#types" class="nav-link" data-toggle="tab" data-target="#types">Metrics Type</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#metrics" class="nav-link" data-toggle="tab" data-target="#metrics">Metrics</a>
+                </li>
+            </ul>
+            <div id="mainTabContent" class="tab-content">
+                <div class="tab-pane" id="projects" aria-labelledby="projects-tab">
+                    <p>{{ include('AccountingMetrics/tableProjects.html.twig') }}</p>
+                </div>
+                <div class="tab-pane" id="providers" aria-labelledby="providers-tab">
+                    <p>{{ include('AccountingMetrics/tableProviders.html.twig') }}</p>
+                </div>
+                <div class="tab-pane" id="def" aria-labelledby="def-tab">
+                    <p>{{ include('AccountingMetrics/tableDefinitions.html.twig') }}</p>
+                </div>
+                <div class="tab-pane" id="def" aria-labelledby="def-tab">
+                    <p>{{ include('AccountingMetrics/tableDefinitions.html.twig') }}</p>
+                </div>
+                <div class="tab-pane" id="units" aria-labelledby="units-tab">
+                    <p>{{ include('AccountingMetrics/tableUnits.html.twig') }}</p>
+                </div>
+                <div class="tab-pane" id="types" aria-labelledby="types">
+                    <p>{{ include('AccountingMetrics/tableTypes.html.twig') }}</p>
+                </div>
+
+                <div class="tab-pane" id="metrics" aria-labelledby="metrics">
+                    <p>{{ include('AccountingMetrics/Metrics.html.twig') }}</p>
+                </div>
+            </div>
+
+            <hr/>
+        </div>
+
+    </div>
+
+
+{% endblock %}
+{% block javascripts %}
+
+    <script>
+
+        $(document).on('submit','.form_add_provider',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+
+            var id = $(this).find('input[name="providerId"]').val().trim();
+            var name = $(this).find('input[name="providerName"]').val().trim();
+            var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();
+            var logo = $(this).find('input[name="providerLogo"]').val().trim();
+            var website = $(this).find('input[name="providerWebSite"]').val().trim();
+
+            dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website;
+
+
+            let url= "{{ url('add_provider') }}";
+            let redirection="{{ url('metrics')}}#providers";
+
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+
+                beforeSend: function () {
+                        $('#loader_add_provider').removeClass('d-none');
+                }});
+
+            request.done(function (output_success) {
+                $("#toast-prov-update-success > .toast-body").html(output_success);
+                $("#toast-prov-update-success").toast("show");
+
+                $("#add_provider").modal('hide');
+                $('#loader_add_provider').addClass('d-none');
+
+                window.setTimeout(function(){
+                    window.location.href=redirection;
+                }, 5000);
+
+
+            })
+
+            request.fail(function (xhr, status, error) {
+
+                $("#toast-prov-update-failure > .toast-body").html(xhr.responseText);
+                $("#toast-prov-update-failure").toast("show");
+
+                $("#add_provider").modal('hide');
+
+
+            });
+        });
+
+        $(document).on('submit','.form_add_metric_desc, .form_update_metric_desc, .form_delete_metric_desc',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+            let metricId=  $(this).find('input[name="metricId"]').val().trim();
+            let type=  $(this).find('input[name="type"]').val().trim();
+            let dataUrl;
+
+            if (type === 'delete') {
+                dataUrl = 'type=' + type + '&metricId=' + metricId;
+
+            } else {
+                var metricDescription = $(this).find('input[name="metricDescription"]').val().trim();
+                var metricName = $(this).find('input[name="metricName"]').val().trim();
+                var metricUnit = $(this).find('select[name="metricUnit"] > option:selected').val().trim();
+                var metricType = $(this).find('select[name="metricType"] > option:selected').val().trim();
+                dataUrl = 'type=' + type + '&metricId=' + metricId + '&metricDescription=' + metricDescription + '&metricName=' + metricName + '&metricUnit=' + metricUnit + '&metricType=' + metricType;
+                    }
+
+            let url= "{{ url('modify_metric_description') }}";
+            let redirection="{{ url('metrics')}}";
+
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+
+                beforeSend: function () {
+                    if (type==='addition')
+                    $('#loader_add').removeClass('d-none');
+                }});
+
+            request.done(function (output_success) {
+                $("#toast-update-success > .toast-body").html(output_success);
+                $("#toast-update-success").toast("show");
+
+                if (type==='update') {
+
+                    $("#tr_"+metricId).find('td.metricName').text(metricName);
+                    $("#tr_"+metricId).find('td.metricDescription').text(metricDescription);
+                    $("#tr_"+metricId).find('td.metricUnit').text(metricUnit);
+                    $("#tr_"+metricId).find('td.metricType').text(metricType);
+                    $("#update_" + metricId).modal('hide');
+
+
+
+                }
+                if (type==='addition') {
+                    $("#add_metric_desc").modal('hide');
+                    $('#loader_add').addClass('d-none');
+                    window.location.href=redirection;
+
+                }
+                if (type==='delete') {
+                    $("#delete_" + metricId).modal('hide');
+                    $("#tr_"+metricId).addClass('d-none');
+
+                }
+
+
+            });
+            request.fail(function (xhr, status, error) {
+
+                $("#toast-update-failure > .toast-body").html(xhr.responseText);
+                $("#toast-update-failure").toast("show");
+
+                if (type==='update')
+                    $("#update_"+metricId).modal('hide');
+                if (type==='addition')
+                    $("#add_metric_desc").modal('hide');
+                if (type==='delete')
+                    $("#delete_"+metricId).modal('hide');
+
+
+            });
+
+
+        });
+
+    $(document).ready(function() {
+
+    /********************************************** Management of the TABS ******************************************/
+
+    var hash = $(location).attr('hash');
+
+    $("#mainTab > li > a").removeClass('active');
+    $("#mainTabContent > div").removeClass('active').removeClass('show');
+
+
+    if (hash) {
+    $("#mainTab > li > a[href='"+hash+"']").addClass('active');
+    $(hash).addClass('active show');
+    }
+    else
+    {
+    $("#mainTab > li:first-child > a").addClass('active');
+    $("#mainTabContent > div:first-child").addClass('show').addClass('active');
+    }
+
+    /********************************************** Tab Pane Init ******************************************/
+
+    $("#mainTab a").click(function(e){
+    e.preventDefault();
+    $(this).tab('show');
+    });
+
+        /********************************************** Tables Management ******************************************/
+
+        $(".dataTable").dataTable();
+
+
+
+    });
+</script>
+
+{% endblock %}

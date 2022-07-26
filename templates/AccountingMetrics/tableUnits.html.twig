@@ -1,0 +1,26 @@
+<h1>Metrics Units</h1>
+
+
+<table class="dataTable table  border border-dark" id="TableUnits">
+
+    <thead>
+    <tr>
+        <th>Unit Description</th>
+        <th>Unit Symbol</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {%  for id, unit in tabMetricsUnits %}
+        <tr>
+            <td>{{ unit.unit }} </td>
+            <td>{{ unit.symbol }} </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+

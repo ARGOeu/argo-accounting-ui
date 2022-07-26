@@ -1,19 +1,52 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <title>EOSC Accounting UI</title>
+
+    <link rel="icon" type="image/x-icon" href="{{ asset('build/images/favicon.ico') }}"/>
+
+    {{ encore_entry_link_tags('app') }}
+
+
+    {% block stylesheets %} {% endblock %}
+
+</head>
+
+<body>
+{% include 'default/header.html.twig' %}
+
+
+
+<main class="dd container-fluid">
+
+    {% for flash_message in app.session.flashbag.get('danger') %}
+        <div role="alert" class="alert alert-danger">
+            {{ flash_message|raw }}
+        </div>
+    {% endfor %}
+
+
+    {% for flash_message in app.session.flashbag.get('success') %}
+        <div role="alert" class="alert alert-success">
+            {{ flash_message|raw }}
+        </div>
+    {% endfor %}
+
+
+    {% block body %}{% endblock %}
+
+
+    {% include 'default/footer.html.twig' %}
+
+
+</main>
+
+{{ encore_entry_script_tags('app') }}
+{% block javascripts %}
+{% endblock %}
+</body>
+
 </html>
