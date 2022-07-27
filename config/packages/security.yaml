@@ -6,6 +6,20 @@ security:
     providers:
         users_in_memory: { memory: null }
     firewalls:
+#        secured_area:
+#            pattern: ^/admin/*
+#            oauth:
+#                resource_owners:
+#                    aai_eosc: "/aai_eosc/callback"
+#                login_path: /admin/login
+#                use_forward: true
+#                failure_path: /admin/login
+#                oauth_user_provider:
+#                    service: spl.user_provider
+#            entry_point: App\Security\AuthenticationEntryPoint
+#            logout:
+#                path: /admin/logout
+#                target: /
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false

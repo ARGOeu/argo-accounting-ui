@@ -38,3 +38,6 @@ services:
             - '@logger'
             - '%lavoisierUrl%'
             - '%lavoisierPort%'
+    spl.user_provider:
+        class: 'App\Entity\User\UserProvider'
+        arguments: [ '@doctrine.orm.default_entity_manager', '@security.encoder_factory' ]
