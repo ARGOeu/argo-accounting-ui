@@ -8,8 +8,7 @@ RUN mv .env.template .env
 
 
 
-RUN /usr/local/bin/php composer.phar install
-
+RUN composer install
 RUN yarn install --ignore-engines \
     && yarn encore prod ;
 
