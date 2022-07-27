@@ -1,0 +1,15 @@
+FROM gitlab-registry.in2p3.fr/cc-in2p3-devops/openshift-origin/openshift-images/php:8.1-fpm-alpine
+LABEL maintainer="CNRS/CCIN2P3 DevOps Team"
+
+WORKDIR /var/www/html
+ADD . /var/www/html
+
+RUN mv .env.template .env
+
+
+
+RUN /usr/local/bin/php composer.phar install
+
+RUN yarn install --ignore-engines \
+    && yarn encore prod ;
+

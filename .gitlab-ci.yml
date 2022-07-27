@@ -1,0 +1,74 @@
+stages:
+  - php
+  - nginx
+  - test
+  - deploy
+
+variables:
+  IMAGE_PHP: $CI_REGISTRY_IMAGE/php-fpm:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+  IMAGE_NGINX: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+
+default:
+  services:
+    - docker:dind
+  image: docker:latest
+
+php-image-build:
+  stage: php
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$IMAGE_PHP" -f ./docker/php-fpm/Dockerfile .
+    - docker cp -a $(docker create "$IMAGE_PHP"):/var/www/html/. php-build
+    - docker push "$IMAGE_PHP"
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - php-build
+
+nginx-image-build:
+  stage: nginx
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$IMAGE_NGINX" -f ./docker/nginx/Dockerfile .
+    - docker push "$IMAGE_NGINX"
+
+
+#test:
+#  stage: test
+#  before_script:
+#    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#  variables:
+#    # Don't clone, the software is already in the image run
+#    GIT_STRATEGY: none
+#  dependencies: []
+#  script:
+#    - docker run -v $PHP_UNIT:/var/www/html/php-unit.xml "$IMAGE_PHP" vendor/bin/phpunit --configuration /var/www/html/tms/phpunit.xml.dist
+
+
+deploy-to-wok:
+  image: docker.io/appuio/oc:v3.11
+  stage: deploy
+  services:
+    - docker:dind
+  script: |
+    oc login $WOK_URL --token=$WOK_TOKEN --insecure-skip-tls-verify
+    oc project $WOK_PROJECT
+    oc patch deployment php-accounting-eosc -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"php-accounting-eosc\", \"image\":\"$IMAGE_PHP\"}]}}}}"
+    oc patch deployment nginx-accounting-eosc -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"nginx-accounting-eosc\", \"image\":\"$IMAGE_NGINX\"}]}}}}"
+  only:
+    - master
+
+deploy-to-wok-dev:
+  image: docker.io/appuio/oc:v3.11
+  stage: deploy
+  services:
+    - docker:dind
+  script: |
+    oc login $WOK_URL --token=$WOK_TOKEN --insecure-skip-tls-verify
+    oc project $WOK_PROJECT
+    oc patch deployment php-accounting-eosc-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"php-accounting-eosc-dev\", \"image\":\"$IMAGE_PHP\"}]}}}}"
+    oc patch deployment nginx-accounting-eosc-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"nginx-accounting-eosc-dev\", \"image\":\"$IMAGE_NGINX\"}]}}}}"
+  only:
+    - develop
