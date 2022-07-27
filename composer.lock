@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "27c2df4c70c436d2c905c518068c885d",
+    "content-hash": "05262e308fc6f7f87c85d0d3c8682ada",
     "packages": [
         {
             "name": "ccin2p3/lavoisiercli",
