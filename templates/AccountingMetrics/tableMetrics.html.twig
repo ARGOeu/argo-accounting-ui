@@ -1,25 +1,31 @@
-<h1>Metrics Table</h1>
+{%  if tabMetricsProject!=null %}
+<div>
 
+<h1><i class="bi bi-bar-chart"></i> Metrics Table </h1>
+<hr/>
 
-<table class="dataTable table  border border-dark" id="TableMetrics">
+<table class="dataTable table  border border-dark" id="TableMetricsProject">
 
     <thead>
     <tr>
-{#        <th>Resource Id</th>#}
+        {#        <th>Resource Id</th>#}
         <th>Start</th>
         <th>End</th>
         <th>Value</th>
+        <th>Provider</th>
+        <th>Install</th>
     </tr>
     </thead>
 
     <tbody>
-    {%  for id, data in tabMetrics %}
+    {%  for id, data in tabMetricsProject %}
         <tr>
-{#            <td class="name">{{ data.resourceId }} </td>#}
-            <td class="start">{{ data.start }} </td>
-            <td class="end">{{ data.end }} </td>
+            {#            <td class="name">{{ data.resourceId }} </td>#}
+            <td class="start">{{ data.time_period_start }} </td>
+            <td class="end">{{ data.time_period_end }} </td>
             <td class="value">{{ data.value }}</td>
-
+            <td class="provider">{{ data.provider }}</td>
+            <td class="install">{{ data.installation }}</td>
         </tr>
 
     {% endfor %}
@@ -28,3 +34,46 @@
 
 </table>
 
+</div>
+
+{% endif %}
+
+{%  if tabMetricsProvider!=null %}
+    <div>
+
+        <h1><i class="bi bi-bar-chart"></i> Metrics Table for provider {{ provider }}</h1>
+        <hr/>
+
+        <table class="dataTable table  border border-dark" id="TableMetricsProvider">
+
+            <thead>
+            <tr>
+                {#        <th>Resource Id</th>#}
+                <th>Start</th>
+                <th>End</th>
+                <th>Value</th>
+                <th>Provider</th>
+                <th>Install</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {%  for id, data in tabMetricsProvider %}
+                <tr>
+                    {#            <td class="name">{{ data.resourceId }} </td>#}
+                    <td class="start">{{ data.time_period_start }} </td>
+                    <td class="end">{{ data.time_period_end }} </td>
+                    <td class="value">{{ data.value }}</td>
+                    <td class="provider">{{ data.provider }}</td>
+                    <td class="install">{{ data.installation }}</td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+{% endif %}

@@ -58,7 +58,7 @@ class HomeController extends AbstractController
      * @return Response
      */
 
-    public function listMetrics(LavoisierService $lavoisierService)
+    public function listMetrics(Request $request,LavoisierService $lavoisierService)
     {
 
         $hydrator = new EntriesHydrator();
@@ -92,13 +92,44 @@ class HomeController extends AbstractController
         $result5 = $lavQuery5->execute();
         $tabProviders=$result5->getArrayCopy();
 
+        $project="-- Project --";
+        $provider="-- Provider --";
+        $tabMetricsProject=null;
+        $tabMetricsProvider=null;
+
+
+
+        if ($request->request->get('form') == 1) {
+                $project=$request->request->get('projectName');
+            $provider=$request->request->get('providerName');
+
+            if ($project!=0) {
+                $lavQuery = new Query($lavoisierUrl, 'listMetricsbyProject', 'lavoisier', 'xml', $lavoisierPort);
+                $lavQuery->setMethod('POST');
+                $lavQuery->setPostFields(array('projectId' => $project));
+                $lavQuery->setHydrator($hydrator);
+                try {
+                    $result = $lavQuery->execute();
+                } catch (CurlException $e) {
+                } catch (HTTPStatusException $e) {
+                    return new Response("Exception", 500);
+                }
+                $tabMetricsProject=$result->getArrayCopy();
+
+            }
+
+        }
+
         return $this->render("AccountingMetrics/AccountingMetrics.html.twig", [
             'tabMetricsDef'=>$tabMetricsDef,
             'tabMetricsTypes' =>$tabMetricsTypes,
             'tabMetricsUnits' =>$tabMetricsUnits,
             'tabProjects' =>$tabProjects,
-            'tabProviders' =>$tabProviders
-
+            'tabProviders' =>$tabProviders,
+            'project'=>$project,
+            'provider' => $provider,
+            'tabMetricsProject'=>$tabMetricsProject,
+            'tabMetricsProvider'=>$tabMetricsProvider
         ]);
 
     }
