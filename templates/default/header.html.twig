@@ -5,86 +5,57 @@
             <div class="col-3">
                 <a class="navbar-brand" href="/">
                     <p class="h3 my-0 me-md-auto fw-normal text-dark">
-                       ACCOUNTING SYSTEM UI
+                        <img alt="logo" src="{{ asset('build/images/logo_eosc.png') }}" height='70px'/>
 
-                        {%  if app_environment=='prod' %}
-                            <span class=" badge bg-info  m-1" >EOSC Instance</span>
-                        {% else %}
-                            <span class="badge bg-danger  m-1 h-4" ><i class="fab fa-dev"></i> EOSC Instance</span>
-                        {% endif %}
+                    </p>
+                </a>
+                </div>
+
+            <div class="col-3 text-end">
+                
+                    <p class="h3 my-0 me-md-auto fw-normal text-dark">
+                        <i class="bi bi-activity text-primary" style="width: 64px;"></i>
+
+                        <span class=" badge bg-info  m-1" >EOSC Accounting System</span>
+                        <i class="bi bi-activity text-primary" style="width: 64px;"></i>
+
+
+
                         {% if maintenance_mode != 'false' %}
                             <a class="text-white"  href="{{ maintenance_url }}">
                                 <span class="badge bg-danger  m-1 h-4" ><i class="fas fa-bolt  text-white mr-1" ></i> {{ maintenance_description }}</span></a>
                         {% endif %}
 
                     </p>
-                </a>
-                </div>
-
-
-
-
-
-            <div class="col-6 collapse navbar-collapse" id="navbarNavAltMarkup">
-
-
-
-                <div class="navbar-nav ml-auto">
-
-{#                    {% for key, module in menu %}#}
-
-{#                            {% set active='' %}#}
-{#                            {% set current_path = app.request.get('_route') %}#}
-{#                            {% for items in module["items"] %}#}
-{#                                {% if current_path == items["name"] %}#}
-{#                                    {% set active=' active' %}#}
-{#                                {% endif %}#}
-{#                            {% endfor %}#}
-
-{#                        <span class="m-2 nav-item dropdown   {{ active}}">#}
-{#                            <a class="dropdown-toggle nav-link m-2" href="#" role="button" id="dropdown{{ key }}" data-bs-toggle="dropdown" aria-expanded="false">#}
-{#                                <i class="fa {{  module["icon"]  }}"></i> {{ module["title"] }} &nbsp;#}
-{#                            </a>#}
-
-{#                            <ul class="dropdown-menu" aria-labelledby="dropdown{{ key }}">#}
-{#                                {% for items2 in module["items"] %}#}
-{#                                    {% if items2["parameter"] is not defined %}#}
-{#                                    <li><a class="dropdown-item small" href="{{ path(items2["name"]) }}">{{ items2["title"] }}</a></li>#}
-{#                                    {% else %}#}
-{#                                        <li><a class="dropdown-item small" href="{{ path(items2["name"], { 'type':items2["parameter"]["value"] } )}}">{{ items2["title"] }}</a></li>#}
-
-{#                                    {% endif %}#}
-{#                                {% endfor %}#}
-{#                            </ul>#}
-{#                        </span>#}
-{#                    {% endfor %}#}
-
-{#                    {% if app.user.username is defined  %}#}
-{#                        <span class="text-right ml-5 nav-item dropdown">#}
-{#                              <a class="dropdown-toggle nav-link" href="#" role="button" id="dropdown_user" data-bs-toggle="dropdown" aria-expanded="false">#}
-{#                                  <i class=" ml-5 fas fa-user-circle text-primary"></i> <span class="text-default">{{ app.user.username}}</span>#}
-{#                            <br/><small class="ml-3 text-muted ml-1 navbar-email">{{ app.user.email }}</small>#}
-{#                            </a>#}
-{#                             <ul class="dropdown-menu" aria-labelledby="dropdown_user">#}
-{#                                 <li><a class="dropdown-item" href="{{ path('userInfo') }}"><i class="fa fa-user"></i> Your info</a></li>#}
-{#                                  <li><a class="dropdown-item" href="{{ path('logout') }}"><i class="fa fa-lock"></i> Logout</a></li>#}
-
-{#                            </ul>#}
-
-{#                        </span>#}
-
-{#                    </span>#}
-{#                    {% else %}#}
-{#                    <span class="m-2 nav-item">#}
-{#                         <a class="m-2 nav-link" href="{{ path('hwi_oauth_service_redirect', {'service': 'aai_eosc' }) }}"  role="button">#}
-{#                             <i class="fas fa-unlock text-primary"></i> Login#}
-{#                         </a>#}
-{#                    </span>#}
-{#                    {% endif %}#}
-
-
-                </div>
+              
             </div>
+
+            <div class="col-3">
+                &nbsp;
+            </div>
+
+
+
+
+                <div class="col-3 text-end navbar-nav">
+
+
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown" style="width: 250px">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-home">About</i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="https://argoeu.github.io/ARGO-accounting">Documentation</a></li>
+                            <li><a class="dropdown-item" href="https://acc.devel.argo.grnet.gr/swagger-ui/">EOSC Accounting API</a></li>
+
+                        </ul>
+                    </li>
+                    </ul>
+
+
+                </div>
+
         </div>
     </nav>
 
