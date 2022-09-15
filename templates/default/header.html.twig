@@ -1,60 +1,89 @@
 <header class="p-1 px-md-2 mb-3 bg-white border-bottom shadow-sm">
 
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid row">
-            <div class="col-3">
+
+
+    <div id="top-header" class="uk-visible@m">
+    <div class="uk-container">
+        <div class="uk-grid">
+            <div class="uk-width-1-5@m uk-text-right"></div>
+            <div class="uk-width-4-5@m uk-text-right">
+                <div class="region region-header-right">
+                    <div id="block-system-user-menu" class="block block-system block-border block-menu">
+                        <div class="content">
+                            <ul id="globalmenu" class="uk-nav uk-navbar-nav uk-navbar-right uk-float-right">
+                                <li class="first leaf"><a href="https://eosc-portal.eu">Portal Home</a></li>
+                                <li class="leaf"><a href="https://argoeu.github.io/argo-accounting">Documentation</a>
+                                </li>
+                                <li class="leaf"><a href="https://acc.devel.argo.grnet.gr/swagger-ui/">EOSC
+                                        Accounting API</a></li>
+                                <li class="leaf">
+                                    <a class="active" href="/">Accounting UI</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+    <nav class="navbar navbar-expand-lg" style="background-color: rgb(255, 255, 255);">
+        <div class="container-fluid row" >
+            <div class="col-6">
                 <a class="navbar-brand" href="/">
-                    <p class="h3 my-0 me-md-auto fw-normal text-dark">
-                        <img alt="logo" src="{{ asset('build/images/logo_eosc.png') }}" height='70px'/>
-
-                    </p>
+                        <img alt="logo" class="offset-2 m-4" src="{{ asset('build/images/logo_eosc.png') }}" height="100px"/>
                 </a>
-                </div>
-
-            <div class="col-3 text-end">
-                
-                    <p class="h3 my-0 me-md-auto fw-normal text-dark">
-                        <i class="bi bi-activity text-primary" style="width: 64px;"></i>
-
-                        <span class=" badge bg-info  m-1" >EOSC Accounting System</span>
-                        <i class="bi bi-activity text-primary" style="width: 64px;"></i>
-
-
-
-                        {% if maintenance_mode != 'false' %}
-                            <a class="text-white"  href="{{ maintenance_url }}">
-                                <span class="badge bg-danger  m-1 h-4" ><i class="fas fa-bolt  text-white mr-1" ></i> {{ maintenance_description }}</span></a>
-                        {% endif %}
-
-                    </p>
-              
             </div>
 
-            <div class="col-3">
-                &nbsp;
-            </div>
+            <div class="col-6 text-end">
+
+
+                    {% if maintenance_mode != 'false' %}
+                        <a class="text-white" href="{{ maintenance_url }}">
+                            <span class="badge bg-danger  m-1 h-4"><i
+                                        class="fas fa-bolt  text-white mr-1"></i> {{ maintenance_description }}</span></a>
+                    {% endif %}
 
 
 
-
-                <div class="col-3 text-end navbar-nav">
-
-
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown" style="width: 250px">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-home">About</i>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="https://argoeu.github.io/ARGO-accounting">Documentation</a></li>
-                            <li><a class="dropdown-item" href="https://acc.devel.argo.grnet.gr/swagger-ui/">EOSC Accounting API</a></li>
-
-                        </ul>
+                <div class="uk-navbar-right align-self-center">
+                <ul id="mainTab" class="uk-navbar-nav nav nav-tabs ">
+                    <li class="nav-item">
+                        <a href="#projects" class="nav-link" data-toggle="tab" data-target="#projects">Projects</a>
                     </li>
-                    </ul>
+                    <li class="nav-item">
+                        <a href="#providers" class="nav-link" data-toggle="tab" data-target="#providers">Providers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#def" class="nav-link" data-toggle="tab" data-target="#def">Metrics Definitions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#units" class="nav-link" data-toggle="tab" data-target="#units">Metrics Units</a>
+                    </li>
 
+                    <li class="nav-item">
+                        <a href="#types" class="nav-link" data-toggle="tab" data-target="#types">Metrics Type</a>
+                    </li>
 
+                    <li class="nav-item">
+                        <a href="#metrics" class="nav-link" data-toggle="tab" data-target="#metrics">Metrics</a>
+                    </li>
+                </ul>
                 </div>
+
+
+
+            </div>
+
+
+
+
+            <div class="col-3 text-end navbar-nav">
+
+
+            </div>
 
         </div>
     </nav>

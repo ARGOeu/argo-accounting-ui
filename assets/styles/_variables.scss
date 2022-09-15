@@ -12,13 +12,13 @@ $gray-800: #343a40;
 $gray-900: #212529;
 $black: #000;
 
-$blue: rgba(37, 91, 240, 0.87) !default;
+$blue: rgb(218, 188, 89) !default;
 $indigo:  #6610f2 !default;
 $purple:  #6f42c1 !default;
 $pink:    #d63384 !default;
 $red: rgba(255, 2, 24, 0.78) !default;
 $orange: rgba(255, 147, 43, 0.82) !default;
-$yellow:  #ffc107 !default;
+$yellow: #ffcd00 !default;
 $green:   #198754 !default;
 $teal: rgba(14, 144, 60, 0.54) !default;
 $cyan: rgba(31, 119, 240, 0.63) !default;
@@ -29,7 +29,7 @@ $bg-violet: $purple;
 $bg-green: $teal;
 
 
-$primary: $blue;
+$primary: $orange;
 $success: $green;
 $info: $cyan;
 $warning: $yellow;
@@ -60,16 +60,17 @@ $headings-color: $gray-900;
 // Navbar
 
 $navbar-light-brand-color: $black;
-$navbar-light-brand-hover-color: $primary;
-$navbar-light-hover-color: $primary;
+$navbar-light-brand-hover-color: $white;
+$navbar-light-hover-color: $white;
 
-$nav-tabs-border-width: 1px;
+$nav-tabs-border-width: 0px;
 
-$nav-tabs-link-active-color: $white;
-$nav-tabs-link-active-bg:$primary;
+$nav-tabs-link-active-color:$primary;
+$nav-tabs-link-active-border-color: $primary;
+$nav-tabs-link-active-bg:$white;
 $nav-tabs-border-color:$gray-600;
 $nav-tabs-link-hover-border-color:$black;
-$nav-tabs-link-active-bg : $primary;
+$nav-tabs-link-active-bg : $white;
 
 
 // Dropdown
