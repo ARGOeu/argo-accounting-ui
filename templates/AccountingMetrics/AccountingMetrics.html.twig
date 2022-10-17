@@ -205,9 +205,56 @@
 
         $(".dataTable").dataTable();
 
+        $('.providersDetails').on('shown.bs.modal', function(){
 
 
-    });
+
+            let Id= $(this).attr('id').split('provider_')[1];
+            var  url = $("#logo_url_"+Id).val();
+            var canvas =$("#container_"+Id);
+            canvas.append('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>');
+
+            if (url!=='Not found') {
+            checkIfImageExists(url, (exists) => {
+                if (exists) {
+                    let img = document.createElement('img');
+                    img.src = url;
+                    img.width= "200";
+                    canvas.empty();
+                    canvas.append(img);
+                } else {
+                    canvas.empty();
+                    canvas.append('<i class="bi bi-radioactive" style="font-size: 3rem;"></i><br/>Image Not found');
+                }
+            });
+            }
+            else {
+                canvas.empty();
+                canvas.append('<i class="bi bi-radioactive" style="font-size: 3rem;"></i><br/>Image Not found');
+            }
+
+
+        });
+
+        function checkIfImageExists(url, callback) {
+            const img = new Image();
+            img.src = url;
+
+            if (img.complete) {
+                callback(true);
+            } else {
+                img.onload = () => {
+                    callback(true);
+                };
+
+                img.onerror = () => {
+                    callback(false);
+                };
+            }
+        }
+
+
+        });
 </script>
 
 {% endblock %}
