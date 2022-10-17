@@ -87,6 +87,55 @@
     </div>
 </div>
 
+<!-- This loop for bootstrap modals should be done outside of the table -->
+<!-- otherwise the dynamic ajax call will not work because of the inexisting dom -->
+{%  for id, data in tabProviders %}
+<div class="modal fade providersDetails" id="provider_{{ data.id }}" tabindex="-1"  aria-labelledby="provider_{{ data.id }}_Label">
+
+    <div class="modal-dialog modal-dialog-scrollable">
+        <form>
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title text-center">Provider details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="logo_url_{{ data.id  }}" value="{{ data.logo }}"/>
+                    <div class="form-group m-2 text-center" >
+                        <div id="container_{{ data.id  }}"></div>
+                    </div>
+                    <br/><br/>
+                    <div class="form-group m-2" >
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" name="name" value="{{ data.name }}" disabled="true"/>
+                    </div>
+                    <div class="form-group m-2" >
+                        <label for="sname">Short Name</label>
+                        <input type="text" class="form-control" name="sname" value="{{ data.abbreviation }}" disabled="true"/>
+
+                    </div>
+                    <div class="form-group m-2" >
+
+                        <label for="website">Web Site</label>
+                        <input type="text" class="form-control" name="website" value="{{ data.website}}" disabled="true"/>
+
+                    </div>
+
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endfor %}
+<!-- end of loop -->
+
 <table class="dataTable table  border border-dark" id="TableProviders">
 
     <thead>
@@ -105,59 +154,10 @@
             <td>{{ data.abbreviation}} </td>
 
 
-
-
             <td> <a class="dropdown-item" data-bs-toggle="modal"
                     data-bs-target="#provider_{{ data.id }}">
-                    <i class="bi bi-plus-circle-fill" ></i>
-                </a>
-                <div class="modal fade providersDetails" id="provider_{{ data.id }}" tabindex="-1"  aria-labelledby="provider_{{ data.id }}_Label">
-
-                    <div class="modal-dialog modal-dialog-scrollable">
-                        <form>
-                        <div class="modal-content">
-                            <div class="modal-header bg-light">
-                                <h5 class="modal-title text-center">Provider details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                        <div class="modal-body">
-                           <input type="hidden" id="logo_url_{{ data.id  }}" value="{{ data.logo }}"/>
-                            <div class="form-group m-2 text-center" >
-                                <div id="container_{{ data.id  }}"></div>
-                            </div>
-                            <br/><br/>
-
-                            <div class="form-group m-2" >
-                                <label for="name">Name</label>
-                                <input type="text" class="form-control" name="name" value="{{ data.name }}" disabled="true"/>
-                            </div>
-                            <div class="form-group m-2" >
-                                    <label for="sname">Short Name</label>
-                                    <input type="text" class="form-control" name="sname" value="{{ data.abbreviation }}" disabled="true"/>
-
-                            </div>
-                            <div class="form-group m-2" >
-
-                                    <label for="website">Web Site</label>
-                                    <input type="text" class="form-control" name="website" value="{{ data.website}}" disabled="true"/>
-
-                            </div>
-
-
-
-
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                        </div>
-                        </form>
-                    </div>
-
-                </div>
-            </td>
+                    <i class="bi bi-plus-circle-fill" style="font-size:2em;color: orange" ></i>
+                </a></td>
 
         </tr>
 
