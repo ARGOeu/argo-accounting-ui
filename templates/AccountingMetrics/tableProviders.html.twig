@@ -101,9 +101,12 @@
     {%  for id, data in tabProviders %}
         <tr>
             <td>{{ data.name }}</td>
+            {% if data.logo !='Not Found' %}
             <td><img src="{{ data.logo }}" width="80px" alt="{{ data.name }}"/> </td>
+            {% else %}
+                <td><i class="fa-solid fa-bomb"></i></td>
 
-
+            {% endif %}
         </tr>
 
     {% endfor %}
