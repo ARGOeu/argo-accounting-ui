@@ -93,6 +93,7 @@ class HomeController extends AbstractController
         $tabProviders=$result5->getArrayCopy();
 
         $project="-- Project --";
+        $projectName="";
         $provider="-- Provider --";
         $tabMetricsProject=null;
         $tabMetricsProvider=null;
@@ -100,8 +101,12 @@ class HomeController extends AbstractController
 
 
         if ($request->request->get('form') == 1) {
-                $project=$request->request->get('projectName');
+
+            $project=$request->request->get('projectId');
+            $projectName=$request->request->get('projectName');
             $provider=$request->request->get('providerName');
+
+
 
             if ($project!=0) {
                 $lavQuery = new Query($lavoisierUrl, 'listMetricsbyProject', 'lavoisier', 'xml', $lavoisierPort);
@@ -112,7 +117,7 @@ class HomeController extends AbstractController
                     $result = $lavQuery->execute();
                 } catch (CurlException $e) {
                 } catch (HTTPStatusException $e) {
-                    return new Response("Exception", 500);
+                    return new Response("Exception".$e, 500);
                 }
                 $tabMetricsProject=$result->getArrayCopy();
 
@@ -127,6 +132,7 @@ class HomeController extends AbstractController
             'tabProjects' =>$tabProjects,
             'tabProviders' =>$tabProviders,
             'project'=>$project,
+            'projectName'=>$projectName,
             'provider' => $provider,
             'tabMetricsProject'=>$tabMetricsProject,
             'tabMetricsProvider'=>$tabMetricsProvider

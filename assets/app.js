@@ -40,5 +40,6 @@ import 'select2/dist/css/select2.css'; // optional if you have css loader
 $(document).ready(function() {
 
     $('.select2-enable').select2();
+    $(".dataTable").dataTable();
 
 })

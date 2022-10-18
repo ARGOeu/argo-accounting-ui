@@ -2,13 +2,13 @@
 
         <div class="row">
 
-            <form class="form_browse_metrics" method="POST" action="metrics#metrics">
+            <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="metrics#metrics">
                 <input name="form" value="1" type="hidden"/>
                 <H3>Select a projet to browse associated metrics</H3>
                 <div class="form-group m-2">
                     <label for="projectName">Project</label>
 
-                    <select class="select2-enable form-control" name="projectName">
+                    <select class="select2-enable form-control" name="projectId">
 
                         {% if ( project==0 or project=='-- Project --') %}
                         <option value="0" selected>{{ project }}</option>

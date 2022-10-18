@@ -18,10 +18,15 @@
     {%  for id, data in tabProjects %}
         <tr>
             <td class="id">
-                <a
-                   href="{{ path('accounting-metrics_byProject', {'projectId': data.project_id }) }}">
-                    Metrics for project
-                </a>
+                <form class="form_browse" method="POST" action="metrics#metrics">
+                    <input name="form" value="1" type="hidden"/>
+
+                    <input type="hidden" name="providerName" value="undef"/>
+                    <input  type="hidden" name="projectName" value="{{ data.acronym }}"/>
+                    <input  type="hidden" name="projectId" value="{{ data.project_id }}"/>
+                    <input type="submit" class="btn btn-primary" value="Metrics for project">
+
+                </form>
             </td>
             <td class="acronym">{{ data.acronym }} </td>
             <td class="title">{{ data.title }} </td>
