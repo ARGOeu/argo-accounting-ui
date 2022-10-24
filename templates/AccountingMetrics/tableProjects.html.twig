@@ -2,14 +2,14 @@
 <hr/>
 
 
-<table class="dataTable table  border border-dark" id="TableProjects">
+<table class="dataTable table  border border-dark table-responsive" id="TableProjects">
 
     <thead>
     <tr>
-        <th>Project Id</th>
-        <th>Acronym</th>
-        <th>Title</th>
-        <th>Providers</th>
+        <th class="col-1">Link</th>
+        <th class="col-1">Acronym</th>
+        <th class="col-5">Title</th>
+        <th class="col-5">Providers</th>
     </tr>
     </thead>
 
@@ -23,7 +23,7 @@
 
                     <input type="hidden" name="providerName" value="undef"/>
                     <input  type="hidden" name="projectName" value="{{ data.acronym }}"/>
-                    <input  type="hidden" name="projectId" value="{{ data.project_id }}"/>
+                    <input  type="hidden" name="projectId" value="{{ data.id }}"/>
                     <input type="submit" class="btn btn-primary" value="Metrics for project">
 
                 </form>
@@ -33,7 +33,7 @@
             <td class="providers">
             {% for provider in data  %}
                 {%  if provider.name is defined %}
-                {{ provider.name }} -
+                {{ provider.name }} <br/>
                 {% endif %}
             {% endfor %}
             </td>

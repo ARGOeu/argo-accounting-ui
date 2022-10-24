@@ -14,11 +14,11 @@
                         <option value="0" selected>{{ project }}</option>
                         {% endif %}
                         {%  for project in tabProjects %}
-                            {% if project.project_id==project %}
+                            {% if project.id==project %}
                                 {% set projectName= project.title  %}
-                            <option value="{{project.project_id}}" selected>{{ project.title }}</option>
+                            <option value="{{project.id}}" selected>{{ project.acronym}}</option>
                             {% else %}
-                                <option value="{{project.project_id}}">{{ project.title }}</option>
+                                <option value="{{project.id}}">{{ project.acronym}}</option>
                             {% endif %}
 
                         {% endfor %}
