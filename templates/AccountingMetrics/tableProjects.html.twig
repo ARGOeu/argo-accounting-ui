@@ -162,6 +162,7 @@
                 type: "POST",
                 url: url,
                 data: dataUrl,
+                crossDomain: true,
 
                 beforeSend: function () {
                     $('#loader_remove_provider').removeClass('d-none');
@@ -202,6 +203,7 @@
                 type: "POST",
                 url: url,
                 data: dataUrl,
+                crossDomain: true,
                 beforeSend: function () {
                         $('#loader_add_provider').removeClass('d-none');
                 }});

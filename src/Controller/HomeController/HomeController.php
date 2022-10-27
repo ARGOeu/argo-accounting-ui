@@ -382,7 +382,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metricsEOSC/ajax/deleteInstallation",  name="delete_installation")
+     * @Route("/ajax/deleteInstallation",  name="delete_installation",schemes={"https"})
      *
      * ajax calls to remove installation
      * @param LavoisierService $lavoisierService
@@ -425,7 +425,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metricsEOSC/ajax/addInstallation",  name="add_installation")
+     * @Route("/ajax/addInstallation",  name="add_installation",schemes={"https"})
      *
      * ajax calls to add installation
      * @param LavoisierService $lavoisierService
@@ -471,7 +471,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metricsEOSC/ajax/associatesProviders",  name="associates_providers")
+     * @Route("/ajax/associatesProviders",  name="associates_providers" , schemes={"https"})
      *
      * ajax calls to associates providers to a project
      * @param LavoisierService $lavoisierService
@@ -516,7 +516,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metricsEOSC/ajax/addProvider",  name="add_provider")
+     * @Route("/ajax/addProvider",  name="add_provider" , schemes={"https"})
      *
      * form to get metrics provider list
      * @param LavoisierService $lavoisierService
@@ -565,7 +565,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metricsEOSC/ajax/modifyMetricsDescription",  name="modify_metric_description")
+     * @Route("/ajax/modifyMetricsDescription",  name="modify_metric_description" , schemes={"https"})
      *
      * form to get metrics provider list
      * @param LavoisierService $lavoisierService
