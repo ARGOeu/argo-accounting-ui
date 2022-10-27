@@ -41,7 +41,7 @@ class HomeController extends AbstractController
     public function index(): RedirectResponse
     {
         // redirects to the "homepage" route
-        return $this->redirectToRoute('metrics');
+        return $this->redirectToRoute('projects');
 
     }
 
