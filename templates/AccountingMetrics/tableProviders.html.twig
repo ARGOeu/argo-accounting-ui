@@ -1,170 +1,303 @@
-<h1>Providers Table</h1>
+{% extends 'base.html.twig' %}
 
-<div class="toast m-2" id="toast-prov-update-success">
-    <div class="toast-header">
-        <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-             preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-            <rect fill="#007a00" width="100%" height="100%"/>
-        </svg>
-        <strong class="me-auto">Status</strong>
-        <small>just now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast-update-success" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-        The provider has been properly added !
-    </div>
-</div>
+{% block stylesheets %}
 
-<div class="toast m-2" id="toast-prov-update-failure">
-    <div class="toast-header">
-        <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-             preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-            <rect fill="#ff0000" width="100%" height="100%"/>
-        </svg>
-        <strong class="me-auto">Status</strong>
-        <small>just now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-        The update has failed !
-    </div>
-</div>
-<div class="text-end">
-    <button class="btn btn-primary" id="addProvider" data-bs-toggle="modal" data-bs-target="#add_provider"> <i class="bi bi-plus-square me-1"></i> Add a new provider
-    </button>
-</div>
+{% endblock %}
 
-<!-- Modal ADD  -->
-<div class="modal fade" id="add_provider" tabindex="-1" aria-labelledby="add_provider_Label">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-
-            <div class="modal-header  bg-light">
-                <h5 class="modal-title text-center">Add Provider</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="form_add_provider">
-
-                    <div class="form-group m-2">
-                        <label for="metricName">Provider Id</label>
-                        <input type="text" class="form-control" name="providerId" id="providerId"    aria-describedby="providerIdHelp">
-                        <small id="providerIdHelp" class="form-text text-muted">An unique alpha-numeric identifier for the provider</small>
-                    </div>
-
-                    <div class="form-group m-2">
-                        <label for="metricName">Provider Name</label>
-                        <input type="text" class="form-control" name="providerName" id="providerName">
-                    </div>
-                    <div class="form-group m-2">
-                        <label for="providerNameAbrr">Provider Name Abbreviation</label>
-                        <input type="text" class="form-control" id="providerNameAbbr"
-                               name="providerNameAbbr" aria-describedby="providerNameAbbrHelp">
-                        <small id="providerNameAbbrHelp" class="form-text text-muted">A short name for the provider</small>
-                    </div>
-
-                    <div class="form-group m-2">
-                        <label for="metricName">Provider Website</label>
-                        <input type="text" class="form-control" name="providerWebSite" id="providerWebSite">
-                    </div>
-
-                    <div class="form-group m-2">
-                        <label for="metricName">Provider Logo</label>
-                        <input type="text" class="form-control" name="providerLogo" id="providerLogo" aria-describedby="providerLogoHelp">
-                        <small id="providerLogoHelp" class="form-text text-muted">An url pointing to the logo of the provider</small>
-                    </div>
+{% block body %}
+    <div class="row">
+        <div class="offset-1 col-10 mt-1 mb-3">
+            <h1><i class="bi bi-diagram-3-fill"></i>
+                Providers Table</h1>
+            <hr/>
 
 
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button class='d-none spinner-border text-primary m-1 bg-white' role='status' id="loader_add_provider"><span class='sr-only'>Loading...</span></button>
 
-                </form>
-
+            <div class="toast m-2" id="toast-prov-update-success">
+                <div class="toast-header">
+                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                        <rect fill="#007a00" width="100%" height="100%"/>
+                    </svg>
+                    <strong class="me-auto">Status</strong>
+                    <small>just now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast-update-success"
+                            aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The provider has been properly added !
+                </div>
             </div>
 
+            <div class="toast m-2" id="toast-prov-update-failure">
+                <div class="toast-header">
+                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                        <rect fill="#ff0000" width="100%" height="100%"/>
+                    </svg>
+                    <strong class="me-auto">Status</strong>
+                    <small>just now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The update has failed !
+                </div>
+            </div>
+{#            <div class="text-end">#}
+{#                <button class="btn btn-primary" id="addProvider" data-bs-toggle="modal" data-bs-target="#add_provider">#}
+{#                    <i class="bi bi-plus-square me-1"></i> Add a new provider#}
+{#                </button>#}
+{#            </div>#}
+
+            <!-- Modal ADD  -->
+            <div class="modal fade" id="add_provider" tabindex="-1" aria-labelledby="add_provider_Label">
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+
+                        <div class="modal-header  bg-light">
+                            <h5 class="modal-title text-center">Add Provider</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form_add_provider">
+
+                                <div class="form-group m-2">
+                                    <label for="metricName">Provider Id</label>
+                                    <input type="text" class="form-control" name="providerId" id="providerId"
+                                           aria-describedby="providerIdHelp">
+                                    <small id="providerIdHelp" class="form-text text-muted">An unique alpha-numeric
+                                        identifier for the provider</small>
+                                </div>
+
+                                <div class="form-group m-2">
+                                    <label for="metricName">Provider Name</label>
+                                    <input type="text" class="form-control" name="providerName" id="providerName">
+                                </div>
+                                <div class="form-group m-2">
+                                    <label for="providerNameAbrr">Provider Name Abbreviation</label>
+                                    <input type="text" class="form-control" id="providerNameAbbr"
+                                           name="providerNameAbbr" aria-describedby="providerNameAbbrHelp">
+                                    <small id="providerNameAbbrHelp" class="form-text text-muted">A short name for the
+                                        provider</small>
+                                </div>
+
+                                <div class="form-group m-2">
+                                    <label for="metricName">Provider Website</label>
+                                    <input type="text" class="form-control" name="providerWebSite" id="providerWebSite">
+                                </div>
+
+                                <div class="form-group m-2">
+                                    <label for="metricName">Provider Logo</label>
+                                    <input type="text" class="form-control" name="providerLogo" id="providerLogo"
+                                           aria-describedby="providerLogoHelp">
+                                    <small id="providerLogoHelp" class="form-text text-muted">An url pointing to the
+                                        logo of the provider</small>
+                                </div>
+
+
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button class='d-none spinner-border text-primary m-1 bg-white' role='status'
+                                        id="loader_add_provider"><span class='sr-only'>Loading...</span></button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- This loop for bootstrap modals should be done outside of the table -->
+            <!-- otherwise the dynamic ajax call will not work because of the inexisting dom -->
+            {% for id, data in tabProviders %}
+                <div class="modal fade providersDetails" id="provider_{{ data.id }}" tabindex="-1"
+                     aria-labelledby="provider_{{ data.id }}_Label">
+
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <form>
+                            <div class="modal-content">
+                                <div class="modal-header bg-light">
+                                    <h5 class="modal-title text-center">Provider details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <input type="hidden" id="logo_url_{{ data.id }}" value="{{ data.logo }}"/>
+                                    <div class="form-group m-2 text-center">
+                                        <div id="container_{{ data.id }}"></div>
+                                    </div>
+                                    <br/><br/>
+                                    <div class="form-group m-2">
+                                        <label for="name">Name</label>
+                                        <input type="text" class="form-control" name="name" value="{{ data.name }}"
+                                               disabled="true"/>
+                                    </div>
+                                    <div class="form-group m-2">
+                                        <label for="sname">Short Name</label>
+                                        <input type="text" class="form-control" name="sname"
+                                               value="{{ data.abbreviation }}" disabled="true"/>
+
+                                    </div>
+                                    <div class="form-group m-2">
+
+                                        <label for="website">Web Site</label>
+                                        <input type="text" class="form-control" name="website"
+                                               value="{{ data.website }}" disabled="true"/>
+
+                                    </div>
+
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            {% endfor %}
+            <!-- end of loop -->
+
+            <table class="dataTable table  border border-dark" id="TableProviders">
+
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Short Name</th>
+                    <th>Details</th>
+
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for id, data in tabProviders %}
+                    <tr>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.abbreviation }} </td>
+
+
+                        <td><a class="dropdown-item" data-bs-toggle="modal"
+                               data-bs-target="#provider_{{ data.id }}">
+                                <i class="bi bi-plus-circle-fill" style="font-size:2em;color: orange"></i>
+                            </a></td>
+
+                    </tr>
+
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
         </div>
     </div>
-</div>
-
-<!-- This loop for bootstrap modals should be done outside of the table -->
-<!-- otherwise the dynamic ajax call will not work because of the inexisting dom -->
-{%  for id, data in tabProviders %}
-<div class="modal fade providersDetails" id="provider_{{ data.id }}" tabindex="-1"  aria-labelledby="provider_{{ data.id }}_Label">
-
-    <div class="modal-dialog modal-dialog-scrollable">
-        <form>
-            <div class="modal-content">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title text-center">Provider details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <input type="hidden" id="logo_url_{{ data.id  }}" value="{{ data.logo }}"/>
-                    <div class="form-group m-2 text-center" >
-                        <div id="container_{{ data.id  }}"></div>
-                    </div>
-                    <br/><br/>
-                    <div class="form-group m-2" >
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" name="name" value="{{ data.name }}" disabled="true"/>
-                    </div>
-                    <div class="form-group m-2" >
-                        <label for="sname">Short Name</label>
-                        <input type="text" class="form-control" name="sname" value="{{ data.abbreviation }}" disabled="true"/>
-
-                    </div>
-                    <div class="form-group m-2" >
-
-                        <label for="website">Web Site</label>
-                        <input type="text" class="form-control" name="website" value="{{ data.website}}" disabled="true"/>
-
-                    </div>
 
 
+{% endblock %}
+{% block javascripts %}
+    <script>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-
-</div>
-{% endfor %}
-<!-- end of loop -->
-
-<table class="dataTable table  border border-dark" id="TableProviders">
-
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Short Name</th>
-        <th>Details</th>
-
-    </tr>
-    </thead>
-
-    <tbody>
-    {%  for id, data in tabProviders %}
-        <tr>
-            <td>{{ data.name }}</td>
-            <td>{{ data.abbreviation}} </td>
+        $(document).on('submit','.form_add_provider',function(event) {
+            event.preventDefault(); // cancel default behavior
 
 
-            <td> <a class="dropdown-item" data-bs-toggle="modal"
-                    data-bs-target="#provider_{{ data.id }}">
-                    <i class="bi bi-plus-circle-fill" style="font-size:2em;color: orange" ></i>
-                </a></td>
+            var id = $(this).find('input[name="providerId"]').val().trim();
+            var name = $(this).find('input[name="providerName"]').val().trim();
+            var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();
+            var logo = $(this).find('input[name="providerLogo"]').val().trim();
+            var website = $(this).find('input[name="providerWebSite"]').val().trim();
 
-        </tr>
+            dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website;
 
 
-    {% endfor %}
+            let url= "{{ url('add_provider') }}";
+            let redirection="{{ url('metrics')}}#providers";
 
-    </tbody>
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
 
-</table>
+                beforeSend: function () {
+                    $('#loader_add_provider').removeClass('d-none');
+                }});
 
+            request.done(function (output_success) {
+                $("#toast-prov-update-success > .toast-body").html(output_success);
+                $("#toast-prov-update-success").toast("show");
+
+                $("#add_provider").modal('hide');
+                $('#loader_add_provider').addClass('d-none');
+
+                window.setTimeout(function(){
+                    window.location.href=redirection;
+                }, 5000);
+
+
+            })
+
+            request.fail(function (xhr, status, error) {
+
+                $("#toast-prov-update-failure > .toast-body").html(xhr.responseText);
+                $("#toast-prov-update-failure").toast("show");
+
+                $("#add_provider").modal('hide');
+
+
+            });
+        });
+
+        $(document).ready(function () {
+            $('.providersDetails').on('shown.bs.modal', function () {
+
+
+                let Id = $(this).attr('id').split('provider_')[1];
+                var url = $("#logo_url_" + Id).val();
+                var canvas = $("#container_" + Id);
+                canvas.append('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>');
+
+                if (url !== 'Not found') {
+                    checkIfImageExists(url, (exists) => {
+                        if (exists) {
+                            let img = document.createElement('img');
+                            img.src = url;
+                            img.width = "200";
+                            canvas.empty();
+                            canvas.append(img);
+                        } else {
+                            canvas.empty();
+                            canvas.append('<i class="bi bi-radioactive" style="font-size: 3rem;"></i><br/>Image Not found');
+                        }
+                    });
+                } else {
+                    canvas.empty();
+                    canvas.append('<i class="bi bi-radioactive" style="font-size: 3rem;"></i><br/>Image Not found');
+                }
+
+
+            });
+
+            function checkIfImageExists(url, callback) {
+                const img = new Image();
+                img.src = url;
+
+                if (img.complete) {
+                    callback(true);
+                } else {
+                    img.onload = () => {
+                        callback(true);
+                    };
+
+                    img.onerror = () => {
+                        callback(false);
+                    };
+                }
+            }
+        });
+
+    </script>
+{% endblock %}

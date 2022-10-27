@@ -5,6 +5,11 @@
 @import 'layout/footer';
 @import 'layout/dataTable-bs5';
 
+.no-sort::before { display: none!important; }
+
+.no-sort::after { display: none!important; }
+
+.no-sort { pointer-events: none!important; cursor: default!important; }
 
 .dt-buttons {
   float: right;

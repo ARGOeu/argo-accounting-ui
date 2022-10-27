@@ -1,14 +1,152 @@
-{%  if tabMetricsProject!=null %}
-<div>
+{% extends 'base.html.twig' %}
 
-    <h3><i class="bi bi-bar-chart"></i> Metrics Table for project : {{ projectName }}</h3>
-<hr/>
+{% block stylesheets %}
+
+{%  endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <H3>Browse metrics</H3>
+    </div>
+
+        <div class="row">
+
+
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+
+                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_1" value="btn_selection_1" autocomplete="off" {% if  (tabMetricsDetails!=null and parameters.projectId != 0 and parameters.provider == 0) or tabMetricsDetails==null %}checked {% endif %}>
+                <label class="btn btn-outline-primary text-dark" for="btn_selection_1">Browse by Project</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_2" value="btn_selection_2"  autocomplete="off" {% if  tabMetricsDetails!=null and parameters.provider != 0 %}checked {% endif %}>
+                <label class="btn btn-outline-primary text-dark" for="btn_selection_2">Browse by Project and Provider</label>
+
+                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_3" value="btn_selection_3"  autocomplete="off" {% if  tabMetricsDetails!=null and parameters.installation != 0 %}checked {% endif %}>
+                <label class="btn btn-outline-primary text-dark" for="btn_selection_3">Browse by Installation</label>
+            </div>
+
+
+        </div>
+
+    <div class="row m-4 selection" id="selection_1">
+
+        <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
+            <input type="hidden" name="case" value="1">
+            <div class="col">
+
+
+
+                <div class="form-group">
+                    <label for="project" class="text-muted">Please select a project</label>
+                    <select id="project" class="select2-enable form-control form-select" name="project">
+
+
+                            <option value="0" selected> -- Projects --</option>
+
+                        {%  for project in tabProjects %}
+                            {% if project.id==project %}
+                                {% set projectName= project.title  %}
+                                <option value="{{project.id}}" selected>{{ project.acronym}}</option>
+                            {% else %}
+                                <option value="{{project.id}}">{{ project.acronym}}</option>
+                            {% endif %}
+
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+            </div>
+            <div class="col">
+                <button type="submit" class="submit btn btn-primary mt-3" value="submit_project">Submit</button>
+            </div>
+        </form>
+
+    </div>
+
+        <div class="row m-4 selection d-none" id="selection_2">
+
+            <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
+                <input type="hidden" name="case" value="2">
+            <div class="col">
+
+
+                <div class="form-group">
+                    <label for="project_provider" class="text-muted">Please select an association of project and provider</label>
+
+                    <select class="select2-enable form-control form-select"  id="project_provider" name="project_provider">
+
+                        <option value="0" selected> -- Projects / Providers --</option>
+
+                        {%  for project in tabProjects %}
+                            {%  for provider in project %}
+                                {%  if provider.name is defined %}
+                                <option value="{{project.id}}___{{ provider.id}}">{{ project.acronym}} / {{ provider.name}} </option>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+            </div>
+            <div class="col">
+                <button type="submit" class="submit btn btn-primary mt-3" value="submit_project_provider">Submit</button>
+            </div>
+            </form>
+
+        </div>
+
+        <div class="row m-4 selection d-none" id="selection_3">
+            <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
+                <input type="hidden" name="case" value="3">
+
+            <div class="col">
+
+                <div class="form-group">
+                    <label for="installation" class="text-muted">Please select an installation</label>
+                    <select class="select2-enable form-control  form-control form-select" name="installation" id="installation">
+                        <option value="0" selected> -- Installations --</option>
+                        {%  for installation in tabInstallations %}
+                                    <option value="{{installation.id}}">{{ installation.installation}} -  {{ installation.organisation}} - {{ installation.infrastructure}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+            </div>
+            <div class="col">
+                <button type="submit" class="submit btn btn-primary mt-3" value="submit_installation">Submit</button>
+            </div>
+            </form>
+        </div>
+
+
+
+{%  if tabMetricsDetails!=null %}
+    <hr class="text-dark"/>
+    <h3><i class="bi bi-bar-chart"></i> Metrics Table </h3>
+    {%  if parameters.projectId != 0 %}
+        <h5 class="text-muted"><span class="text-dark">Project</span> > {{  tabProjects[parameters.projectId].title }}</h5>
+    {% endif %}
+
+    {%  if parameters.provider != 0 %}
+        <h5 class="text-muted"> <span class="text-dark">Provider</span> > {{  tabProviders[parameters.provider].name }} </h5>
+    {% endif %}
+
+    {%  if parameters.installation != 0 %}
+        <h5 class="text-muted"> <span class="text-dark">Installation</span> > {{  tabInstallations[parameters.installation].installation }} -  {{  tabInstallations[parameters.installation].organisation }}</h5>
+    {% endif %}
+
+
+
 
 <table class="dataTable table  border border-dark" id="TableMetricsProject">
 
     <thead>
     <tr>
-        {#        <th>Resource Id</th>#}
+{#        <th>Resource Id</th>#}
         <th>Start</th>
         <th>End</th>
         <th>Value</th>
@@ -16,70 +154,70 @@
         <th>Metric Type</th>
         <th>Metric Description</th>
         <th>Provider</th>
-        <th>Install</th>
+
     </tr>
     </thead>
 
     <tbody>
-    {%  for id, data in tabMetricsProject %}
+    {%  for data in tabMetricsDetails %}
+
+
         <tr>
-            {#            <td class="name">{{ data.resourceId }} </td>#}
-            <td class="start">{{ data.time_period_start }} </td>
-            <td class="end">{{ data.time_period_end }} </td>
-            <td class="value">{{ data.value }}</td>
+{#            <td class="name">{{ data.resourceId }} </td>#}
+
+            {% if data.time_period_start is defined %}
+                <td class="start">{{ data.time_period_start }} </td>
+            {% else %}
+                <td></td>
+            {% endif %}
+
+            {% if data.time_period_end  is defined %}
+                <td class="end">{{ data.time_period_end  }} </td>
+            {% else %}
+                <td></td>
+            {% endif %}
+
+            {% if data.value  is defined %}
+                <td class="value">{{ data.value   }} </td>
+            {% else %}
+                <td></td>
+            {% endif %}
+
+
             <td class="unit">{{ data.unit_type }}</td>
             <td>{{ data.metric_type }}</td>
             <td>{{ data.metric_description }}</td>
             <td class="provider">{{ data.provider }}</td>
 {#            <td class="install">{{ data.installation }}</td>#}
         </tr>
+        {% endfor %}
 
-    {% endfor %}
 
     </tbody>
 
 </table>
 
+
+
+{% endif %}
+
+
 </div>
 
-{% endif %}
+{% endblock %}
 
-{%  if tabMetricsProvider!=null %}
-    <div>
+{% block javascripts %}
+    <script>
+        $(document).on('change','input[name="btnradio"]',function(event) {
+        var id=$('input[name="btnradio"]:checked').val().split('btn_')[1];
+            $(".selection").addClass('d-none');
+            $(".selection").find('select').addClass('select2-hidden-accessible');
+            $(".selection").find('select').addClass('form-control form-select');
+            $("#"+id).removeClass('d-none');
+            $("#"+id ).find('select').removeClass('select2-hidden-accessible');
+        });
 
-        <h3><i class="bi bi-bar-chart"></i> Metrics Table for provider {{ provider }}</h3>
-        <hr/>
 
-        <table class="dataTable table  border border-dark" id="TableMetricsProvider">
 
-            <thead>
-            <tr>
-                {#        <th>Resource Id</th>#}
-                <th>Start</th>
-                <th>End</th>
-                <th>Value</th>
-                <th>Provider</th>
-                <th>Install</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            {%  for id, data in tabMetricsProvider %}
-                <tr>
-                    {#            <td class="name">{{ data.resourceId }} </td>#}
-                    <td class="start">{{ data.time_period_start }} </td>
-                    <td class="end">{{ data.time_period_end }} </td>
-                    <td class="value">{{ data.value }}</td>
-                    <td class="provider">{{ data.provider }}</td>
-{#                    <td class="install">{{ data.installation }}</td>#}
-                </tr>
-
-            {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-{% endif %}
+    </script>
+{% endblock %}

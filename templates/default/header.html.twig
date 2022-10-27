@@ -50,25 +50,29 @@
 
                 <div class="uk-navbar-right align-self-center">
                 <ul id="mainTab" class="uk-navbar-nav nav nav-tabs ">
+                    {% set current_path = app.request.get('_route') %}
                     <li class="nav-item">
-                        <a href="#projects" class="nav-link" data-toggle="tab" data-target="#projects">Projects</a>
+                        <a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">Projects</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#providers" class="nav-link" data-toggle="tab" data-target="#providers">Providers</a>
+                        <a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#def" class="nav-link" data-toggle="tab" data-target="#def">Metrics Definitions</a>
+                        <a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >Installations</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#units" class="nav-link" data-toggle="tab" data-target="#units">Metrics Units</a>
+                        <a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#types" class="nav-link" data-toggle="tab" data-target="#types">Metrics Type</a>
+                        <a href="{{ path('metrics-types') }}" class="nav-link {% if current_path == 'metrics-types' %}  active {% endif %}">Metrics Type</a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#metrics" class="nav-link" data-toggle="tab" data-target="#metrics">Metrics</a>
+                        <a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Metrics</a>
                     </li>
                 </ul>
                 </div>

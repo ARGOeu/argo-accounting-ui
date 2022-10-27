@@ -1,4 +1,15 @@
-<h1>Metrics Definitions</h1>
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{%  endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="offset-1 col-10 mt-1 mb-3">
+            <h1><i class="bi bi-clipboard-data"></i>
+                Metrics definition</h1>
+            <hr/>
 
 <div class="toast m-2" id="toast-update-success">
     <div class="toast-header">
@@ -83,7 +94,11 @@
 
 
                     <button type="submit" class="btn btn-primary">Submit</button>
-                    <button class='d-none spinner-border text-primary m-1 bg-white' role='status' id="loader_add"><span class='sr-only'>Loading...</span></button>
+
+                    <div class="ms-2 d-none spinner-border text-primary" id="loader_add" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+
 
                 </form>
 
@@ -254,6 +269,93 @@
 
     </tbody>
 </table>
+
+</div>
+</div>
+
+
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(document).on('submit','.form_add_metric_desc, .form_update_metric_desc, .form_delete_metric_desc',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+            let metricId=  $(this).find('input[name="metricId"]').val().trim();
+            let type=  $(this).find('input[name="type"]').val().trim();
+            let dataUrl;
+
+            if (type === 'delete') {
+                dataUrl = 'type=' + type + '&metricId=' + metricId;
+
+            } else {
+                var metricDescription = $(this).find('input[name="metricDescription"]').val().trim();
+                var metricName = $(this).find('input[name="metricName"]').val().trim();
+                var metricUnit = $(this).find('select[name="metricUnit"] > option:selected').val().trim();
+                var metricType = $(this).find('select[name="metricType"] > option:selected').val().trim();
+                dataUrl = 'type=' + type + '&metricId=' + metricId + '&metricDescription=' + metricDescription + '&metricName=' + metricName + '&metricUnit=' + metricUnit + '&metricType=' + metricType;
+            }
+
+            let url= "{{ url('modify_metric_description') }}";
+            let redirection="{{ url('metrics-definitions')}}";
+
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+
+                beforeSend: function () {
+                    if (type==='addition')
+                        $('#loader_add').removeClass('d-none');
+                }});
+
+            request.done(function (output_success) {
+                $("#toast-update-success > .toast-body").html(output_success);
+                $("#toast-update-success").toast("show");
+
+                if (type==='update') {
+
+                    $("#tr_"+metricId).find('td.metricName').text(metricName);
+                    $("#tr_"+metricId).find('td.metricDescription').text(metricDescription);
+                    $("#tr_"+metricId).find('td.metricUnit').text(metricUnit);
+                    $("#tr_"+metricId).find('td.metricType').text(metricType);
+                    $("#update_" + metricId).modal('hide');
+
+
+
+                }
+                if (type==='addition') {
+                    $("#add_metric_desc").modal('hide');
+                    $('#loader_add').addClass('d-none');
+                    window.location.href=redirection;
+
+                }
+                if (type==='delete') {
+                    $("#delete_" + metricId).modal('hide');
+                    $("#tr_"+metricId).addClass('d-none');
+
+                }
+
+
+            });
+            request.fail(function (xhr, status, error) {
+
+                $("#toast-update-failure > .toast-body").html(xhr.responseText);
+                $("#toast-update-failure").toast("show");
+
+                if (type==='update')
+                    $("#update_"+metricId).modal('hide');
+                if (type==='addition')
+                    $("#add_metric_desc").modal('hide');
+                if (type==='delete')
+                    $("#delete_"+metricId).modal('hide');
+
+            });
+
+
+        });
+
+    </script>
+{% endblock %}
 
 
 

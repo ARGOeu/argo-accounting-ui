@@ -1,7 +1,19 @@
-<h1>Metrics Units</h1>
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{%  endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="offset-1 col-10 mt-1 mb-3">
+        <h1><i class="bi bi-bar-chart-steps"></i>
+             Metrics Units</h1>
+        <hr/>
 
 
-<table class="dataTable table  border border-dark" id="TableUnits">
+
+        <table class="dataTable table  border border-dark" id="TableUnits">
 
     <thead>
     <tr>
@@ -23,4 +35,13 @@
     </tbody>
 
 </table>
+
+    </div>
+</div>
+
+
+{% endblock %}
+{% block javascripts %}
+{% endblock %}
+
 

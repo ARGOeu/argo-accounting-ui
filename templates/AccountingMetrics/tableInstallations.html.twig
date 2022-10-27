@@ -1,0 +1,296 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{%  endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="offset-1 col-10 mt-1 mb-3">
+            <h1><i class="bi bi-bar-chart-steps"></i>
+                Installations  <div class="ms-2 d-none spinner-border text-primary" id="loader_remove_installation" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </h1>
+            <hr/>
+
+            <div class="toast m-2" id="toast-update-success">
+                <div class="toast-header">
+                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                        <rect fill="#007a00" width="100%" height="100%"/>
+                    </svg>
+                    <strong class="me-auto">Status</strong>
+                    <small>just now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast-update-success" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The installation has been properly added !
+                </div>
+            </div>
+
+            <div class="toast m-2" id="toast-update-failure">
+                <div class="toast-header">
+                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                        <rect fill="#ff0000" width="100%" height="100%"/>
+                    </svg>
+                    <strong class="me-auto">Status</strong>
+                    <small>just now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    The update has failed !
+                </div>
+            </div>
+
+                        <div class="text-end">
+                            <button class="btn btn-primary" id="addInstallation" data-bs-toggle="modal" data-bs-target="#add_installation">
+                                <i class="bi bi-plus-square me-1"></i> Add a new installation
+                            </button>
+                        </div>
+
+            <!-- Modal ADD  -->
+            <div class="modal fade" id="add_installation" tabindex="-1" aria-labelledby="add_installation_Label">
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+
+                        <div class="modal-header  bg-light">
+                            <h5 class="modal-title text-center">Add installation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form_add_installation">
+
+
+                                <div class="form-group m-2">
+                                    <label for="project_id" class="m-1">Select your Project</label>
+                                    <select class="form-control form-select projects" id="project_id" name="project_id">
+                                        {% for project in tabProjects %}
+                                            <option value="{{ project.id }}">{{ project.acronym }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+
+                                    {% for project in tabProjects %}
+                                        {%  if loop.index==1 %}
+                                            <div class="form-group m-2 providers" id="providers_{{ project.id }}">
+                                                <label for="providers" class="m-1">Associates a new provider</label>
+                                                <select class="form-control form-select" id="providers_select_{{ project.id }}"  name="providers" >
+
+                                                            {% for provider in project  %}
+                                                                {%  if provider.name is defined %}
+                                                                 <option value="{{ provider.id}}">{{ provider.name }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+
+
+                                                </select>
+                                            </div>
+                                    {% else %}
+                                        <div class="form-group m-2 d-none  providers" id="providers_{{ project.id }}">
+                                            <label for="providers" class="m-1">Associates a new provider</label>
+                                            <select class="form-control form-select"  id="providers_select_{{ project.id }}" name="providers" >
+
+                                                {% for provider in project  %}
+                                                    {%  if provider.name is defined %}
+                                                        <option value="{{ provider.id}}">{{ provider.name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+
+
+                                            </select>
+                                        </div>
+                                        {% endif %}
+
+                                    {% endfor %}
+
+
+                                <div class="form-group m-2">
+                                    <label for="installation" class="m-1">Installation Name</label>
+                                    <input type="text" class="form-control" name="installation" id="installation"
+                                           aria-describedby="installationHelp">
+                                    <small id="installationHelp" class="form-text text-muted">Short name of the installation</small>
+                                </div>
+
+                                <div class="form-group m-2">
+                                    <label for="infra" class="m-1">Infrastructure</label>
+                                    <input type="text" class="form-control" name="infra" id="infra"
+                                           aria-describedby="infraHelp">
+                                    <small id="infraHelp" class="form-text text-muted">Short name of infrastructure</small>
+                                </div>
+
+                                <div class="form-group m-2">
+                                    <label for="metric_definition" class="m-1">Metric Definition</label>
+                                    <select class="form-control form-select" id="metric_definition" name="metric_definition" >
+                                        {% for def in tabMetricsDef %}
+                                            <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
+                                        {% endfor %}
+
+                                    </select>
+
+
+                                </div>
+
+
+                                <button type="submit" class="btn btn-primary">Submit</button>
+
+                                <div class="ms-2 d-none spinner-border text-primary" id="loader_add_installation" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <table class="dataTable table  border border-dark" id="TableUnits">
+
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Project</th>
+                    <th>Organization</th>
+                    <th>Infrastructure</th>
+                    <th>Metric Name: Description (Unit Type - Metric Type)</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {%  for id, installation in tabInstallations %}
+                    <tr>
+
+                        <td>{{ installation.installation}}</td>
+                        {%  for project in tabProjects %}
+                            {% if project.id==installation.project %}
+                            <td>{{ project.acronym }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        <td>{{ installation.organisation}}</td>
+                        <td>{{ installation.infrastructure}}</td>
+                        <td>
+
+                            <ul>
+                                    <li>
+                                        {{ installation.metrics.metric_name }} : {{ installation.metrics.metric_description}} ({{ installation.metrics.unit_type}} - {{  installation.metrics.metric_type}})
+                                    </li>
+
+                            </ul>
+
+                        </td>
+                        <td> <a class="deleteInstallation" id="delete_{{ installation.id }}" ><i class="bi bi-trash-fill"></i></a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+{% block javascripts %}
+
+    <script>
+
+        $(document).on('change','#project_id',function(event) {
+
+            var projectId = $('#project_id > option:selected').val().trim();
+            $(".providers").addClass('d-none');
+            $('#providers_'+projectId).removeClass('d-none');
+        });
+
+        $(document).on('click','.deleteInstallation',function(event) {
+            event.preventDefault();
+
+            var installationId= $(this).attr('id').split('delete_')[1];
+
+            var dataUrl="installation_id="+installationId;
+
+            let url= "{{ url('delete_installation') }}";
+            let redirection="{{ url('installations')}}";
+
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+
+                beforeSend: function () {
+                    $('#loader_remove_installation').removeClass('d-none');
+                }});
+
+            request.done(function (output_success) {
+                $("#toast-update-success > .toast-body").html(output_success);
+                $("#toast-update-success").toast("show");
+                $('#loader_remove_installation').addClass('d-none');
+                window.location.href=redirection;
+
+
+            });
+            request.fail(function (xhr, status, error) {
+                $('#loader_remove_installation').addClass('d-none');
+                $("#toast-update-failure > .toast-body").html(xhr.responseText);
+                $("#toast-update-failure").toast("show");
+
+
+            });
+
+        });
+
+    $(document).on('submit','.form_add_installation',function(event) {
+        event.preventDefault(); // cancel default behavior
+
+
+        var projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
+        var provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
+
+        var installation = $(this).find('input[name="installation"]').val().trim();
+        var infra = $(this).find('input[name="infra"]').val().trim();
+        var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
+
+        var dataUrl = "project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
+
+        let url = "{{ url('add_installation') }}";
+        let redirection = "{{ url('installations') }}";
+
+        let request = $.ajax({
+            type: "POST",
+            url: url,
+            data: dataUrl,
+            beforeSend: function () {
+                $('#loader_add_installation').removeClass('d-none');
+            }});
+
+        request.done(function (output_success) {
+            $("#toast-update-success > .toast-body").html(output_success);
+            $("#toast-update-success").toast("show");
+            $("#add_installation").modal('hide');
+            $('#loader_add_installation').addClass('d-none');
+           // window.location.href=redirection;
+
+
+        });
+        request.fail(function (xhr, status, error) {
+
+            $("#toast-update-failure > .toast-body").html(xhr.responseText);
+            $("#toast-update-failure").toast("show");
+            $("#add_installation").modal('hide');
+
+
+        });
+    });
+    </script>
+{% endblock %}
