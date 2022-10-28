@@ -395,7 +395,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/ajax/deleteInstallation",  name="delete_installation",schemes: ['https'])
+     * @Route("/ajax/deleteInstallation",  name="delete_installation")
      *
      * ajax calls to remove installation
      * @param LavoisierService $lavoisierService
@@ -438,7 +438,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/ajax/addInstallation",  name="add_installation",schemes: ['https'])
+     * @Route("/ajax/addInstallation",  name="add_installation")
      *
      * ajax calls to add installation
      * @param LavoisierService $lavoisierService
