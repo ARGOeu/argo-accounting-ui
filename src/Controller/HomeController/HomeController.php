@@ -380,11 +380,10 @@ class HomeController extends AbstractController
             $res = $lavQuery->execute();
             sleep(1);
 
-
             $lavQueryNotify = new Query($lavoisierUrl, 'listProjects', 'notify', 'xml', $lavoisierPort);
             $lavQueryNotify->execute();
 
-            sleep(3);
+
 
             return new Response('<em>' . $message1 . '</em>', 200);
 
@@ -413,8 +412,8 @@ class HomeController extends AbstractController
 
 
         $lavQuery = new Query($lavoisierUrl, 'deleteInstallation', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The installation has been removed successfully :' . serialize($array_POST);
-        $message2 = 'The deletion has failed :' . serialize($array_POST);
+        $message1 = 'The installation has been removed successfully';
+        $message2 = 'The deletion has failed';
 
         try {
             $lavQuery->setMethod('POST');
@@ -422,12 +421,11 @@ class HomeController extends AbstractController
             $res = $lavQuery->execute();
 
 
-            sleep(3);
+            sleep(2);
 
             $lavQueryNotify = new Query($lavoisierUrl, 'listInstallations', 'notify', 'xml', $lavoisierPort);
             $lavQueryNotify->execute();
 
-            sleep(3);
 
             return new Response('<em>' . $message1 . '</em>', 200);
 
@@ -473,8 +471,6 @@ class HomeController extends AbstractController
             $lavQueryNotify = new Query($lavoisierUrl, 'listInstallations', 'notify', 'xml', $lavoisierPort);
             $lavQueryNotify->execute();
 
-            sleep(4);
-
 
             return new Response('<em>' . $message1 . '</em>', 200);
 
@@ -504,7 +500,7 @@ class HomeController extends AbstractController
 
 
         $lavQuery = new Query($lavoisierUrl, 'associatesProvider', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The new provider(s) has been added successfully';
+        $message1 = 'The new provider has been added successfully';
         $message2 = 'The creation of a new provider has failed';
 
         try {
@@ -519,7 +515,7 @@ class HomeController extends AbstractController
             $lavQueryNotify = new Query($lavoisierUrl, 'listProjects', 'notify', 'xml', $lavoisierPort);
             $lavQueryNotify->execute();
 
-            sleep(4);
+
 
             return new Response('<em>' . $message1 . '</em>', 200);
 

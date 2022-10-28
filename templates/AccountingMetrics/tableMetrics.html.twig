@@ -37,7 +37,7 @@
 
                 <div class="form-group">
                     <label for="project" class="text-muted">Please select a project</label>
-                    <select id="project" class="select2-enable form-control form-select" name="project">
+                    <select id="project" class="form-control form-select" name="project">
 
 
                             <option value="0" selected> -- Projects --</option>
@@ -53,6 +53,14 @@
                         {% endfor %}
                     </select>
                 </div>
+
+{#                <div class="form-group">#}
+{#                    <label for="datetimes" class="text-muted">Select the date range</label>#}
+{#                    <div id="reportrange" class="form-control form-select">#}
+{#                        <i class="bi bi-calendar-check"></i>&nbsp;#}
+{#                        <span></span> <i class="fa fa-caret-down"></i>#}
+{#                    </div>#}
+{#                </div>#}
 
 
             </div>
@@ -74,7 +82,7 @@
                 <div class="form-group">
                     <label for="project_provider" class="text-muted">Please select an association of project and provider</label>
 
-                    <select class="select2-enable form-control form-select"  id="project_provider" name="project_provider">
+                    <select class="form-control form-select"  id="project_provider" name="project_provider">
 
                         <option value="0" selected> -- Projects / Providers --</option>
 
@@ -107,7 +115,7 @@
 
                 <div class="form-group">
                     <label for="installation" class="text-muted">Please select an installation</label>
-                    <select class="select2-enable form-control  form-control form-select" name="installation" id="installation">
+                    <select class="form-control  form-control form-select" name="installation" id="installation">
                         <option value="0" selected> -- Installations --</option>
                         {%  for installation in tabInstallations %}
                                     <option value="{{installation.id}}">{{ installation.installation}} -  {{ installation.organisation}} - {{ installation.infrastructure}}</option>
@@ -215,6 +223,7 @@
     <script>
 
 
+
         $(document).on('change','input[name="btnradio"]',function(event) {
         var id=$('input[name="btnradio"]:checked').val().split('btn_')[1];
             $(".selection").addClass('d-none');
@@ -224,7 +233,30 @@
             $("#"+id ).find('select').removeClass('select2-hidden-accessible');
         });
 
+        $(function() {
+            var start = moment().subtract(29, 'days');
+            var end = moment();
 
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#reportrange').daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+            cb(start, end);
+
+        });
 
     </script>
 {% endblock %}

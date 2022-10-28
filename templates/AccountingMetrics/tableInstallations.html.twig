@@ -149,7 +149,7 @@
                 </div>
             </div>
 
-            <table class="dataTable table  border border-dark" id="TableUnits">
+            <table class="dataTable table  border border-dark" id="TableInstallations">
 
                 <thead>
                 <tr>
@@ -164,7 +164,7 @@
 
                 <tbody>
                 {%  for id, installation in tabInstallations %}
-                    <tr>
+                    <tr id="installation_{{ installation.id }}">
 
                         <td>{{ installation.installation}}</td>
                         {%  for project in tabProjects %}
@@ -222,6 +222,7 @@
 
             let url= "{{ url('delete_installation') }}";
             let redirection="{{ url('installations')}}";
+            let rowId="#installation_"+installationId;
 
             let request = $.ajax({
                 type: "POST",
@@ -236,7 +237,8 @@
                 $("#toast-update-success > .toast-body").html(output_success);
                 $("#toast-update-success").toast("show");
                 $('#loader_remove_installation').addClass('d-none');
-                window.location.href=redirection;
+
+                $("#TableInstallations tbody").find(rowId).remove();
 
 
             });
@@ -244,7 +246,6 @@
                 $('#loader_remove_installation').addClass('d-none');
                 $("#toast-update-failure > .toast-body").html(xhr.responseText);
                 $("#toast-update-failure").toast("show");
-
 
             });
 
@@ -255,16 +256,18 @@
 
 
         var projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
+        var project = $('#project_id > option:selected').text().trim();
         var provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
 
         var installation = $(this).find('input[name="installation"]').val().trim();
         var infra = $(this).find('input[name="infra"]').val().trim();
         var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
+        var metric = $(this).find('select[name="metric_definition"] > option:selected').text().trim();
 
         var dataUrl = "project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
 
         let url = "{{ url('add_installation') }}";
-        let redirection = "{{ url('installations') }}";
+
 
         let request = $.ajax({
             type: "POST",
@@ -280,8 +283,10 @@
             $("#toast-update-success").toast("show");
             $("#add_installation").modal('hide');
             $('#loader_add_installation').addClass('d-none');
-           // window.location.href=redirection;
 
+
+            var table = $('#TableInstallations').DataTable();
+            table.row.add( [installation,project, provider,infra,"<ul><li>"+metric+"</ul></li>",""]).draw();
 
         });
         request.fail(function (xhr, status, error) {

@@ -109,7 +109,7 @@
 
     {%  for id, data in tabProjects %}
         <tr>
-            <td class="id">
+            <td id="row_{{ data.id }}">
                 <form class="form_browse" method="POST" action="{{path('metrics')}}">
                     <input name="form" value="1" type="hidden"/>
                     <input type="hidden" name="providerName" value="undef"/>
@@ -122,11 +122,11 @@
             <td class="acronym">{{ data.acronym }} </td>
             <td class="title">{{ data.title }} </td>
             <td class="providers">
-                <ul>
+                <ul id="row_provider_{{ data.id }}">
             {% for provider in data  %}
 
                 {%  if provider.name is defined %}
-                    <li>{{ provider.name }} <a class="deleteProviders" id="delete___{{ provider.id }}___{{ data.id }}" ><i class="bi bi-trash-fill"></i></a> </li>
+                    <li id="provider_{{ data.id }}_{{ provider.id }}">{{ provider.name }} <a class="deleteProviders" id="delete___{{ provider.id }}___{{ data.id }}" ><i class="bi bi-trash-fill"></i></a> </li>
                 {% endif %}
             {% endfor %}
                 </ul>
@@ -172,7 +172,7 @@
                 $("#toast-update-success > .toast-body").html(output_success);
                 $("#toast-update-success").toast("show");
                 $('#loader_remove_provider').addClass('d-none');
-                window.location.href=redirection;
+                $('#provider_'+projectId+'_'+provider).addClass('d-none');
 
 
             });
@@ -192,8 +192,7 @@
 
             var projectId= $(this).find('select[name="project_id"] > option:selected').val().trim();
             var provider=$(this).find('select[name="providers"] > option:selected').val().trim();
-
-
+            var providerN=$(this).find('select[name="providers"] > option:selected').text().trim();
             var dataUrl="project="+projectId+"&provider="+provider;
 
             let url= "{{ url('associates_providers') }}";
@@ -213,7 +212,12 @@
                 $("#toast-update-success").toast("show");
                     $("#add_provider").modal('hide');
                     $('#loader_add_provider').addClass('d-none');
-                    window.location.href=redirection;
+
+                var linkA='<a class="deleteProviders" id="delete___'+provider+'___'+projectId+'" ><i class="bi bi-trash-fill"></i></a>';
+                var liId ="provider_"+projectId+"_"+provider;
+
+                $('<li id='+liId+'>'+providerN+linkA+'</li>').appendTo($('#row_provider_'+projectId));
+
 
 
             });

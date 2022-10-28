@@ -22,6 +22,8 @@ import 'popper.js';
 require('chart.js');
 import Chart from 'chart.js';
 
+import moment from 'moment';
+global.moment = moment;
 
 require('daterangepicker');
 require('daterangepicker/daterangepicker.css');
