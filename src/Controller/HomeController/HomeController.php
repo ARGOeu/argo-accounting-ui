@@ -439,6 +439,7 @@ class HomeController extends AbstractController
 
     /**
      * @Route("/ajax/addInstallation",  name="add_installation")
+     * @Route("/ajax/addInstallation",  name="add_installation")
      *
      * ajax calls to add installation
      * @param LavoisierService $lavoisierService
@@ -484,7 +485,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/ajax/associatesProviders",  name="associates_providers" , schemes: ['https'])
+     * @Route("/ajax/associatesProviders",  name="associates_providers" )
      *
      * ajax calls to associates providers to a project
      * @param LavoisierService $lavoisierService
@@ -529,7 +530,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/ajax/addProvider",  name="add_provider" , schemes: ['https'])
+     * @Route("/ajax/addProvider",  name="add_provider" )
      *
      * form to get metrics provider list
      * @param LavoisierService $lavoisierService
@@ -578,7 +579,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/ajax/modifyMetricsDescription",  name="modify_metric_description" , schemes: ['https'])
+     * @Route("/ajax/modifyMetricsDescription",  name="modify_metric_description" )
      *
      * form to get metrics provider list
      * @param LavoisierService $lavoisierService
