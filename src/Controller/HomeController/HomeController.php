@@ -46,6 +46,15 @@ class HomeController extends AbstractController
     }
 
     /**
+     * @Route("/home/termsofuse", name="termsofuse")
+     */
+    public function TermsUseAction()
+    {
+        return $this->render("/home/TermsOfUse.html.twig");
+
+    }
+
+    /**
      * @Route("/projects",  name="projects")
      *
      * list all projetcs
@@ -290,7 +299,7 @@ class HomeController extends AbstractController
             $project = $request->request->get('project');
         }
         if ($request->request->get('case') == 2) {
-            $details = 1;
+            $details = 2;
             $project_provider = $request->request->get('project_provider');
             $project = explode('___', $project_provider)[0];
             $provider = explode('___', $project_provider)[1];
@@ -298,17 +307,18 @@ class HomeController extends AbstractController
         }
 
         if ($request->request->get('case') == 3) {
-            $details = 1;
+            $details = 3;
             $installation = $request->request->get('installation');
         }
 
 
-        if ($details == 1) {
+        if ($details >=1) {
 
             $array_POST = [
                 "projectId" => $project,
                 "provider" => $provider,
                 "installation" => $installation,
+                "details" => $details
             ];
 
             $lavQuery_details = new Query($lavoisierUrl, 'listMetricsDetails', 'lavoisier', 'xml', $lavoisierPort);
@@ -320,6 +330,8 @@ class HomeController extends AbstractController
                 try {
                     $res_details  = $lavQuery_details->execute();
                     $tabMetricsDetails=$res_details->getArrayCopy();
+
+
                 } catch (CurlException $e) {
                 } catch (HTTPStatusException $e) {
                     return new Response("Exception".$e, 500);
@@ -333,7 +345,8 @@ class HomeController extends AbstractController
             'tabProjects' => $tabProjects,
             'tabInstallations' => $tabInstallations,
             'tabMetricsDetails' => $tabMetricsDetails,
-            'parameters'=> $array_POST
+            'parameters'=> $array_POST,
+            'details'=>$details
         ]);
 
     }

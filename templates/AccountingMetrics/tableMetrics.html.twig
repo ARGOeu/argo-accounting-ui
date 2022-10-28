@@ -16,26 +16,24 @@
 
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 
-                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_1" value="btn_selection_1" autocomplete="off" {% if  (tabMetricsDetails!=null and parameters.projectId != 0 and parameters.provider == 0) or tabMetricsDetails==null %}checked {% endif %}>
+                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_1" value="btn_selection_1" autocomplete="off" {% if  details < 2 %}checked {% endif %}>
                 <label class="btn btn-outline-primary text-dark" for="btn_selection_1">Browse by Project</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_2" value="btn_selection_2"  autocomplete="off" {% if  tabMetricsDetails!=null and parameters.provider != 0 %}checked {% endif %}>
+                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_2" value="btn_selection_2"  autocomplete="off" {% if  details == 2 %}checked {% endif %}>
                 <label class="btn btn-outline-primary text-dark" for="btn_selection_2">Browse by Project and Provider</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_3" value="btn_selection_3"  autocomplete="off" {% if  tabMetricsDetails!=null and parameters.installation != 0 %}checked {% endif %}>
+                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_3" value="btn_selection_3"  autocomplete="off" {% if  details == 3 %}checked {% endif %}>
                 <label class="btn btn-outline-primary text-dark" for="btn_selection_3">Browse by Installation</label>
             </div>
 
 
         </div>
 
-    <div class="row m-4 selection" id="selection_1">
-
+    <div class="card row m-4 selection {% if details >= 2 %} d-none {% endif %}" id="selection_1">
+        <div class="card-body">
         <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
             <input type="hidden" name="case" value="1">
             <div class="col">
-
-
 
                 <div class="form-group">
                     <label for="project" class="text-muted">Please select a project</label>
@@ -62,11 +60,12 @@
                 <button type="submit" class="submit btn btn-primary mt-3" value="submit_project">Submit</button>
             </div>
         </form>
+        </div>
 
     </div>
 
-        <div class="row m-4 selection d-none" id="selection_2">
-
+        <div class="card row m-4 selection {% if details != 2 %} d-none {% endif %}" id="selection_2">
+            <div class="card-body">
             <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
                 <input type="hidden" name="case" value="2">
             <div class="col">
@@ -95,10 +94,12 @@
                 <button type="submit" class="submit btn btn-primary mt-3" value="submit_project_provider">Submit</button>
             </div>
             </form>
+            </div>
 
         </div>
 
-        <div class="row m-4 selection d-none" id="selection_3">
+        <div class="row m-4 card selection {% if details != 3 %} d-none {% endif %}" id="selection_3">
+            <div class="card-body">
             <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
                 <input type="hidden" name="case" value="3">
 
@@ -120,27 +121,29 @@
                 <button type="submit" class="submit btn btn-primary mt-3" value="submit_installation">Submit</button>
             </div>
             </form>
+            </div>
         </div>
 
 
 
-{%  if tabMetricsDetails!=null %}
+{%  if details >= 1 %}
     <hr class="text-dark"/>
     <h3><i class="bi bi-bar-chart"></i> Metrics Table </h3>
-    {%  if parameters.projectId != 0 %}
+    {%  if details == 1  %}
         <h5 class="text-muted"><span class="text-dark">Project</span> > {{  tabProjects[parameters.projectId].title }}</h5>
     {% endif %}
 
-    {%  if parameters.provider != 0 %}
-        <h5 class="text-muted"> <span class="text-dark">Provider</span> > {{  tabProviders[parameters.provider].name }} </h5>
+    {%  if details == 2 %}
+        <h5 class="text-muted"><span class="text-dark">Project</span> > {{  tabProjects[parameters.projectId].title }}<br/>
+         <span class="text-dark">Provider</span> > {{  tabProviders[parameters.provider].name }} </h5>
     {% endif %}
 
-    {%  if parameters.installation != 0 %}
+    {%  if details == 3 %}
         <h5 class="text-muted"> <span class="text-dark">Installation</span> > {{  tabInstallations[parameters.installation].installation }} -  {{  tabInstallations[parameters.installation].organisation }}</h5>
     {% endif %}
 
 
-
+{% if tabMetricsDetails!=null %}
 
 <table class="dataTable table  border border-dark" id="TableMetricsProject">
 
@@ -198,16 +201,20 @@
 </table>
 
 
-
+{% else %}
+    <div class="mt-4"><span class="alert alert-info">No metrics registered for this configuration</span></div>
 {% endif %}
 
 
+{% endif %}
 </div>
 
 {% endblock %}
 
 {% block javascripts %}
     <script>
+
+
         $(document).on('change','input[name="btnradio"]',function(event) {
         var id=$('input[name="btnradio"]:checked').val().split('btn_')[1];
             $(".selection").addClass('d-none');
