@@ -585,6 +585,7 @@ class HomeController extends AbstractController
      * @param LavoisierService $lavoisierService
      * @return Response
      */
+
     public function modifyMetricDescription(LavoisierService $lavoisierService, Request $request)
     {
         $hydrator = new EntriesHydrator();
