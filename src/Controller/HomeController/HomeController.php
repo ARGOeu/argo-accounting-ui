@@ -372,7 +372,7 @@ class HomeController extends AbstractController
 
         $lavQuery = new Query($lavoisierUrl, 'dissociatesProvider', 'lavoisier', 'xml', $lavoisierPort);
         $message1 = 'The provider has been removed';
-        $message2 = 'The deletion of provider has failed';
+        $message2 = 'The dissociation of the provider has failed';
 
         try {
             $lavQuery->setMethod('POST');
@@ -422,9 +422,9 @@ class HomeController extends AbstractController
             $res = $lavQuery->execute();
 
 
-            sleep(2);
+            sleep(3);
 
-            $lavQueryNotify = new Query($lavoisierUrl, 'listInstallation', 'notify', 'xml', $lavoisierPort);
+            $lavQueryNotify = new Query($lavoisierUrl, 'listInstallations', 'notify', 'xml', $lavoisierPort);
             $lavQueryNotify->execute();
 
             sleep(3);
@@ -438,7 +438,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/ajax/addInstallation",  name="add_installation")
+
      * @Route("/ajax/addInstallation",  name="add_installation")
      *
      * ajax calls to add installation

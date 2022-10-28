@@ -126,7 +126,7 @@
             {% for provider in data  %}
 
                 {%  if provider.name is defined %}
-                    <li>{{ provider.name }} <a class="deleteProviders" id="delete_{{ provider.id }}_{{ data.id }}" ><i class="bi bi-trash-fill"></i></a> </li>
+                    <li>{{ provider.name }} <a class="deleteProviders" id="delete___{{ provider.id }}___{{ data.id }}" ><i class="bi bi-trash-fill"></i></a> </li>
                 {% endif %}
             {% endfor %}
                 </ul>
@@ -150,8 +150,8 @@
     <script>
         $(document).on('click','.deleteProviders',function(event) {
             event.preventDefault();
-            var projectId= $(this).attr('id').split('_')[2];
-            var provider= $(this).attr('id').split('_')[1];
+            var projectId= $(this).attr('id').split('___')[2];
+            var provider= $(this).attr('id').split('___')[1];
 
             var dataUrl="project="+projectId+"&provider="+provider;
 
