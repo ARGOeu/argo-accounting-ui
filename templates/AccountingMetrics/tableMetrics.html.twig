@@ -29,54 +29,50 @@
 
         </div>
 
-    <div class="card row m-4 selection {% if details >= 2 %} d-none {% endif %}" id="selection_1">
-        <div class="card-body">
-        <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
-            <input type="hidden" name="case" value="1">
-            <div class="col">
 
-                <div class="form-group">
-                    <label for="project" class="text-muted">Please select a project</label>
-                    <select id="project" class="form-control form-select" name="project">
+        <div class="card row m-4" >
+            <div class="card-body selection {% if details >= 2 %} d-none {% endif %}" id="selection_1">
 
+                    <form class="needs-validation" novalidate  id="form_selection_1" name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
+                        <input type="hidden" name="case" value="1">
+                        <input class="start_date" name="start_date" value="0" type="hidden"/>
+                        <input class="end_date" name="end_date" value="0" type="hidden"/>
+                        <div class="col">
 
-                            <option value="0" selected> -- Projects --</option>
-
-                        {%  for project in tabProjects %}
-                            {% if project.id==project %}
-                                {% set projectName= project.title  %}
-                                <option value="{{project.id}}" selected>{{ project.acronym}}</option>
-                            {% else %}
-                                <option value="{{project.id}}">{{ project.acronym}}</option>
-                            {% endif %}
-
-                        {% endfor %}
-                    </select>
-                </div>
-
-{#                <div class="form-group">#}
-{#                    <label for="datetimes" class="text-muted">Select the date range</label>#}
-{#                    <div id="reportrange" class="form-control form-select">#}
-{#                        <i class="bi bi-calendar-check"></i>&nbsp;#}
-{#                        <span></span> <i class="fa fa-caret-down"></i>#}
-{#                    </div>#}
-{#                </div>#}
+                            <div class="form-group">
+                                <label for="project" class="text-muted">Please select a project</label>
+                                <select id="project" class="form-control form-select" name="project" required>
 
 
+
+                                    {%  for project in tabProjects %}
+                                        {% if project.id==project %}
+                                            {% set projectName= project.title  %}
+                                            <option  value="{{project.id}}" selected>{{ project.acronym}}</option>
+                                        {% else %}
+                                            <option  value="{{project.id}}">{{ project.acronym}}</option>
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please choose a project
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
             </div>
-            <div class="col">
-                <button type="submit" class="submit btn btn-primary mt-3" value="submit_project">Submit</button>
-            </div>
-        </form>
-        </div>
 
-    </div>
 
-        <div class="card row m-4 selection {% if details != 2 %} d-none {% endif %}" id="selection_2">
-            <div class="card-body">
-            <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
+
+
+            <div class="card-body selection  {% if details != 2 %} d-none {% endif %}" id="selection_2">
+            <form class="form_browse_metrics" id="form_selection_2" name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
                 <input type="hidden" name="case" value="2">
-            <div class="col">
+                <input class="start_date" name="start_date" value="0" type="hidden"/>
+                <input class="end_date" name="end_date" value="0" type="hidden"/>
+                <div class="col">
 
 
                 <div class="form-group">
@@ -84,7 +80,7 @@
 
                     <select class="form-control form-select"  id="project_provider" name="project_provider">
 
-                        <option value="0" selected> -- Projects / Providers --</option>
+
 
                         {%  for project in tabProjects %}
                             {%  for provider in project %}
@@ -96,41 +92,73 @@
                     </select>
                 </div>
 
+                    <div class="invalid-feedback">
+                        Please choose an association of project and provider
+                    </div>
 
-            </div>
-            <div class="col">
-                <button type="submit" class="submit btn btn-primary mt-3" value="submit_project_provider">Submit</button>
+
+
             </div>
             </form>
             </div>
 
-        </div>
+            <div class="card-body  selection {% if details != 3 %} d-none {% endif %}" id="selection_3">
 
-        <div class="row m-4 card selection {% if details != 3 %} d-none {% endif %}" id="selection_3">
-            <div class="card-body">
-            <form class="form_browse_metrics"  name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
-                <input type="hidden" name="case" value="3">
+                    <form class="form_browse_metrics"  id="form_selection_3" name="form_browse_metrics" method="POST" action="{{ path('metrics') }}">
+                        <input type="hidden" name="case" value="3">
+                        <input class="start_date" name="start_date" value="0" type="hidden"/>
+                        <input class="end_date" name="end_date" value="0" type="hidden"/>
 
-            <div class="col">
+                        <div class="col">
 
-                <div class="form-group">
-                    <label for="installation" class="text-muted">Please select an installation</label>
-                    <select class="form-control  form-control form-select" name="installation" id="installation">
-                        <option value="0" selected> -- Installations --</option>
-                        {%  for installation in tabInstallations %}
-                                    <option value="{{installation.id}}">{{ installation.installation}} -  {{ installation.organisation}} - {{ installation.infrastructure}}</option>
-                        {% endfor %}
-                    </select>
+                            <div class="form-group">
+                                <label for="installation" class="text-muted">Please select an installation</label>
+                                <select class="form-control  form-control form-select" name="installation" id="installation">
+
+                                    {%  for installation in tabInstallations %}
+                                        <option value="{{installation.id}}">{{ installation.installation}} -  {{ installation.organisation}} - {{ installation.infrastructure}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+
+                            <div class="invalid-feedback">
+                                Please choose an installation
+                            </div>
+
+
+                        </div>
+
+                    </form>
+
+            </div>
+
+
+            <div class="card-body  ">
+                <div><a href="" id="addTime"><i class="bi bi-plus-circle-fill m-1"></i> Add a date range</a> </div>
+            <div class="addTime form-group d-none">
+                <label for="datetimes" class="text-muted">Select the date range <a href="" id="removeTime"><i class="bi bi-trash-fill m-1"></i> </a> </label>
+
+                <div id="reportrange" class="form-control form-select">
+                    <i class="bi bi-calendar-check"></i>&nbsp;
+                    <span></span> <i class="fa fa-caret-down"></i>
                 </div>
 
 
+
             </div>
+            </div>
+
+            <div class="card-body text-center">
             <div class="col">
-                <button type="submit" class="submit btn btn-primary mt-3" value="submit_installation">Submit</button>
+                <button type="submit" id="submit_metrics" class="submit btn btn-primary mt-3" value="submit_metrics">Submit</button>
             </div>
-            </form>
             </div>
-        </div>
+
+            </div>
+
+
+
 
 
 
@@ -149,6 +177,10 @@
     {%  if details == 3 %}
         <h5 class="text-muted"> <span class="text-dark">Installation</span> > {{  tabInstallations[parameters.installation].installation }} -  {{  tabInstallations[parameters.installation].organisation }}</h5>
     {% endif %}
+
+
+        <h5 class="text-muted"><span class="text-dark">Period</span> > {{ start }} / {{ end }}</h5>
+
 
 
 {% if tabMetricsDetails!=null %}
@@ -222,6 +254,28 @@
 {% block javascripts %}
     <script>
 
+        $(document).on('click','#removeTime',function(event) {
+            $('.addTime').addClass('d-none');
+            $('#addTime').removeClass('d-none');
+            $('.start_date').val(0) ;
+            $('.end_date').val(0);
+            event.preventDefault();
+        });
+
+        $(document).on('click','#addTime',function(event) {
+            $('.addTime').removeClass('d-none');
+            $('#addTime').addClass('d-none');
+            event.preventDefault();
+        });
+
+        $(document).on('click','#submit_metrics',function(event) {
+            var id=$('input[name="btnradio"]:checked').val().split('btn_')[1];
+            if($('.addTime').hasClass('d-none')) {
+                $('.start_date').val(0) ;
+                $('.end_date').val(0);
+            }
+            $('#form_'+id).submit();
+        });
 
 
         $(document).on('change','input[name="btnradio"]',function(event) {
@@ -237,8 +291,11 @@
             var start = moment().subtract(29, 'days');
             var end = moment();
 
+
             function cb(start, end) {
-                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('.start_date').val(start.format('YYYY-MM-DD') );
+                $('.end_date').val(end.format('YYYY-MM-DD'));
+                $('#reportrange span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
             }
 
             $('#reportrange').daterangepicker({

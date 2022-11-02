@@ -293,6 +293,14 @@ class HomeController extends AbstractController
         $project = 0;
         $provider = 0;
         $installation = 0;
+        $start=0;
+        $end=0;
+
+        if($request->request->get('start_date')!=0)
+            $start=$request->request->get('start_date');
+
+        if($request->request->get('end_date')!=0)
+            $end=$request->request->get('end_date');
 
         if ($request->request->get('case') == 1) {
             $details = 1;
@@ -314,12 +322,24 @@ class HomeController extends AbstractController
 
         if ($details >=1) {
 
+            if ($start!=0 and $end !=0) {
             $array_POST = [
                 "projectId" => $project,
                 "provider" => $provider,
                 "installation" => $installation,
-                "details" => $details
+                "details" => $details,
+                "start"=>$start,
+                "end" => $end
             ];
+            }
+            else {
+                $array_POST = [
+                    "projectId" => $project,
+                    "provider" => $provider,
+                    "installation" => $installation,
+                    "details" => $details
+                ];
+            }
 
             $lavQuery_details = new Query($lavoisierUrl, 'listMetricsDetails', 'lavoisier', 'xml', $lavoisierPort);
             $lavQuery_details->setHydrator($hydrator);
@@ -346,7 +366,9 @@ class HomeController extends AbstractController
             'tabInstallations' => $tabInstallations,
             'tabMetricsDetails' => $tabMetricsDetails,
             'parameters'=> $array_POST,
-            'details'=>$details
+            'details'=>$details,
+            "start"=>$start,
+            "end" => $end
         ]);
 
     }
