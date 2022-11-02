@@ -116,7 +116,7 @@
                                 <select class="form-control  form-control form-select" name="installation" id="installation">
 
                                     {%  for installation in tabInstallations %}
-                                        <option value="{{installation.id}}">{{ installation.installation}} -  {{ installation.organisation}} - {{ installation.infrastructure}}</option>
+                                        <option value="{{installation.id}}">Installation : {{ installation.installation}} -  Provider : {{ installation.organisation}} - {{ installation.infrastructure}}</option>
                                     {% endfor %}
                                 </select>
 
@@ -175,7 +175,7 @@
     {% endif %}
 
     {%  if details == 3 %}
-        <h5 class="text-muted"> <span class="text-dark">Installation</span> > {{  tabInstallations[parameters.installation].installation }} -  {{  tabInstallations[parameters.installation].organisation }}</h5>
+        <h5 class="text-muted"> <span class="text-dark">Installation</span> > Name : {{  tabInstallations[parameters.installation].installation }} -  Provider : {{  tabInstallations[parameters.installation].organisation }}  }}</h5>
     {% endif %}
 
     {%  if start!=0 %}
@@ -196,7 +196,9 @@
         <th>Unit</th>
         <th>Metric Type</th>
         <th>Metric Description</th>
+        <th>Project</th>
         <th>Provider</th>
+
 
     </tr>
     </thead>
@@ -230,8 +232,9 @@
             <td class="unit">{{ data.unit_type }}</td>
             <td>{{ data.metric_type }}</td>
             <td>{{ data.metric_description }}</td>
+           <td>{{ data.project }}</td>
             <td class="provider">{{ data.provider }}</td>
-{#            <td class="install">{{ data.installation }}</td>#}
+
         </tr>
         {% endfor %}
 

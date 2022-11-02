@@ -282,7 +282,7 @@ class HomeController extends AbstractController
         $result5 = $lavQuery5->execute();
         $tabProviders = $result5->getArrayCopy();
 
-        $lavQuery = new Query($lavoisierUrl, 'listInstallations', 'lavoisier', 'xml', $lavoisierPort);
+        $lavQuery = new Query($lavoisierUrl, 'listInstallationsOrdered', 'lavoisier', 'xml', $lavoisierPort);
         $lavQuery->setHydrator($hydrator);
         $result = $lavQuery->execute();
         $tabInstallations = $result->getArrayCopy();
@@ -347,6 +347,8 @@ class HomeController extends AbstractController
             $lavQuery_details ->setPostFields($array_POST);
 
 
+
+
                 try {
                     $res_details  = $lavQuery_details->execute();
                     $tabMetricsDetails=$res_details->getArrayCopy();
@@ -360,7 +362,7 @@ class HomeController extends AbstractController
         }
 
 
-        return $this->render("AccountingMetrics/tableMetrics.html.twig", [
+        return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", [
             'tabProviders' => $tabProviders,
             'tabProjects' => $tabProjects,
             'tabInstallations' => $tabInstallations,

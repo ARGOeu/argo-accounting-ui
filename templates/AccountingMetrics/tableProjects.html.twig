@@ -111,10 +111,9 @@
         <tr>
             <td id="row_{{ data.id }}">
                 <form class="form_browse" method="POST" action="{{path('metrics')}}">
-                    <input name="form" value="1" type="hidden"/>
-                    <input type="hidden" name="providerName" value="undef"/>
-                    <input  type="hidden" name="projectName" value="{{ data.acronym }}"/>
-                    <input  type="hidden" name="projectId" value="{{ data.id }}"/>
+                    <input name="case" value="1" type="hidden"/>
+
+                    <input  type="hidden" name="project" value="{{ data.id }}"/>
                     <input type="submit" class="btn btn-primary" value="Metrics for project">
 
                 </form>
