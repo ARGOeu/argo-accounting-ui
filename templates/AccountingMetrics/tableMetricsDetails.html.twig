@@ -11,10 +11,21 @@
 
     <div class="card">
         <div class="card-header">
-            <H3 class="card-title"><i class="bi bi-gear"></i> Browse metrics</H3>
+            <div class="row">
+                <div class="col text-start">
+                    <H3 class="card-title"> <i class="bi bi-gear"></i> Browse metrics</H3>
+                </div>
+            <div class="col text-end align-top align-text-top">
+                <a class="btn btn-primary  align-top" data-bs-toggle="collapse" href="#collapse-body" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    <i class="bi bi-arrows-collapse"></i>
+                </a>
+            </div>
+
         </div>
 
-        <div class="card-body">
+        </div>
+
+        <div class="card-body collapse show" id="collapse-body">
             <div class="m-1">
                 <input type="radio" class="btn-check" name="btnradio" id="btn_selection_1" value="btn_selection_1"
                        autocomplete="off" {% if  details < 2 %}checked {% endif %}>
