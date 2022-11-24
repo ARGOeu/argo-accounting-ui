@@ -167,12 +167,13 @@
                     <tr id="installation_{{ installation.id }}">
 
                         <td>{{ installation.installation}}</td>
+                        {%  set nameP = '' %}
                         {%  for project in tabProjects %}
                             {% if project.id==installation.project %}
-                            <td>{{ project.acronym }}</td>
+                                {% set nameP = project.acronym %}
                             {% endif %}
                         {% endfor %}
-
+                        <td>{{ nameP }}</td>
                         <td>{{ installation.organisation}}</td>
                         <td>{{ installation.infrastructure}}</td>
                         <td>
