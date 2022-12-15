@@ -46,6 +46,15 @@ class HomeController extends AbstractController
     }
 
     /**
+     * @Route("/home/data_protection", name="data_protection")
+     */
+    public function DataProtectionAction()
+    {
+        return $this->render("/home/DataProtection.html.twig");
+
+    }
+
+    /**
      * @Route("/home/termsofuse", name="termsofuse")
      */
     public function TermsUseAction()
