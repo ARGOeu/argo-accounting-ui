@@ -1,42 +1,72 @@
 {% extends "base.html.twig" %}
 {% block body %}
-<div class="card  offset-2 col-6">
+    {# <div class="card  offset-2 col-6"> #}
+    {# <div class="card-header"> #}
+    {# <span class="card-title h2 text-primary"><i class="fas fa-user"></i> {{ user.username }}</span> #}
 
-    <div class="card-header">
-        <span class="card-title h2 text-primary"><i class="fas fa-user"></i> {{ user.username }}</span>
+    {# </div> #}
+    {# <div class="card-body"> #}
+    {# <ul> #}
+    {# <li><label>Email : </label> {{ user.email }}</li> #}
+    {# <li><label>Id : </label> {{ user.id }}</li> #}
+    {# </ul> #}
+
+
+    {# <label class="h3">Properties : </label> #}
+    {# <ul> #}
+    {# {% for key, oproles in user.oproles %} #}
+    {# {% if oproles is not iterable %} #}
+    {# <li><strong>{{ key }} : </strong>{{ oproles }}</li> #}
+    {# {% endif %} #}
+    {# {%endfor%} #}
+    {# </ul> #}
+
+    {# {% for key, oproles in user.oproles %} #}
+    {# {% if oproles is  iterable %} #}
+    {# <label class="h4">{{ key }} </label> #}
+    {# <ul> #}
+    {# {%  for roles in oproles %} #}
+    {# <li>{{ roles }}</li> #}
+    {# {% endfor %} #}
+    {# </ul> #}
+    {# {% endif %} #}
+    {# {%endfor%} #}
+
+    {# </div> #}
+
+    {# </div> #}
+
+    <div class="card  offset-2 col-6">
+        <div class="card-header">
+            <span class="card-title h2 text-primary"><i class="fas fa-lock"></i> Accounting Permissions </span>
+
+        </div>
+        <div class="card-body">
+            <table class="dataTable table">
+                <thead>
+                <tr>
+                    <td>Project</td>
+                    <td>Provider</td>
+                    <td>Installation</td>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for project in res %}
+                    {% for provider in project['providers'] %}
+                        {% for installation in provider['installations'] %}
+                            <tr>
+                                <td>{{ project.acronym }}</td>
+                                <td>{{ provider.id }}</td>
+                                <td>{{ installation.installation }}</td>
+                            </tr>
+                        {% endfor %}
+                {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
     </div>
-     <div class="card-body">
-         <ul>
-             <li><label>Email : </label> {{ user.email }}</li>
-             <li><label>Id : </label> {{ user.id }}</li>
-         </ul>
-
-
-         <label class="h3">Properties : </label>
-         <ul>
-             {% for key, oproles in user.oproles %}
-                 {% if oproles is not iterable %}
-                 <li><strong>{{ key }} : </strong>{{ oproles }}</li>
-                 {% endif %}
-             {%endfor%}
-         </ul>
-
-         {% for key, oproles in user.oproles %}
-         {% if oproles is  iterable %}
-             <label class="h4">{{ key }} </label>
-         <ul>
-             {%  for roles in oproles %}
-                 <li>{{ roles }}</li>
-             {% endfor %}
-         </ul>
-         {% endif %}
-         {%endfor%}
-
-     </div>
-
-
-
-</div>
 
 {% endblock %}

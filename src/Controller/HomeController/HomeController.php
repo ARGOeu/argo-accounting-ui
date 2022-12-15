@@ -271,21 +271,27 @@ class HomeController extends AbstractController
         $lavoisierPort = $this->getParameter("lavoisierPort");
 
 
-        $lavQuery = new Query($lavoisierUrl, 'listProjects', 'lavoisier', 'xml', $lavoisierPort);
+        $lavQuery = new Query($lavoisierUrl, 'listPermissions', 'lavoisier', 'xml', $lavoisierPort);
         $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabProjects = $result->getArrayCopy();
+        $listEntities = $lavQuery->execute()->getArrayCopy();
 
 
-        $lavQuery5 = new Query($lavoisierUrl, 'listProviders', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery5->setHydrator($hydrator);
-        $result5 = $lavQuery5->execute();
-        $tabProviders = $result5->getArrayCopy();
-
-        $lavQuery = new Query($lavoisierUrl, 'listInstallationsOrdered', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabInstallations = $result->getArrayCopy();
+//
+//        $lavQuery = new Query($lavoisierUrl, 'listProjects', 'lavoisier', 'xml', $lavoisierPort);
+//        $lavQuery->setHydrator($hydrator);
+//        $result = $lavQuery->execute();
+//        $tabProjects = $result->getArrayCopy();
+//
+//
+//        $lavQuery5 = new Query($lavoisierUrl, 'listProviders', 'lavoisier', 'xml', $lavoisierPort);
+//        $lavQuery5->setHydrator($hydrator);
+//        $result5 = $lavQuery5->execute();
+//        $tabProviders = $result5->getArrayCopy();
+//
+//        $lavQuery = new Query($lavoisierUrl, 'listInstallationsOrdered', 'lavoisier', 'xml', $lavoisierPort);
+//        $lavQuery->setHydrator($hydrator);
+//        $result = $lavQuery->execute();
+//        $tabInstallations = $result->getArrayCopy();
 
         $details = 0;
         $tabMetricsDetails = [];
@@ -295,82 +301,76 @@ class HomeController extends AbstractController
         $installation = 0;
         $start=0;
         $end=0;
-
-        if($request->request->get('start_date')!=0)
-            $start=$request->request->get('start_date');
-
-        if($request->request->get('end_date')!=0)
-            $end=$request->request->get('end_date');
-
-        if ($request->request->get('case') == 1) {
-            $details = 1;
-            $project = $request->request->get('project');
-        }
-        if ($request->request->get('case') == 2) {
-            $details = 2;
-            $project_provider = $request->request->get('project_provider');
-            $project = explode('___', $project_provider)[0];
-            $provider = explode('___', $project_provider)[1];
-
-        }
-
-        if ($request->request->get('case') == 3) {
-            $details = 3;
-            $installation = $request->request->get('installation');
-        }
-
-
-        if ($details >=1) {
-
-            if ($start!=0 and $end !=0) {
-            $array_POST = [
-                "projectId" => $project,
-                "provider" => $provider,
-                "installation" => $installation,
-                "details" => $details,
-                "start"=>$start,
-                "end" => $end
-            ];
-            }
-            else {
-                $array_POST = [
-                    "projectId" => $project,
-                    "provider" => $provider,
-                    "installation" => $installation,
-                    "details" => $details
-                ];
-            }
-
-            $lavQuery_details = new Query($lavoisierUrl, 'listMetricsDetails', 'lavoisier', 'xml', $lavoisierPort);
-            $lavQuery_details->setHydrator($hydrator);
-            $lavQuery_details ->setMethod('POST');
-            $lavQuery_details ->setPostFields($array_POST);
-
-
-
-
-                try {
-                    $res_details  = $lavQuery_details->execute();
-                    $tabMetricsDetails=$res_details->getArrayCopy();
-
-
-                } catch (CurlException $e) {
-                } catch (HTTPStatusException $e) {
-                    return new Response("Exception".$e, 500);
-                }
-
-        }
+//
+//        if($request->request->get('start_date')!=0)
+//            $start=$request->request->get('start_date');
+//
+//        if($request->request->get('end_date')!=0)
+//            $end=$request->request->get('end_date');
+//
+//        if ($request->request->get('case') == 1) {
+//            $details = 1;
+//            $project = $request->request->get('project');
+//        }
+//        if ($request->request->get('case') == 2) {
+//            $details = 2;
+//            $project_provider = $request->request->get('project_provider');
+//            $project = explode('___', $project_provider)[0];
+//            $provider = explode('___', $project_provider)[1];
+//
+//        }
+//
+//        if ($request->request->get('case') == 3) {
+//            $details = 3;
+//            $installation = $request->request->get('installation');
+//        }
+//
+//
+//        if ($details >=1) {
+//
+//            if ($start!=0 and $end !=0) {
+//            $array_POST = [
+//                "projectId" => $project,
+//                "provider" => $provider,
+//                "installation" => $installation,
+//                "details" => $details,
+//                "start"=>$start,
+//                "end" => $end
+//            ];
+//            }
+//            else {
+//                $array_POST = [
+//                    "projectId" => $project,
+//                    "provider" => $provider,
+//                    "installation" => $installation,
+//                    "details" => $details
+//                ];
+//            }
+//
+//            $lavQuery_details = new Query($lavoisierUrl, 'listMetricsDetails', 'lavoisier', 'xml', $lavoisierPort);
+//            $lavQuery_details->setHydrator($hydrator);
+//            $lavQuery_details ->setMethod('POST');
+//            $lavQuery_details ->setPostFields($array_POST);
+//
+//
+//
+//
+//                try {
+//                    $res_details  = $lavQuery_details->execute();
+//                    $tabMetricsDetails=$res_details->getArrayCopy();
+//
+//
+//                } catch (CurlException $e) {
+//                } catch (HTTPStatusException $e) {
+//                    return new Response("Exception".$e, 500);
+//                }
+//
+//        }
 
 
         return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", [
-            'tabProviders' => $tabProviders,
-            'tabProjects' => $tabProjects,
-            'tabInstallations' => $tabInstallations,
-            'tabMetricsDetails' => $tabMetricsDetails,
-            'parameters'=> $array_POST,
-            'details'=>$details,
-            "start"=>$start,
-            "end" => $end
+            'listEntities'=>$listEntities,
+            'details'=>$details
         ]);
 
     }

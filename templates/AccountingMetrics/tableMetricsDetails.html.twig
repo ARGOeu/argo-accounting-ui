@@ -6,302 +6,210 @@
 
 {% block body %}
 
-<div class="container">
+    <div class="container">
 
 
-    <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <div class="col text-start">
-                    <H3 class="card-title"> <i class="bi bi-gear"></i> Browse metrics</H3>
-                </div>
-            <div class="col text-end align-top align-text-top">
-                <a class="btn btn-primary  align-top" data-bs-toggle="collapse" href="#collapse-body" role="button" aria-expanded="false" aria-controls="collapseExample">
-                    <i class="bi bi-arrows-collapse"></i>
-                </a>
-            </div>
-
-        </div>
-
-        </div>
-
-        <div class="card-body collapse show" id="collapse-body">
-            <div class="m-1">
-                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_1" value="btn_selection_1"
-                       autocomplete="off" {% if  details < 2 %}checked {% endif %}>
-                <label class="btn btn-outline-primary text-dark" for="btn_selection_1">Browse by Project</label>
-
-                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_2" value="btn_selection_2"
-                       autocomplete="off" {% if  details == 2 %}checked {% endif %}>
-                <label class="btn btn-outline-primary text-dark" for="btn_selection_2">Browse by Project and
-                    Provider</label>
-
-                <input type="radio" class="btn-check" name="btnradio" id="btn_selection_3" value="btn_selection_3"
-                       autocomplete="off" {% if  details == 3 %}checked {% endif %}>
-                <label class="btn btn-outline-primary text-dark" for="btn_selection_3">Browse by Installation</label>
-            </div>
-            <div class="m-1">
-                <div class="selection {% if details >= 2 %} d-none {% endif %}" id="selection_1">
-
-                    <form class="needs-validation" novalidate id="form_selection_1" name="form_browse_metrics"
-                          method="POST" action="{{ path('metrics') }}">
-                        <input type="hidden" name="case" value="1">
-                        <input class="start_date" name="start_date" value="{{ start }}" type="hidden"/>
-                        <input class="end_date" name="end_date" value="{{ end }}" type="hidden"/>
-
-                        <div class="form-group">
-                            <label for="project" class="text-muted">Please select a project</label>
-                            <select id="project" class="form-control form-select" name="project" required>
-
-
-                                {% for project in tabProjects %}
-                                    <option value="{{ project.id }}" {% if parameters.projectId is defined and project.id == parameters.projectId %} selected {% endif %}>{{ project.acronym }}</option>
-
-                                {% endfor %}
-                            </select>
-                            <div class="invalid-feedback">
-                                Please choose a project
-                            </div>
-                        </div>
-
-
-                    </form>
-                </div>
-
-            </div>
-            <div class="m-1">
-
-                <div class="selection  {% if details != 2 %} d-none {% endif %}" id="selection_2">
-                    <form class="form_browse_metrics" id="form_selection_2" name="form_browse_metrics" method="POST"
-                          action="{{ path('metrics') }}">
-                        <input type="hidden" name="case" value="2">
-                        <input class="start_date" name="start_date" value="{{ start }}" type="hidden"/>
-                        <input class="end_date" name="end_date" value="{{ end }}" type="hidden"/>
-
-                        <div class="form-group">
-                            <label for="project_provider" class="text-muted">Please select an association of project and
-                                provider</label>
-
-                            <select class="form-control form-select" id="project_provider" name="project_provider">
-
-
-                                {% for project in tabProjects %}
-                                    {% for provider in project %}
-                                        {% if provider.name is defined %}
-                                            <option value="{{ project.id }}___{{ provider.id }}" {% if parameters.provider is defined and provider.id == parameters.provider and parameters.projectId==project.id %} selected {% endif %}>{{ project.acronym }}
-                                                / {{ provider.name }} </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="invalid-feedback">
-                            Please choose an association of project and provider
-                        </div>
-
-
-                    </form>
-                </div>
-
-            </div>
-
-            <div class="m-1">
-                <div class="selection {% if details != 3 %} d-none {% endif %}" id="selection_3">
-
-                    <form class="form_browse_metrics" id="form_selection_3" name="form_browse_metrics" method="POST"
-                          action="{{ path('metrics') }}">
-                        <input type="hidden" name="case" value="3">
-                        <input class="start_date" name="start_date" value="{{ start }}" type="hidden"/>
-                        <input class="end_date" name="end_date" value="{{ end }}" type="hidden"/>
-
-
-                        <div class="form-group">
-
-                            <label for="installation" class="text-muted">Please select an installation</label>
-                            <select class="form-control  form-control form-select" name="installation"
-                                    id="installation">
-
-
-                                {% for key, tabproject in tabInstallations %}
-                                    <optgroup label="{{ key }}">
-                                        {% for key2, installations in tabproject %}
-                                            <option value="{{ installations.id }}" {% if parameters.installation is defined and parameters.installation ==  installations.id %} selected {% endif %}>{{ installations.installation }}</option>
-                                        {% endfor %}
-                                    </optgroup>
-
-                                {% endfor %}
-
-                            </select>
-
-                        </div>
-
-                        <div class="invalid-feedback">
-                            Please choose an installation
-                        </div>
-
-
-                    </form>
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col text-start">
+                        <H3 class="card-title"><i class="bi bi-gear"></i> Browse metrics</H3>
+                    </div>
+                    <div class="col text-end align-top align-text-top">
+                        <a class="btn btn-primary  align-top" data-bs-toggle="collapse" href="#collapse-body"
+                           role="button" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="bi bi-arrows-collapse"></i>
+                        </a>
+                    </div>
 
                 </div>
 
             </div>
-
-            <div class="row">
-
-                {% if start !=0  %}
-                    <input type="hidden" id="range_index" value="0"/>
-                    <input type="hidden" id="start_range" value="{{ start }}"    />
-                    <input type="hidden" id="end_range" value="{{ end }}"    />
-
-                {% else %}
-                    <input type="hidden" id="range_index" value="1"/>
-                {% endif %}
-
-
-                <div><a href="" id="addTime" class="{% if start != 0 %} d-none{% endif %}"><i
-                                class="bi bi-plus-circle-fill m-1"></i> Add a date range</a></div>
-                <div class="addTime form-group {% if start == 0 %} d-none{% endif %}">
-                    <label for="datetimes" class="text-muted">Select the date range <a href="" id="removeTime"><i
-                                    class="bi bi-trash-fill m-1"></i> </a> </label>
-
-                    <div id="reportrange" class="form-control form-select">
-                        <i class="bi bi-calendar-check"></i>&nbsp;
-                        <span>{% if start != 0 %}{{ start }} - {{ end }} {% endif %}</span> <i
-                                class="fa fa-caret-down"></i>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="projects">Projects</label>
+                    <div>
+                    <select name="projects" id="projects" class="col projects form-control form-select">
+                        <option value="O" name="0" class="text-muted">-- Please select a project --</option>
+                        {% for project in listEntities %}
+                            <option name="{{ project.id }}" value="{{ project.id }}">{{ project.acronym }}</option>
+                        {% endfor %}
+                    </select>
                     </div>
                 </div>
-
             </div>
-            <div class="row">
+            <div class="card-body">
+                <div class="form-group row">
+                {% for project in listEntities %}
+                        <div class="d-none providers_{{ project.id }} list_providers">
 
-                <div>
-                    <button type="submit" id="submit_metrics" class="submit btn btn-primary mt-3"
-                            value="submit_metrics">Submit
-                    </button>
-                </div>
-
-
-            </div>
-        </div>
-    </div>
-
-
-    <div class="card mt-2">
-        {% if details >= 1 %}
-
-        <div class="card-header">
-            <h3 class="card-title"><i class="bi bi-bar-chart"></i> Metrics Table </h3>
-        </div>
-
-        <div class="card-body">
-
-
-            <ul class="list-group list-group-horizontal m-1">
-                <li class="list-group-item"><span class="text-muted"><i class="bi bi-gear m-1"></i> Parameters :</span>
-                </li>
-                {% if details == 1 %}
-                    <li class="list-group-item"><span class="text-dark">Project</span>
-                        > {{ tabProjects[parameters.projectId].acronym }}</li>
-                {% endif %}
-                {% if details == 2 %}
-                    <li class="list-group-item"><span class="text-muted">Project</span>
-                        > {{ tabProjects[parameters.projectId].acronym }}</li>
-                    <li class="list-group-item"><span class="text-muted">Provider</span>
-                        > {{ tabProviders[parameters.provider].name }}</li>
-                {% endif %}
-
-                {% if details == 3 %}
-
-                    {% for key, tabproject in tabInstallations %}
-                        {% for key2, installations in tabproject %}
-                            {% if parameters.installation ==  installations.id %}
-                                <li class="list-group-item"> <span  class="text-muted">Project > </span>{{ installations.projectName }}  </li>
-                                <li class="list-group-item"> <span  class="text-muted">Provider > </span>{{ installations.organisation }}  </li>
-                                <li class="list-group-item"><span    class="text-muted">Installation > </span>{{ installations.installation }} </li>
-                            {% endif %}
-                        {% endfor %}
+                            <label for="providers">Providers > {{ project.acronym }} Project >  <span class="btn btn-sm btn-secondary m-1">Browse Metrics</span></label>
+                            <select name="providers"  class="providers form-control form-select">
+                                <option value="O" name="0" class="text-muted">-- Please select a provider --</option>
+                                {% for provider in project['providers'] %}
+                                    <option name="{{ provider.id }}" value="{{ provider.id }}">{{ provider.id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                 {% endfor %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    {% for project in listEntities %}
+                        {% for provider in project['providers'] %}
+                            <div class="d-none  installations_{{ provider.id }} list_installations">
 
-                {% endif %}
+                                {% if provider['installations'] | length > 0%}
+                            <label for="installations">Installations > {{ provider.id }} Provider > <span class="btn btn-sm btn-secondary m-1">Browse Metrics</span></label>
+                            <ul   class="installations form-control">
 
-                {% if start!=0 %}
-                    <li class="list-group-item"><span class="text-muted">Period</span> > {{ start }} / {{ end }}</li>
-                {% endif %}
+                                {% for installation in provider['installations'] %}
+                                    <li class="{{ installation.installation }} ms-4">{{ installation.installation }}<span class="btn btn-sm btn-secondary m-1">Browse Metrics</span></li>
+                                {% endfor %}
+                            </ul>
+                                {% else %}
+                                    <label for="installations">Installations > <span class="badge bg-light text-dark">0</span> </label>
+                                    {% endif %}
+                            </div>
+                            
+                        {% endfor %}
 
-            </ul>
-
-
-            {% if tabMetricsDetails!=null %}
-
-                <table class="dataTable table  border border-dark" id="TableMetricsProject">
-
-                    <thead>
-                    <tr>
-
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Value</th>
-                        <th>Unit</th>
-                        <th>Metric Type</th>
-                        <th>Metric Description</th>
-                        <th>Project</th>
-                        <th>Provider</th>
-
-
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {% for data in tabMetricsDetails %}
-
-
-                        <tr>
-
-                            {% if data.time_period_start is defined %}
-                                <td class="start">{{ data.time_period_start }} </td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-
-                            {% if data.time_period_end  is defined %}
-                                <td class="end">{{ data.time_period_end }} </td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-
-                            {% if data.value  is defined %}
-                                <td class="value">{{ data.value }} </td>
-                            {% else %}
-                                <td></td>
-                            {% endif %}
-
-
-                            <td class="unit">{{ data.unit_type }}</td>
-                            <td>{{ data.metric_type }}</td>
-                            <td>{{ data.metric_description }}</td>
-                            <td>{{ data.project }}</td>
-                            <td class="provider">{{ data.provider }}</td>
-
-                        </tr>
                     {% endfor %}
 
 
-                    </tbody>
-
-                </table>
-
-
-            {% else %}
-                <div class="mt-4 p-2"><span class="alert alert-info">No metrics registered for this configuration</span>
                 </div>
-            {% endif %}
+
+            </div>
 
 
-            {% endif %}
+        </div>
+
+
+        <div class="card mt-2">
+            {% if details >= 1 %}
+
+            <div class="card-header">
+                <h3 class="card-title"><i class="bi bi-bar-chart"></i> Metrics Table </h3>
+            </div>
+
+            <div class="card-body">
+
+
+                <ul class="list-group list-group-horizontal m-1">
+                    <li class="list-group-item"><span class="text-muted"><i
+                                    class="bi bi-gear m-1"></i> Parameters :</span>
+                    </li>
+                    {% if details == 1 %}
+                        <li class="list-group-item"><span class="text-dark">Project</span>
+                            > {{ tabProjects[parameters.projectId].acronym }}</li>
+                    {% endif %}
+                    {% if details == 2 %}
+                        <li class="list-group-item"><span class="text-muted">Project</span>
+                            > {{ tabProjects[parameters.projectId].acronym }}</li>
+                        <li class="list-group-item"><span class="text-muted">Provider</span>
+                            > {{ tabProviders[parameters.provider].name }}</li>
+                    {% endif %}
+
+                    {% if details == 3 %}
+
+                        {% for key, tabproject in tabInstallations %}
+                            {% for key2, installations in tabproject %}
+                                {% if parameters.installation ==  installations.id %}
+                                    <li class="list-group-item"><span
+                                                class="text-muted">Project > </span>{{ installations.projectName }}
+                                    </li>
+                                    <li class="list-group-item"><span
+                                                class="text-muted">Provider > </span>{{ installations.organisation }}
+                                    </li>
+                                    <li class="list-group-item"><span
+                                                class="text-muted">Installation > </span>{{ installations.installation }}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                    {% endif %}
+
+                    {% if start!=0 %}
+                        <li class="list-group-item"><span class="text-muted">Period</span> > {{ start }} / {{ end }}
+                        </li>
+                    {% endif %}
+
+                </ul>
+
+
+                {% if tabMetricsDetails!=null %}
+
+                    <table class="dataTable table  border border-dark" id="TableMetricsProject">
+
+                        <thead>
+                        <tr>
+
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Value</th>
+                            <th>Unit</th>
+                            <th>Metric Type</th>
+                            <th>Metric Description</th>
+                            <th>Project</th>
+                            <th>Provider</th>
+
+
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for data in tabMetricsDetails %}
+
+
+                            <tr>
+
+                                {% if data.time_period_start is defined %}
+                                    <td class="start">{{ data.time_period_start }} </td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+
+                                {% if data.time_period_end  is defined %}
+                                    <td class="end">{{ data.time_period_end }} </td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+
+                                {% if data.value  is defined %}
+                                    <td class="value">{{ data.value }} </td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+
+
+                                <td class="unit">{{ data.unit_type }}</td>
+                                <td>{{ data.metric_type }}</td>
+                                <td>{{ data.metric_description }}</td>
+                                <td>{{ data.project }}</td>
+                                <td class="provider">{{ data.provider }}</td>
+
+                            </tr>
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+
+                {% else %}
+                    <div class="mt-4 p-2"><span
+                                class="alert alert-info">No metrics registered for this configuration</span>
+                    </div>
+                {% endif %}
+
+
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
 
 {% endblock %}
 
@@ -332,6 +240,23 @@
         });
 
 
+        $(document).on('change', '#projects', function (event) {
+
+            var id=$('select.projects').find(":selected").val();
+            $(".list_providers").addClass('d-none');
+            $(".list_installations").addClass('d-none');
+           $(".providers_"+id).removeClass('d-none');
+
+        });
+
+        $(document).on('change', 'select.providers', function (event) {
+
+            var id=$('select.providers').find(":selected").val();
+             $(".list_installations").addClass('d-none');
+            $(".installations_"+id).removeClass('d-none');
+
+        });
+
         $(document).on('change', 'input[name="btnradio"]', function (event) {
             var id = $('input[name="btnradio"]:checked').val().split('btn_')[1];
             $(".selection").addClass('d-none');
@@ -343,15 +268,13 @@
 
         $(function () {
 
-            if ($("#range_index").val()==1){
+            if ($("#range_index").val() == 1) {
                 var start = moment().subtract(29, 'days');
                 var end = moment();
-            }
-            else {
+            } else {
                 var start = moment($('#start_range').val());
                 var end = moment($('#end_range').val());
             }
-
 
 
             function cb(start, end) {

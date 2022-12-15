@@ -8,6 +8,8 @@
 
 namespace App\Controller;
 
+use Lavoisier\Hydrators\EntriesHydrator;
+use Lavoisier\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -23,11 +25,15 @@ class DefaultController extends AbstractController
     public function userInfoAction(Request $request)
     {
 
-        if ($this->getUser()!=null)
-            return $this->render('default/userInfo.html.twig', array(  'user' => $this->getUser()));
-        else
-            throw new AccessDeniedHttpException();
 
+            $hydrator = new EntriesHydrator();
+            $lavoisierUrl = $this->getParameter('lavoisierUrl');
+            $lavoisierPort = $this->getParameter("lavoisierPort");
+            $lavQuery = new Query($lavoisierUrl, 'listPermissions', 'lavoisier', 'xml', $lavoisierPort);
+            $lavQuery->setHydrator($hydrator);
+            $res = $lavQuery->execute();
+
+            return $this->render('default/userInfo.html.twig', array('res'=>$res->getArrayCopy()));
 
     }
 
