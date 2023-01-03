@@ -975,9 +975,9 @@
     string-width "^4.2.3"
 
 "@popperjs/core@^2.11.5":
-  version "2.11.5"
-  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.5.tgz#db5a11bf66bdab39569719555b0f76e138d7bd64"
-  integrity sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==
+  version "2.11.6"
+  resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.6.tgz"
+  integrity sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==
 
 "@symfony/stimulus-bridge@^3.2.0":
   version "3.2.1"
@@ -1551,20 +1551,20 @@ boolbase@^1.0.0:
 
 bootstrap-datepicker@^1.9.0:
   version "1.9.0"
-  resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.9.0.tgz#e4bfce3fcce1967876b21dc6833ec5994aaed090"
+  resolved "https://registry.npmjs.org/bootstrap-datepicker/-/bootstrap-datepicker-1.9.0.tgz"
   integrity sha512-9rYYbaVOheGYxjOr/+bJCmRPihfy+LkLSg4fIFMT9Od8WwWB/MB50w0JO1eBgKUMbb7PFHQD5uAfI3ArAxZRXA==
   dependencies:
     jquery ">=1.7.1 <4.0.0"
 
-bootstrap-icons@^1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.9.1.tgz#cf22d91a25447645e45c49ebde4e56eafdfe761b"
-  integrity sha512-d4ZkO30MIkAhQ2nNRJqKXJVEQorALGbLWTuRxyCTJF96lRIV6imcgMehWGJUiJMJhglN0o2tqLIeDnMdiQEE9g==
+bootstrap-icons@^1.10.2:
+  version "1.10.2"
+  resolved "https://registry.npmjs.org/bootstrap-icons/-/bootstrap-icons-1.10.2.tgz"
+  integrity sha512-PTPYadRn1AMGr+QTSxe4ZCc+Wzv9DGZxbi3lNse/dajqV31n2/wl/7NX78ZpkvFgRNmH4ogdIQPQmxAfhEV6nA==
 
 bootstrap@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.0.tgz#838727fb60f1630db370fe57c63cbcf2962bb3d3"
-  integrity sha512-qlnS9GL6YZE6Wnef46GxGv1UpGGzAwO0aPL1yOjzDIJpeApeMvqV24iL+pjr2kU4dduoBA9fINKWKgMToobx9A==
+  version "5.2.3"
+  resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.2.3.tgz"
+  integrity sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -1652,9 +1652,9 @@ chalk@^4.0.0:
     supports-color "^7.1.0"
 
 chart.js@^3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-3.8.2.tgz#e3ebb88f7072780eec4183a788a990f4a58ba7a1"
-  integrity sha512-7rqSlHWMUKFyBDOJvmFGW2lxULtcwaPLegDjX/Nu5j6QybY+GCiQkEY+6cqHw62S5tcwXMD8Y+H5OBGoR7d+ZQ==
+  version "3.9.1"
+  resolved "https://registry.npmjs.org/chart.js/-/chart.js-3.9.1.tgz"
+  integrity sha512-Ro2JbLmvg83gXF5F4sniaQ+lTbSv18E+TIf2cOeiH1Iqd2PGFOtem+DUufMZsCJwFE7ywPOpfXFBwRTGq7dh6w==
 
 "chokidar@>=3.0.0 <4.0.0", chokidar@^3.5.3:
   version "3.5.3"
@@ -1815,7 +1815,7 @@ core-js-compat@^3.21.0, core-js-compat@^3.22.1:
 
 core-js@^3.24.0:
   version "3.24.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.24.0.tgz#4928d4e99c593a234eb1a1f9abd3122b04d3ac57"
+  resolved "https://registry.npmjs.org/core-js/-/core-js-3.24.0.tgz"
   integrity sha512-IeOyT8A6iK37Ep4kZDD423mpi6JfPRoPUdQwEWYiGolvn4o6j2diaRzNfDfpTdu3a5qMbrGUzKUpYpRY8jXCkQ==
 
 core-util-is@~1.0.0:
@@ -1949,15 +1949,15 @@ csso@^4.2.0:
     css-tree "^1.1.2"
 
 datatables.net@^1.12.1:
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.12.1.tgz#3e625e49a3341f605b0efb519fae94e37b278f24"
-  integrity sha512-e6XAMUoV41JdQPS/r9YRfRcmTPcCVvyZbWI+xog1Zg+kjVliMQbEkvWK5XFItmi64Cvwg+IqsZbTUJ1KSY3umA==
+  version "1.13.1"
+  resolved "https://registry.npmjs.org/datatables.net/-/datatables.net-1.13.1.tgz"
+  integrity sha512-cX5dDHsbVdLLYKsWOSE0MvuGUcV88zU5dZ/taK2puJV6F9Fw0CFsP3+U/kr+qpDSFOBLWISRyM4Q9wWWovPTNg==
   dependencies:
     jquery ">=1.7"
 
 daterangepicker@^3.1.0:
   version "3.1.0"
-  resolved "https://registry.yarnpkg.com/daterangepicker/-/daterangepicker-3.1.0.tgz#718d606614331df3e774c9aba82ccd8838d45da1"
+  resolved "https://registry.npmjs.org/daterangepicker/-/daterangepicker-3.1.0.tgz"
   integrity sha512-DxWXvvPq4srWLCqFugqSV+6CBt/CvQ0dnpXhQ3gl0autcIDAruG1PuGG3gC7yPRNytAD1oU1AcUOzaYhOawhTw==
   dependencies:
     jquery ">=1.10"
@@ -2282,7 +2282,7 @@ faye-websocket@^0.11.3:
 
 file-loader@^6.0.0:
   version "6.2.0"
-  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-6.2.0.tgz#baef7cf8e1840df325e4390b4484879480eebe4d"
+  resolved "https://registry.npmjs.org/file-loader/-/file-loader-6.2.0.tgz"
   integrity sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw==
   dependencies:
     loader-utils "^2.0.0"
@@ -2339,12 +2339,12 @@ follow-redirects@^1.0.0:
 
 font-awesome@^4.7.0:
   version "4.7.0"
-  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
+  resolved "https://registry.npmjs.org/font-awesome/-/font-awesome-4.7.0.tgz"
   integrity sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==
 
 fortawesome@^0.0.1-security:
   version "0.0.1-security"
-  resolved "https://registry.yarnpkg.com/fortawesome/-/fortawesome-0.0.1-security.tgz#1c85341f2fa14e1adb28ccfaecfa7ef63796e6fa"
+  resolved "https://registry.npmjs.org/fortawesome/-/fortawesome-0.0.1-security.tgz"
   integrity sha512-o/pwn9ZSnveFLYP0d5IejSwz0rpGMDQsBaYVvR8WXSvnxILIwh7IUJK0P90QMF4cnIyouVF2BGrz0LEVSyzimA==
 
 forwarded@0.2.0:
@@ -2580,7 +2580,7 @@ icss-utils@^5.0.0, icss-utils@^5.1.0:
 
 immutable@^4.0.0:
   version "4.1.0"
-  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.1.0.tgz#f795787f0db780183307b9eb2091fcac1f6fafef"
+  resolved "https://registry.npmjs.org/immutable/-/immutable-4.1.0.tgz"
   integrity sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==
 
 import-local@^3.0.2:
@@ -2732,15 +2732,15 @@ jest-worker@^27.4.5, jest-worker@^27.5.1:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jquery@>=1.10, jquery@>=1.7, jquery@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
-  integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
+jquery.redirect@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/jquery.redirect/-/jquery.redirect-1.2.0.tgz#2ab41b17520de755702b84eb0e9ea084a53e7725"
+  integrity sha512-KDZhc2uOf82FBWUP6UJQIiVnNlzQqQ34PPX00hoVRI/DzU2nCL5YYSIVziFTSs9UQ2JpbFUy3JNPleSE0/Sr2Q==
 
-"jquery@>=1.7.1 <4.0.0":
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.1.tgz#fab0408f8b45fc19f956205773b62b292c147a16"
-  integrity sha512-opJeO4nCucVnsjiXOE+/PcCgYw9Gwpvs/a6B1LL/lQhwWwpbVEVYDZ1FokFr8PRc7ghYlrFPuyHuiiDNTQxmcw==
+jquery@>=1.10, jquery@>=1.7, "jquery@>=1.7.1 <4.0.0", jquery@^3.6.0:
+  version "3.6.3"
+  resolved "https://registry.npmjs.org/jquery/-/jquery-3.6.3.tgz"
+  integrity sha512-bZ5Sy3YzKo9Fyc8wH2iIQK4JImJ6R0GWI9kL1/k7Z91ZBNgkRXE6U0JfHIizZbort8ZunhSI3jw9I6253ahKfg==
 
 js-tokens@^4.0.0:
   version "4.0.0"
@@ -2784,7 +2784,7 @@ kind-of@^6.0.2:
 
 klona@^2.0.4:
   version "2.0.5"
-  resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.5.tgz#d166574d90076395d9963aa7a928fabb8d76afbc"
+  resolved "https://registry.npmjs.org/klona/-/klona-2.0.5.tgz"
   integrity sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==
 
 lilconfig@^2.0.3:
@@ -2938,12 +2938,12 @@ minimatch@^3.1.1:
 
 moment@^2.29.4, moment@^2.9.0:
   version "2.29.4"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
+  resolved "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 momentjs@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.yarnpkg.com/momentjs/-/momentjs-2.0.0.tgz#73df904b4fa418f6e3c605e831cef6ed5518ebd4"
+  resolved "https://registry.npmjs.org/momentjs/-/momentjs-2.0.0.tgz"
   integrity sha512-GYMUxLyCwVhECkJR1/LMHEyb9gWYSPRnXi+elGN0m5bet7ngQOxU4QLWUI/eBzgN4N/T194n6yP7lQiE+Udw9A==
 
 ms@2.0.0:
@@ -3222,7 +3222,7 @@ pkg-up@^3.1.0:
 
 popper.js@^1.16.1:
   version "1.16.1"
-  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
+  resolved "https://registry.npmjs.org/popper.js/-/popper.js-1.16.1.tgz"
   integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
 
 postcss-calc@^8.2.3:
@@ -3704,17 +3704,17 @@ safe-buffer@5.2.1, safe-buffer@~5.2.0:
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
 sass-loader@^13.0.0:
-  version "13.0.2"
-  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-13.0.2.tgz#e81a909048e06520e9f2ff25113a801065adb3fe"
-  integrity sha512-BbiqbVmbfJaWVeOOAu2o7DhYWtcNmTfvroVgFXa6k2hHheMxNAeDHLNoDy/Q5aoaVlz0LH+MbMktKwm9vN/j8Q==
+  version "13.2.0"
+  resolved "https://registry.npmjs.org/sass-loader/-/sass-loader-13.2.0.tgz"
+  integrity sha512-JWEp48djQA4nbZxmgC02/Wh0eroSUutulROUusYJO9P9zltRbNN80JCBHqRGzjd4cmZCa/r88xgfkjGD0TXsHg==
   dependencies:
     klona "^2.0.4"
     neo-async "^2.6.2"
 
 sass@^1.54.0:
-  version "1.54.0"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.54.0.tgz#24873673265e2a4fe3d3a997f714971db2fba1f4"
-  integrity sha512-C4zp79GCXZfK0yoHZg+GxF818/aclhp9F48XBu/+bm9vXEVAYov9iU3FBVRMq3Hx3OA4jfKL+p2K9180mEh0xQ==
+  version "1.57.1"
+  resolved "https://registry.npmjs.org/sass/-/sass-1.57.1.tgz"
+  integrity sha512-O2+LwLS79op7GI0xZ8fqzF7X2m/m8WFfI02dHOdsK5R2ECeS5F62zrwg/relM1rjSLy7Vd/DiMNIvPrQGsA0jw==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
@@ -3755,7 +3755,7 @@ select-hose@^2.0.0:
 
 select2@^4.1.0-rc.0:
   version "4.1.0-rc.0"
-  resolved "https://registry.yarnpkg.com/select2/-/select2-4.1.0-rc.0.tgz#ba3cd3901dda0155e1c0219ab41b74ba51ea22d8"
+  resolved "https://registry.npmjs.org/select2/-/select2-4.1.0-rc.0.tgz"
   integrity sha512-Hr9TdhyHCZUtwznEH2CBf7967mEM0idtJ5nMtjvk3Up5tPukOLXbHUNmh10oRfeNIhj+3GD3niu+g6sVK+gK0A==
 
 selfsigned@^2.0.1:

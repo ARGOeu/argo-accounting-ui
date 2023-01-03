@@ -10,6 +10,12 @@ parameters:
     lavoisierPort: '%env(string:LAVOISIER_PORT)%'
     router.request_context.scheme: 'https'
     asset.request_context.secure: true
+    aai_client_id: '%env(EOSC_AAI_ID)%'
+    aai_client_secret: '%env(EOSC_AAI_SECRET)%'
+    aai_access_token_url: '%env(EOSC_AAI_TOKEN)%'
+    aai_access_info_url: '%env(EOSC_AAI_INFO)%'
+    accounting_api_url: '%env(ACCOUNTING_API_URL)%'
+    accounting_refresh_token: '%env(REFRESH_TOKEN)%'
 
 services:
     # default configuration for services in *this* file
@@ -34,13 +40,13 @@ services:
         resource: '../src/Controller/'
         public: true
         tags: ['controller.service_arguments']
-        arguments: ['%kernel.environment%', "@service_container"]
+        arguments: ['%kernel.environment%', 'controller.service_arguments',"@service_container"]
 
-    App\Services\LavoisierService:
+    App\Service\LavoisierService:
         arguments:
             - '@logger'
             - '%lavoisierUrl%'
             - '%lavoisierPort%'
     spl.user_provider:
         class: 'App\Entity\User\UserProvider'
-        arguments: [ '@doctrine.orm.default_entity_manager', '@security.encoder_factory' ]
+        arguments: [ '@doctrine.orm.default_entity_manager' ]

@@ -14,7 +14,7 @@ import './bootstrap';
 
 const $ = require('jquery');
 global.$ = global.jQuery = $;
-
+require('jquery.redirect');
 require('datatables.net');
 
 import 'popper.js';
@@ -43,5 +43,6 @@ $(document).ready(function() {
 
     $('.select2-enable').select2();
     $(".dataTable").dataTable();
+
 
 })

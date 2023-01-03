@@ -811,6 +811,17 @@ body {
   -webkit-tap-highlight-color: transparent
 }
 
+.dropdown-large{ padding:1rem; }
+
+@media all and (min-width: 992px) {
+  .dropdown-large{min-width:300px;}
+}
+
+
+.nav-link:hover{
+  color: #ffc68d;
+}
+
 
 
 

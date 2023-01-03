@@ -12,24 +12,28 @@
         <hr/>
 
 
-
         <table class="dataTable table  border border-dark" id="TableUnits">
 
     <thead>
     <tr>
         <th>Unit Description</th>
+        <th>Unit Type</th>
         <th>Unit Symbol</th>
     </tr>
     </thead>
 
     <tbody>
-    {%  for id, unit in tabMetricsUnits %}
+
+    {%  for id, units in tabMetricsUnits %}
+        {%  for unit in units  %}
         <tr>
+
             <td>{{ unit.unit }} </td>
+            <td>{{ id }}</td>
             <td>{{ unit.symbol }} </td>
 
         </tr>
-
+        {% endfor %}
     {% endfor %}
 
     </tbody>

@@ -43,11 +43,7 @@
                     The update has failed !
                 </div>
             </div>
-{#            <div class="text-end">#}
-{#                <button class="btn btn-primary" id="addProvider" data-bs-toggle="modal" data-bs-target="#add_provider">#}
-{#                    <i class="bi bi-plus-square me-1"></i> Add a new provider#}
-{#                </button>#}
-{#            </div>#}
+
 
             <!-- Modal ADD  -->
             <div class="modal fade" id="add_provider" tabindex="-1" aria-labelledby="add_provider_Label">
@@ -110,7 +106,7 @@
 
             <!-- This loop for bootstrap modals should be done outside of the table -->
             <!-- otherwise the dynamic ajax call will not work because of the inexisting dom -->
-            {% for id, data in tabProviders %}
+            {% for id, data in tabProviders['content'] %}
                 <div class="modal fade providersDetails" id="provider_{{ data.id }}" tabindex="-1"
                      aria-labelledby="provider_{{ data.id }}_Label">
 
@@ -174,7 +170,7 @@
                 </thead>
 
                 <tbody>
-                {% for id, data in tabProviders %}
+                {% for id, data in tabProviders['content'] %}
                     <tr>
                         <td>{{ data.name }}</td>
                         <td>{{ data.abbreviation }} </td>
@@ -201,56 +197,56 @@
 {% block javascripts %}
     <script>
 
-        $(document).on('submit','.form_add_provider',function(event) {
-            event.preventDefault(); // cancel default behavior
+        {#$(document).on('submit','.form_add_provider',function(event) {#}
+        {#    event.preventDefault(); // cancel default behavior#}
 
 
-            var id = $(this).find('input[name="providerId"]').val().trim();
-            var name = $(this).find('input[name="providerName"]').val().trim();
-            var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();
-            var logo = $(this).find('input[name="providerLogo"]').val().trim();
-            var website = $(this).find('input[name="providerWebSite"]').val().trim();
+        {#    var id = $(this).find('input[name="providerId"]').val().trim();#}
+        {#    var name = $(this).find('input[name="providerName"]').val().trim();#}
+        {#    var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();#}
+        {#    var logo = $(this).find('input[name="providerLogo"]').val().trim();#}
+        {#    var website = $(this).find('input[name="providerWebSite"]').val().trim();#}
 
-            dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website;
-
-
-            let url= "{{ url('add_provider') }}";
-            let redirection="{{ url('metrics')}}#providers";
-
-            let request = $.ajax({
-                type: "POST",
-                url: url,
-                data: dataUrl,
-                crossDomain: true,
-
-                beforeSend: function () {
-                    $('#loader_add_provider').removeClass('d-none');
-                }});
-
-            request.done(function (output_success) {
-                $("#toast-prov-update-success > .toast-body").html(output_success);
-                $("#toast-prov-update-success").toast("show");
-
-                $("#add_provider").modal('hide');
-                $('#loader_add_provider').addClass('d-none');
-
-                window.setTimeout(function(){
-                    window.location.href=redirection;
-                }, 5000);
+        {#    dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website;#}
 
 
-            })
+        {#    let url= "{{ url('add_provider') }}";#}
+        {#    let redirection="{{ url('metrics')}}#providers";#}
 
-            request.fail(function (xhr, status, error) {
+        {#    let request = $.ajax({#}
+        {#        type: "POST",#}
+        {#        url: url,#}
+        {#        data: dataUrl,#}
+        {#        crossDomain: true,#}
 
-                $("#toast-prov-update-failure > .toast-body").html(xhr.responseText);
-                $("#toast-prov-update-failure").toast("show");
+        {#        beforeSend: function () {#}
+        {#            $('#loader_add_provider').removeClass('d-none');#}
+        {#        }});#}
 
-                $("#add_provider").modal('hide');
+        {#    request.done(function (output_success) {#}
+        {#        $("#toast-prov-update-success > .toast-body").html(output_success);#}
+        {#        $("#toast-prov-update-success").toast("show");#}
+
+        {#        $("#add_provider").modal('hide');#}
+        {#        $('#loader_add_provider').addClass('d-none');#}
+
+        {#        window.setTimeout(function(){#}
+        {#            window.location.href=redirection;#}
+        {#        }, 5000);#}
 
 
-            });
-        });
+        {#    })#}
+
+        {#    request.fail(function (xhr, status, error) {#}
+
+        {#        $("#toast-prov-update-failure > .toast-body").html(xhr.responseText);#}
+        {#        $("#toast-prov-update-failure").toast("show");#}
+
+        {#        $("#add_provider").modal('hide');#}
+
+
+        {#    });#}
+        {#});#}
 
         $(document).ready(function () {
             $('.providersDetails').on('shown.bs.modal', function () {

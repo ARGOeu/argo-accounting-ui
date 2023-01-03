@@ -3,11 +3,15 @@
 namespace App\Controller\HomeController;
 
 
-use App\Services\LavoisierService;
+use App\Service\AccountingService;
+use App\Service\LavoisierService;
+use http\Client;
 use Lavoisier\Exceptions\CurlException;
 use Lavoisier\Exceptions\HTTPStatusException;
 use Lavoisier\Hydrators\CSVasXMLHydrator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -33,6 +37,538 @@ class HomeController extends AbstractController
      * @var $container \Symfony\Component\DependencyInjection\Container
      */
     protected $container;
+
+    /**
+     * @var AccountingService
+     */
+    private $api;
+
+
+    private $json;
+
+    public function __construct()
+    {
+        $this->json=
+        '{
+        "size_of_page": 4,
+   "number_of_page": 1,
+   "total_elements": 4,
+   "total_pages": 1,
+   "content": [
+       {
+           "id": "888743",
+           "acronym": "DABAT",
+           "title": "DNA-sensing by AIM2 in activated B cells: novel targets to improve allogeneic haematopoietic stem cell transplantation",
+           "start_date": "2020-10-01",
+           "end_date": "2023-09-30",
+           "call_identifier": "H2020-MSCA-IF-2019",
+           "permissions": [
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "ACL",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Installation"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "ACL",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Provider"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Metric"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "MetricDefinition"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "ASSOCIATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "DISSOCIATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "ACL",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Project"
+               }
+           ],
+           "providers": [
+               {
+                   "id": "etais",
+                   "name": "Estonian Scientific Computing Infrastructure",
+                   "website": "https://etais.ee",
+                   "abbreviation": "ETAIS",
+                   "logo": "https://dellingr.neic.no/assets/img/logos/etais.png",
+                   "permissions": [],
+                   "installations": [
+                       {
+                           "id": "63562d1642ce693d14efe391",
+                           "infrastructure": "infra",
+                           "installation": "installation",
+                           "unit_of_access": "63562ce6a6b3c27f486bdea3",
+                           "permissions": []
+                       },
+                       {
+                           "id": "635bc818dfbbc514301e4144",
+                           "infrastructure": "infra_test",
+                           "installation": "installation_name_test",
+                           "unit_of_access": "635643d842ce693d14efe396",
+                           "permissions": []
+                       },
+                       {
+                           "id": "635bc9c4dfbbc514301e4146",
+                           "infrastructure": "WoK",
+                           "installation": "4b_temporary_installation",
+                           "unit_of_access": "6357c360597e7203b51bd4a7",
+                           "permissions": []
+                       }
+                   ]
+               },
+               {
+                   "id": "ubora",
+                   "name": "Open Biomedical Engineering e-platform for Innovation through Education",
+                   "website": "http://ubora-biomedical.org/",
+                   "abbreviation": "UBORA",
+                   "logo": "http://ubora-biomedical.org/wp-content/uploads/2017/01/UBORA-Logo-Final-JPEGb.jpg",
+                   "permissions": [],
+                   "installations": []
+               },
+               {
+                   "id": "umg-br",
+                   "name": "University of Minas Gerais",
+                   "website": "https://ufmg.br/",
+                   "abbreviation": "UMG",
+                   "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Symbolfumg.jpg/375px-Symbolfumg.jpg",
+                   "permissions": [],
+                   "installations": []
+               },
+               {
+                   "id": "elixir-uk",
+                   "name": "ELIXIR United Kingdom",
+                   "website": "https://elixiruknode.org/",
+                   "abbreviation": "ELIXIR-UK",
+                   "logo": "https://i0.wp.com/elixiruknode.org/wp-content/uploads/2017/10/elixir-site-icon-e1519212356120.png?fit=200%2C150&ssl=1",
+                   "permissions": [],
+                   "installations": []
+               },
+               {
+                   "id": "predictia",
+                   "name": "Predictia Intelligent Data Solutions SL",
+                   "website": "https://predictia.es/",
+                   "abbreviation": "Predictia",
+                   "logo": "https://predictia.es/sites/all/themes/predictia/logo.png",
+                   "permissions": [],
+                   "installations": []
+               }
+           ]
+       },
+       {
+           "id": "843702",
+           "acronym": "LCxLCProt",
+           "title": "Comprehensive two-dimensional liquid chromatography for the characterization of protein biopharmaceuticals at the protein level",
+           "start_date": "2020-01-01",
+           "end_date": "2020-12-31",
+           "call_identifier": "H2020-MSCA-IF-2018",
+           "permissions": [],
+           "providers": [
+               {
+                   "id": "etais",
+                   "name": "Estonian Scientific Computing Infrastructure",
+                   "website": "https://etais.ee",
+                   "abbreviation": "ETAIS",
+                   "logo": "https://dellingr.neic.no/assets/img/logos/etais.png",
+                   "permissions": [],
+                   "installations": [
+                       {
+                           "id": "6356443ca6b3c27f486bdeac",
+                           "infrastructure": "infra-etais",
+                           "installation": "installation-etais",
+                           "unit_of_access": "63562ce6a6b3c27f486bdea3",
+                           "permissions": [
+                               {
+                                   "access_permissions": [
+                                       {
+                                           "operation": "CREATE",
+                                           "access_type": "ALWAYS"
+                                       },
+                                       {
+                                           "operation": "DELETE",
+                                           "access_type": "ALWAYS"
+                                       },
+                                       {
+                                           "operation": "UPDATE",
+                                           "access_type": "ALWAYS"
+                                       },
+                                       {
+                                           "operation": "READ",
+                                           "access_type": "ALWAYS"
+                                       }
+                                   ],
+                                   "collection": "Metric"
+                               },
+                               {
+                                   "access_permissions": [
+                                       {
+                                           "operation": "DELETE",
+                                           "access_type": "ALWAYS"
+                                       },
+                                       {
+                                           "operation": "UPDATE",
+                                           "access_type": "ALWAYS"
+                                       },
+                                       {
+                                           "operation": "ACL",
+                                           "access_type": "ALWAYS"
+                                       },
+                                       {
+                                           "operation": "READ",
+                                           "access_type": "ALWAYS"
+                                       }
+                                   ],
+                                   "collection": "Installation"
+                               }
+                           ]
+                       }
+                   ]
+               }
+           ]
+       },
+       {
+           "id": "894921",
+           "acronym": "PlaGE",
+           "title": "Playing at the Gateways of Europe: theatrical languages and performatives practices in the Migrants Reception Centres of the Mediterranean Area",
+           "start_date": "2020-10-01",
+           "end_date": "2023-09-30",
+           "call_identifier": "H2020-MSCA-IF-2019",
+           "permissions": [
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "ACL",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Installation"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "ACL",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Provider"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Metric"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "CREATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "UPDATE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "DELETE",
+                           "access_type": "ENTITY"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "MetricDefinition"
+               },
+               {
+                   "access_permissions": [
+                       {
+                           "operation": "ASSOCIATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "DISSOCIATE",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "ACL",
+                           "access_type": "ALWAYS"
+                       },
+                       {
+                           "operation": "READ",
+                           "access_type": "ALWAYS"
+                       }
+                   ],
+                   "collection": "Project"
+               }
+           ],
+           "providers": [
+               {
+                   "id": "umg-br",
+                   "name": "University of Minas Gerais",
+                   "website": "https://ufmg.br/",
+                   "abbreviation": "UMG",
+                   "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Symbolfumg.jpg/375px-Symbolfumg.jpg",
+                   "permissions": [],
+                   "installations": [
+                       {
+                           "id": "635902afd3df1a296b28ece3",
+                           "infrastructure": "umg-br-infra",
+                           "installation": "umg-br-insta",
+                           "unit_of_access": "6357c360597e7203b51bd4a7",
+                           "permissions": []
+                       }
+                   ]
+               }
+           ]
+       },
+       {
+           "id": "101017452",
+           "acronym": "OpenAIRE Nexus",
+           "title": "OpenAIRE-Nexus Scholarly Communication Services for EOSC users",
+           "start_date": "2021-01-01",
+           "end_date": "2023-06-30",
+           "call_identifier": "H2020-INFRAEOSC-2020-2",
+           "permissions": [],
+           "providers": [
+               {
+                   "id": "openaire",
+                   "name": "OpenAIRE",
+                   "website": "https://www.openaire.eu/",
+                   "abbreviation": "OpenAIRE",
+                   "logo": "https://www.openaire.eu/images/OpenAIRE_branding/Logo_Horizontal.png",
+                   "permissions": [
+                       {
+                           "access_permissions": [
+                               {
+                                   "operation": "CREATE",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "DELETE",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "UPDATE",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "ACL",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "READ",
+                                   "access_type": "ALWAYS"
+                               }
+                           ],
+                           "collection": "Installation"
+                       },
+                       {
+                           "access_permissions": [
+                               {
+                                   "operation": "ACL",
+                                   "access_type": "ALWAYS"
+                               }
+                           ],
+                           "collection": "Provider"
+                       },
+                       {
+                           "access_permissions": [
+                               {
+                                   "operation": "CREATE",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "DELETE",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "UPDATE",
+                                   "access_type": "ALWAYS"
+                               },
+                               {
+                                   "operation": "READ",
+                                   "access_type": "ALWAYS"
+                               }
+                           ],
+                           "collection": "Metric"
+                       }
+                   ],
+                   "installations": [
+                       {
+                           "id": "6357c309597e7203b51bd4a6",
+                           "infrastructure": "other",
+                           "installation": "test-installation",
+                           "unit_of_access": "6357c2a9597e7203b51bd4a5",
+                           "permissions": []
+                       }
+                   ]
+               }
+           ]
+       }
+   ],
+   "links": []
+}';
+    }
+
+    /**
+     * @Route("/user/userInfo", name="userInfo")
+     */
+    public function userInfoAction(Request $request,AccountingService $api)    {
+
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+
+       $permissions=$api->getUserPermissions($bearerToken,false);
+
+
+        return $this->render('default/userInfo.html.twig', array('user'=>$this->getUser(),'listEntities'=>$permissions));
+
+    }
 
 
     /**
@@ -67,31 +603,34 @@ class HomeController extends AbstractController
      * @Route("/projects",  name="projects")
      *
      * list all projetcs
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function listProjects(Request $request, LavoisierService $lavoisierService)
+    public function listProjects(AccountingService $api, Request $request)
     {
-        $hydrator = new EntriesHydrator();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
 
-        $lavQuery = new Query($lavoisierUrl, 'listProjects', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabProjects = $result->getArrayCopy();
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
 
-        $lavQuery = new Query($lavoisierUrl, 'listProviders', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabProviders = $result->getArrayCopy();
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
 
+        $tabProjects=$api->getRessources('projects',$bearerToken);
+        $tabProviders=$api->getRessources('providers',$bearerToken);
+        $permissions=$api->getUserPermissions($bearerToken);
 
         return $this->render("AccountingMetrics/tableProjects.html.twig", [
             'tabProjects' => $tabProjects,
-            'tabProviders' => $tabProviders
+            'tabProviders' => $tabProviders,
+            'permissions'=>$permissions,
+            "message"=>$message,
+            "status"=> $status
 
         ]);
 
@@ -101,23 +640,22 @@ class HomeController extends AbstractController
      * @Route("/providers",  name="providers")
      *
      * list all providers
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function listProviders(Request $request, LavoisierService $lavoisierService)
+    public function listProviders( AccountingService $api)
     {
-        $hydrator = new EntriesHydrator();
-
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
-        $lavQuery = new Query($lavoisierUrl, 'listProviders', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabProviders = $result->getArrayCopy();
 
 
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+
+        $tabProviders=$api->getRessources('providers',$bearerToken);
         return $this->render("AccountingMetrics/tableProviders.html.twig", [
             'tabProviders' => $tabProviders,
 
@@ -126,25 +664,60 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metrics-units",  name="metrics-units")
+     * @Route("/installations",  name="installations")
      *
-     * list all metrics units
-     * @param LavoisierService $lavoisierService
+     * list all installations
      * @return Response
      */
 
-    public function listMetricsUnits(Request $request, LavoisierService $lavoisierService)
+    public function listInstallations(AccountingService $api, Request $request)
     {
-        $hydrator = new EntriesHydrator();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+        $tabProjects=$api->getRessources('projects',$bearerToken);
+        $tabInstallations=$api->getRessources('installations',$bearerToken);
+        $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
+        $permissions=$api->getUserPermissions($bearerToken);
 
 
-        $lavQuery3 = new Query($lavoisierUrl, 'listUnits', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery3->setHydrator($hydrator);
-        $result3 = $lavQuery3->execute();
-        $tabMetricsUnits = $result3->getArrayCopy();
+        return $this->render("AccountingMetrics/tableInstallations.html.twig", [
+            'tabInstallations' => $tabInstallations,
+            'tabProjects' => $tabProjects,
+            'tabMetricsDef' => $tabMetricsDef,
+            "permissions"=>$permissions,
+            "message"=>$message,
+            "status"=> $status
+        ]);
+
+    }
+
+    /**
+     * @Route("/metrics-units",  name="metrics-units")
+     *
+     * list all metrics units
+     * @return Response
+     */
+
+    public function listMetricsUnits(AccountingService $api): Response
+    {
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+
+        $tabMetricsUnits=$api->getRessources('unit-types',$bearerToken);
 
         return $this->render("AccountingMetrics/tableUnits.html.twig", [
             'tabMetricsUnits' => $tabMetricsUnits,
@@ -157,36 +730,34 @@ class HomeController extends AbstractController
      * @Route("/metrics-definitions",  name="metrics-definitions")
      *
      * list all metrics-definitions
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function listMetricsDefinitions(Request $request, LavoisierService $lavoisierService)
+    public function listMetricsDefinitions(Request $request, AccountingService $api)
     {
-        $hydrator = new EntriesHydrator();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
 
-        $lavQuery = new Query($lavoisierUrl, 'listMetricDefinition', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabMetricsDef = $result->getArrayCopy();
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
 
-        $lavQuery2 = new Query($lavoisierUrl, 'listMetricType', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery2->setHydrator($hydrator);
-        $result2 = $lavQuery2->execute();
-        $tabMetricsTypes = $result2->getArrayCopy();
-
-        $lavQuery3 = new Query($lavoisierUrl, 'listUnits', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery3->setHydrator($hydrator);
-        $result3 = $lavQuery3->execute();
-        $tabMetricsUnits = $result3->getArrayCopy();
+        $tabMetricsUnits=$api->getRessources('unit-types',$bearerToken);
+        $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
+        $tabMetricsTypes=$api->getRessources('metric-types',$bearerToken);
 
         return $this->render("AccountingMetrics/tableDefinitions.html.twig", [
             'tabMetricsDef' => $tabMetricsDef,
             'tabMetricsUnits' => $tabMetricsUnits,
-            'tabMetricsTypes' => $tabMetricsTypes
+            'tabMetricsTypes'=>$tabMetricsTypes,
+            "message"=>$message,
+            "status"=> $status
+
         ]);
 
     }
@@ -195,22 +766,22 @@ class HomeController extends AbstractController
      * @Route("/metrics-types",  name="metrics-types")
      *
      * list all metrics-types
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function listMetricsTypes(Request $request, LavoisierService $lavoisierService)
+    public function listMetricsTypes(AccountingService $api)
     {
-        $hydrator = new EntriesHydrator();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
+       $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
-        $lavQuery = new Query($lavoisierUrl, 'listMetricType', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabMetricsTypes = $result->getArrayCopy();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
 
+        $tabMetricsTypes=$api->getRessources('metric-types',$bearerToken);
 
         return $this->render("AccountingMetrics/tableTypes.html.twig", [
             'tabMetricsTypes' => $tabMetricsTypes
@@ -218,253 +789,101 @@ class HomeController extends AbstractController
 
     }
 
-    /**
-     * @Route("/installations",  name="installations")
-     *
-     * list all installations
-     * @param LavoisierService $lavoisierService
-     * @return Response
-     */
 
-    public function listInstallations(Request $request, LavoisierService $lavoisierService)
-    {
-        $hydrator = new EntriesHydrator();
-
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
-        $lavQuery = new Query($lavoisierUrl, 'listInstallations', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabInstallations = $result->getArrayCopy();
-
-        $lavQuery = new Query($lavoisierUrl, 'listProjects', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabProjects = $result->getArrayCopy();
-
-        $lavQuery5 = new Query($lavoisierUrl, 'listProviders', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery5->setHydrator($hydrator);
-        $result5 = $lavQuery5->execute();
-        $tabProviders = $result5->getArrayCopy();
-
-        $lavQuery = new Query($lavoisierUrl, 'listMetricDefinition', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $result = $lavQuery->execute();
-        $tabMetricsDef = $result->getArrayCopy();
-
-
-        return $this->render("AccountingMetrics/tableInstallations.html.twig", [
-            'tabInstallations' => $tabInstallations,
-            'tabProjects' => $tabProjects,
-            'tabProviders' => $tabProviders,
-            'tabMetricsDef' => $tabMetricsDef
-        ]);
-
-    }
 
     /**
      * @Route("/metrics",  name="metrics")
      *
      * form to get metrics provider list
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function listMetrics(Request $request, LavoisierService $lavoisierService)
+    public function listMetrics(Request $request, AccountingService $api)
     {
 
-        $hydrator = new EntriesHydrator();
+        $details=0;
+        $listIds=0;
+        $tabMetricsDetails=null;
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
 
+        $permissions=$api->getUserPermissions($bearerToken,false);
 
-        $lavQuery = new Query($lavoisierUrl, 'listPermissions', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setHydrator($hydrator);
-        $listEntities = $lavQuery->execute()->getArrayCopy();
+            if ($request->request->has('parameters')) {
+                $tabMetricsDetails=$api->searchRessources('metrics',json_decode($request->request->get('parameters'),true),$bearerToken);
+                $details=1;
+                $listIds=json_decode($request->request->get('listIds'),true);
+            }
 
+           $tabInstallations=$api->getRessources('installations',$bearerToken);
 
-//
-//        $lavQuery = new Query($lavoisierUrl, 'listProjects', 'lavoisier', 'xml', $lavoisierPort);
-//        $lavQuery->setHydrator($hydrator);
-//        $result = $lavQuery->execute();
-//        $tabProjects = $result->getArrayCopy();
-//
-//
-//        $lavQuery5 = new Query($lavoisierUrl, 'listProviders', 'lavoisier', 'xml', $lavoisierPort);
-//        $lavQuery5->setHydrator($hydrator);
-//        $result5 = $lavQuery5->execute();
-//        $tabProviders = $result5->getArrayCopy();
-//
-//        $lavQuery = new Query($lavoisierUrl, 'listInstallationsOrdered', 'lavoisier', 'xml', $lavoisierPort);
-//        $lavQuery->setHydrator($hydrator);
-//        $result = $lavQuery->execute();
-//        $tabInstallations = $result->getArrayCopy();
-
-        $details = 0;
-        $tabMetricsDetails = [];
-        $array_POST = [];
-        $project = 0;
-        $provider = 0;
-        $installation = 0;
-        $start=0;
-        $end=0;
-//
-//        if($request->request->get('start_date')!=0)
-//            $start=$request->request->get('start_date');
-//
-//        if($request->request->get('end_date')!=0)
-//            $end=$request->request->get('end_date');
-//
-//        if ($request->request->get('case') == 1) {
-//            $details = 1;
-//            $project = $request->request->get('project');
-//        }
-//        if ($request->request->get('case') == 2) {
-//            $details = 2;
-//            $project_provider = $request->request->get('project_provider');
-//            $project = explode('___', $project_provider)[0];
-//            $provider = explode('___', $project_provider)[1];
-//
-//        }
-//
-//        if ($request->request->get('case') == 3) {
-//            $details = 3;
-//            $installation = $request->request->get('installation');
-//        }
-//
-//
-//        if ($details >=1) {
-//
-//            if ($start!=0 and $end !=0) {
-//            $array_POST = [
-//                "projectId" => $project,
-//                "provider" => $provider,
-//                "installation" => $installation,
-//                "details" => $details,
-//                "start"=>$start,
-//                "end" => $end
-//            ];
-//            }
-//            else {
-//                $array_POST = [
-//                    "projectId" => $project,
-//                    "provider" => $provider,
-//                    "installation" => $installation,
-//                    "details" => $details
-//                ];
-//            }
-//
-//            $lavQuery_details = new Query($lavoisierUrl, 'listMetricsDetails', 'lavoisier', 'xml', $lavoisierPort);
-//            $lavQuery_details->setHydrator($hydrator);
-//            $lavQuery_details ->setMethod('POST');
-//            $lavQuery_details ->setPostFields($array_POST);
-//
-//
-//
-//
-//                try {
-//                    $res_details  = $lavQuery_details->execute();
-//                    $tabMetricsDetails=$res_details->getArrayCopy();
-//
-//
-//                } catch (CurlException $e) {
-//                } catch (HTTPStatusException $e) {
-//                    return new Response("Exception".$e, 500);
-//                }
-//
-//        }
-
-
-        return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", [
-            'listEntities'=>$listEntities,
-            'details'=>$details
-        ]);
+       return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", ["listIds"=>$listIds,"tabInstallations"=>$tabInstallations, "listEntities"=>$permissions , 'details'=>$details,'tabMetricsDetails'=>$tabMetricsDetails]);
 
     }
 
     /**
-     * @Route("/metricsEOSC/ajax/dissociatesProviders",  name="dissociates_providers")
+     * @Route("/ajax/modifyProvidersProject",  name="modify_providers_project")
      *
-     * ajax calls to dissociates providers to a project
-     * @param LavoisierService $lavoisierService
-     * @return Response
+     * ajax calls to dissociates/associate providers to a project
+     * @return JsonResponse
      */
-    public function dissociatesProviders(LavoisierService $lavoisierService, Request $request)
+    public function modifyProviders( Request $request,AccountingService $api)
     {
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
-        $array_POST = [
-            'project' => $request->get('project'),
-            'provider' => $request->get('provider'),
-        ];
-
-
-        $lavQuery = new Query($lavoisierUrl, 'dissociatesProvider', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The provider has been removed';
-        $message2 = 'The dissociation of the provider has failed';
+            $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+            $response=$api->modifyProviders($request->get('mode'), $request->get('project'),$request->get('provider'),$bearerToken);
 
         try {
-            $lavQuery->setMethod('POST');
-            $lavQuery->setPostFields($array_POST);
-            $res = $lavQuery->execute();
-            sleep(1);
-
-            $lavQueryNotify = new Query($lavoisierUrl, 'listProjects', 'notify', 'xml', $lavoisierPort);
-            $lavQueryNotify->execute();
-
-
-
-            return new Response('<em>' . $message1 . '</em>', 200);
+            $status = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
 
         } catch (\Exception $exception) {
-            return new Response('<em>' . $message2 . '</em>', 500);
-        }
 
+            $status = $response->getStatusCode();
+            $message = $exception->getResponse()->getInfo()['response_headers'][2];
+            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
+
+        }
     }
+
+
+
 
     /**
      * @Route("/ajax/deleteInstallation",  name="delete_installation")
      *
      * ajax calls to remove installation
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
-    public function deleteInstallation(LavoisierService $lavoisierService, Request $request)
+    public function deleteInstallation(AccountingService $api, Request $request)
     {
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
 
-        $array_POST = [
-            'installation_id' => $request->get('installation_id'),
-        ];
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
+        $response=$api->deleteRessource('/installations/'.$request->get('installation_id'),$bearerToken);
 
-        $lavQuery = new Query($lavoisierUrl, 'deleteInstallation', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The installation has been removed successfully';
-        $message2 = 'The deletion has failed';
 
         try {
-            $lavQuery->setMethod('POST');
-            $lavQuery->setPostFields($array_POST);
-            $res = $lavQuery->execute();
-
-
-            sleep(2);
-
-            $lavQueryNotify = new Query($lavoisierUrl, 'listInstallations', 'notify', 'xml', $lavoisierPort);
-            $lavQueryNotify->execute();
-
-
-            return new Response('<em>' . $message1 . '</em>', 200);
+            $status = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
 
         } catch (\Exception $exception) {
-            return new Response('<em>' . $message2 . '</em>', 500);
+
+            $status = $response->getStatusCode();
+            $message = $exception->getResponse()->getInfo()['response_headers'][0];
+            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
+
         }
+
 
     }
 
@@ -473,16 +892,13 @@ class HomeController extends AbstractController
      * @Route("/ajax/addInstallation",  name="add_installation")
      *
      * ajax calls to add installation
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
-    public function addInstallation(LavoisierService $lavoisierService, Request $request)
+    public function addInstallation(AccountingService $api, Request $request)
     {
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
-        $array_POST = [
+        $body = [
             'project' => $request->get('project'),
             'infrastructure' => $request->get('infrastructure'),
             'organisation' => $request->get('provider'),
@@ -490,198 +906,119 @@ class HomeController extends AbstractController
             'unit_of_access' => $request->get('metric_definition')
         ];
 
-
-        $lavQuery = new Query($lavoisierUrl, 'addInstallation', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The new installation has been added successfully ';
-        $message2 = 'The creation of a new installation has failed ';
+        $response=$api->addRessource('/installations',$body,$bearerToken );
 
         try {
-            $lavQuery->setMethod('POST');
-            $lavQuery->setPostFields($array_POST);
-            $res = $lavQuery->execute();
-            sleep(2);
-
-            $lavQueryNotify = new Query($lavoisierUrl, 'listInstallations', 'notify', 'xml', $lavoisierPort);
-            $lavQueryNotify->execute();
-
-
-            return new Response('<em>' . $message1 . '</em>', 200);
+            $status = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
 
         } catch (\Exception $exception) {
-            return new Response('<em>' . $message2 . '</em>', 500);
-        }
 
+            $status = $response->getStatusCode();
+            $message = $exception->getResponse()->getInfo()['response_headers'][0];
+            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
+
+        }
     }
 
     /**
-     * @Route("/ajax/associatesProviders",  name="associates_providers" )
+     * @Route("/ajax/modifyInstallation",  name="modify_installation" )
      *
-     * ajax calls to associates providers to a project
-     * @param LavoisierService $lavoisierService
+     *
      * @return Response
      */
-    public function associatesProviders(LavoisierService $lavoisierService, Request $request)
+
+    public function modifyInstallation(AccountingService $api, Request $request)
     {
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
-        $array_POST = [
+        $body = [
             'project' => $request->get('project'),
-            'provider' => $request->get('provider'),
+            'infrastructure' => $request->get('infrastructure'),
+            'organisation' => $request->get('provider'),
+            'installation' => $request->get('installation'),
+            'unit_of_access' => $request->get('metric_definition')
         ];
 
-
-        $lavQuery = new Query($lavoisierUrl, 'associatesProvider', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The new provider has been added successfully';
-        $message2 = 'The creation of a new provider has failed';
+        if ($request->get('type') === 'add') {
+            $response=$api->addRessource('/installations',$body,$bearerToken );
+        }
+        else {
+            $response = $api->updateRessource('/installations/' .$request->get('id'),$body,$bearerToken);
+        }
 
         try {
-            $lavQuery->setMethod('POST');
-            $lavQuery->setPostFields($array_POST);
-            $res = $lavQuery->execute();
-
-
-            sleep(2);
-
-
-            $lavQueryNotify = new Query($lavoisierUrl, 'listProjects', 'notify', 'xml', $lavoisierPort);
-            $lavQueryNotify->execute();
-
-
-
-            return new Response('<em>' . $message1 . '</em>', 200);
+            $status = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
 
         } catch (\Exception $exception) {
-            return new Response('<em>' . $message2 . '</em>', 500);
+
+            $status = $response->getStatusCode();
+            $message = $exception->getResponse()->getInfo()['response_headers'][0];
+            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
+
         }
+
 
     }
 
-    /**
-     * @Route("/ajax/addProvider",  name="add_provider" )
-     *
-     * form to get metrics provider list
-     * @param LavoisierService $lavoisierService
-     * @return Response
-     */
-    public function addProvider(LavoisierService $lavoisierService, Request $request)
-    {
 
-
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
-
-        $array_POST = [
-            'id' => $request->get('id'),
-            'name' => $request->get('name'),
-            'website' => $request->get('website'),
-            'abbreviation' => $request->get('abbreviation'),
-            'logo' => $request->get('logo')];
-
-
-        $lavQuery = new Query($lavoisierUrl, 'publishProvider', 'lavoisier', 'xml', $lavoisierPort);
-        $message1 = 'The new provider has been added successfully';
-        $message2 = 'The creation of a new provider has failed';
-
-        try {
-            $lavQuery->setMethod('POST');
-            $lavQuery->setPostFields($array_POST);
-            $res = $lavQuery->execute();
-
-            sleep(3);
-
-
-            $lavQueryNotify = new Query($lavoisierUrl, 'listProviders', 'notify', 'xml', $lavoisierPort);
-            $lavQueryNotify->execute();
-
-            sleep(3);
-
-
-            return new Response('<em>' . $message1 . '</em>', 200);
-
-        } catch (\Exception $exception) {
-            return new Response('<em>' . $message2 . '</em>', 500);
-        }
-
-    }
 
     /**
      * @Route("/ajax/modifyMetricsDescription",  name="modify_metric_description" )
      *
      * form to get metrics provider list
-     * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function modifyMetricDescription(LavoisierService $lavoisierService, Request $request)
+    public function modifyMetricDescription(AccountingService $api, Request $request)
     {
-        $hydrator = new EntriesHydrator();
 
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
         if ($request->get('type') === 'addition') {
-            $array_POST = [
+            $body = [
                 'metric_name' => $request->get('metricName'),
                 'metric_description' => $request->get('metricDescription'),
                 'unit_type' => $request->get('metricUnit'),
                 'metric_type' => $request->get('metricType')];
 
+            $response=$api->addRessource('/metric-definitions',$body,$bearerToken );
 
-            $lavQuery = new Query($lavoisierUrl, 'publishMetricDefinition', 'lavoisier', 'xml', $lavoisierPort);
-            $message1 = 'A new metric definition has been added successfully';
-            $message2 = 'The addition of a new metric definition has failed';
 
         } else {
             if ($request->get('type') === 'update') {
-                $array_POST = [
+                $body = [
                     'metric_id' => $request->get('metricId'),
                     'metric_name' => $request->get('metricName'),
                     'metric_description' => $request->get('metricDescription'),
                     'unit_type' => $request->get('metricUnit'),
                     'metric_type' => $request->get('metricType')];
-
-                $lavQuery = new Query($lavoisierUrl, 'patchMetricDefinition', 'lavoisier', 'xml', $lavoisierPort);
-                $message1 = 'The metric definition has been updated successfully';
-                $message2 = 'The metric definition update has failed';
-
-
+                $response=$api->updateRessource('/metric-definitions/'.$request->get('metricId'),$body,$bearerToken );
             } // last case : delete
             else {
-                $array_POST = [
-                    'metric_id' => $request->get('metricId')];
-                $lavQuery = new Query($lavoisierUrl, 'deleteMetricDefinition', 'lavoisier', 'xml', $lavoisierPort);
-                $message1 = 'The metric definition has been deleted successfully';
-                $message2 = 'The deletion is not possible. Some metrics are attached to the metric definition';
+                $response=$api->deleteRessource('/metric-definitions/'.$request->get('metricId'),$bearerToken);
 
             }
         }
 
         try {
-            $lavQuery->setMethod('POST');
-            $lavQuery->setPostFields($array_POST);
-            $res = $lavQuery->execute();
-
-            $lavQueryNotify = new Query($lavoisierUrl, 'listMetricDefinition', 'notify', 'xml', $lavoisierPort);
-            $lavQueryNotify->execute();
-            if ($request->get('type') === 'addition')
-                sleep(3);
-
-
-            $code = simplexml_load_string($res);
-
-
-            if (str_contains($code, '409'))
-                return new Response('<em>The deletion is not possible. <br/>Some metrics are attached to the metric definition</em>', 500);
-            else
-                return new Response('<em>' . $message1 . '</em>', 200);
+            $status = $response->getStatusCode();
+            $headers = $response->getHeaders();
+            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
 
         } catch (\Exception $exception) {
-            return new Response('<em>' . $message2 . '</em>', 500);
+
+            $status = $response->getStatusCode();
+            $message = $exception->getResponse()->getInfo()['response_headers'][0];
+
+            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
+
         }
+
 
     }
 

@@ -20,11 +20,13 @@
     </thead>
 
     <tbody>
-    {%  for id, data in tabMetricsTypes %}
-        <tr>
-            <td>{{ id }} </td>
-        </tr>
 
+    {%  for metrics in tabMetricsTypes %}
+        {%  for metric in metrics %}
+            <tr>
+                <td>{{ metric.metric_type }} </td>
+            </tr>
+        {% endfor %}
     {% endfor %}
 </table>
 

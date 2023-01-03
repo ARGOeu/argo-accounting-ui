@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col text-start">
+                <H3 class="card-title"><i class="bi bi-gear"></i> Browse metrics</H3>
+            </div>
+            <div class="col text-end align-top align-text-top">
+                <a class="btn btn-primary  align-top" data-bs-toggle="collapse" href="#collapse-body"
+                   role="button" aria-expanded="false" aria-controls="collapseExample">
+                    <i class="bi bi-arrows-collapse"></i>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="card-body" id="collapse-body">
+        <div class="row">
+            <div class="m-2">
+                <i class="bi bi-gear" style="display: inline-block "></i> Select the different entities by starting with projects then submit to browse metrics related to these entities
+            </div>
+            <div>
+                <hr/>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col text-center  border-end">
+
+                <h3 class="card-title">Projects</h3>
+
+                <div class="btn-group-vertical" role="group">
+                    {% for project in listEntities['content'] %}
+                    {%  for permissions in project['permissions'] %}
+                        {% for permission in permissions['access_permissions'] %}
+                            {% if permissions.collection == 'Metric' and permission.access_type=='ALWAYS' and permission.operation=='READ'  %}
+                            <button id="project_{{ project.id }}" type="button" class="projects btn btn btn-secondary m-1" value="{{ project.acronym }}" >{{ project.acronym }}</button>
+                            {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <div class="col text-center border-end">
+
+                <h3 class="card-title">Providers</h3>
+
+                <div class="btn-group-vertical" role="group">
+                    {% for project in listEntities['content'] %}
+                        <br/>
+                        <label class="fw-bold">{{  project.acronym}}</label>
+                        {% for provider in project['providers'] %}
+                            <button type="button" name="project_{{ project.id }}" id="provider_{{ provider.id }}" class="providers  btn btn btn-primary m-1" value="{{ provider.name }}">{{ provider.name }}</button>
+                        {% endfor %}
+
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <div class="col text-center">
+
+                <h3 class="card-title">Installations</h3>
+
+                <div class="btn-group-vertical" role="group">
+                    {% for project in listEntities['content'] %}
+                        {% for provider in project['providers'] %}
+                            {% if  provider['installations'] | length > 0%}
+                                <br/>
+                            <label class="fw-bold">{{  provider.name}}</label>
+                            {%  for installation in provider['installations'] %}
+                                <button type="button" id="installation_{{  installation.id  }}" name="provider_{{ provider.id }}" class="installations   btn btn btn-primary m-1" value="{{ installation.installation }}">{{ installation.installation }}</button>
+                            {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+
+
+
+    <div class="card-footer text-center">
+        <input type="submit" class="btn btn-primary d-none" id="submit_metrics" value="Browse Metrics"/>
+    </div>
+</div>
+    {% endblock %}
+
+{% block javascripts %}
+{% endblock %}
