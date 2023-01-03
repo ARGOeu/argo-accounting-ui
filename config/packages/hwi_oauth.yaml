@@ -1,0 +1,19 @@
+hwi_oauth:
+    # list of names of the firewalls in which this bundle is active, this setting MUST be set
+    firewall_names: [secured_area]
+
+    # https://github.com/hwi/HWIOAuthBundle/blob/master/Resources/doc/2-configuring_resource_owners.md
+    resource_owners:
+        aai_eosc:
+            type:                oauth2
+            class:               \HWI\Bundle\OAuthBundle\OAuth\ResourceOwner\OAuth2ResourceOwner
+            client_id:           '%env(EOSC_AAI_ID)%'
+            client_secret:       '%env(EOSC_AAI_SECRET)%'
+            access_token_url:    '%env(EOSC_AAI_TOKEN)%'
+            authorization_url:   '%env(EOSC_AAI_AUTHORIZE)%'
+            infos_url:           '%env(EOSC_AAI_INFO)%'
+            scope:               "openid eduperson_entitlement voperson_id profile email"
+
+
+
+

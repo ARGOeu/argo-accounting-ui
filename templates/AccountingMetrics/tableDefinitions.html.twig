@@ -11,35 +11,20 @@
                 Metrics definition</h1>
             <hr/>
 
-<div class="toast m-2" id="toast-update-success">
-    <div class="toast-header">
-        <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-             preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-            <rect fill="#007a00" width="100%" height="100%"/>
-        </svg>
-        <strong class="me-auto">Status</strong>
-        <small>just now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast-update-success" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-        The Metric description has been properly updated !
-    </div>
-</div>
-
-<div class="toast m-2" id="toast-update-failure">
-    <div class="toast-header">
-        <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-             preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-            <rect fill="#ff0000" width="100%" height="100%"/>
-        </svg>
-        <strong class="me-auto">Status</strong>
-        <small>just now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-        The update has failed !
-    </div>
-</div>
+            {% if message is defined and message!='' %}
+                <div class="card m-1 col-4 mb-2" id="message">
+                    <div class="card-header {% if status < 210 %} bg-success{% else %} bg-danger {% endif %}">
+                        {% if status < 210 %}
+                            <h3 class="card-title text-white "><i class="bi bi-check-circle m-1"></i> Update done</h3>
+                        {% else %}
+                            <h3 class="card-title text-white "><i class="bi bi-exclamation-triangle m-1"></i>Update failed</h3>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h4>Status {{ status }} - {{ message }}</h4>
+                    </div>
+                </div>
+            {% endif %}
 
 <div class="text-end">
     <button class="btn btn-primary" id="addMetricDefinition" data-bs-toggle="modal" data-bs-target="#add_metric_desc"> <i class="bi bi-plus-square me-1"></i>Add a new metric definition
@@ -76,22 +61,24 @@
 
                     <div class="form-group m-2">
                         <label for="unit">Unit</label>
-                        <select id="unit" name="metricUnit">
-                            {% for unit in tabMetricsUnits %}
-                                <option value="{{ unit.symbol }}">{{ unit.unit }}</option>
+                        <select id="unit" name="metricUnit" class="form-select">
+                            {% for units in tabMetricsUnits %}
+                                {% for unit in units %}
+                                    <option value="{{ unit.symbol }}">{{ unit.unit }}</option>
+                                {% endfor %}
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="form-group m-2">
                         <label for="type">Metric Type</label>
-                        <select id="type" name="metricType">
-                            {% for  type, metricType in tabMetricsTypes %}
-                                <option value="{{ type }}">{{ type }}</option>
+                        <select id="type" name="metricType" class="form-select">
+                            {% for types in tabMetricsTypes['metric_types'] %}
+                                <option value="{{ types.metric_type  }}">{{ types.metric_type  }}</option>
                             {% endfor %}
+
                         </select>
                     </div>
-
 
                     <button type="submit" class="btn btn-primary">Submit</button>
 
@@ -120,8 +107,11 @@
     </thead>
 
     <tbody>
-    {% for id, data in tabMetricsDef %}
-        <tr id="tr_{{ id }}">
+    {% for data in tabMetricsDef['content'] %}
+
+
+
+        <tr id="tr_{{ data.metric_definition_id }}">
             <td class="metricName">{{ data.metric_name }} </td>
             <td class="metricDescription">{{ data.metric_description }} </td>
             <td class="metricUnit">{{ data.unit_type }} </td>
@@ -129,18 +119,19 @@
 
             <td>
                 <div class="btn-group dropstart">
-                    <button class="btn btn-white dropdown-toggle border border-light text-dark"
+
+                    <button class="btn bg-light dropdown-toggle border border-dark text-dark"
                             type="button" id="dropdownActions" data-bs-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                         Actions
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownActions">
 
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update_{{ id }}">
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update_{{ data.metric_definition_id }}">
                             <i class="bi bi-pencil-square"></i>
                             Update Metric Definition
                         </a>
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#delete_{{ id }}">
+                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#delete_{{ data.metric_definition_id}}">
                             <i class="bi bi-x-circle"></i>
                              Delete Metric Definition
                         </a>
@@ -150,7 +141,7 @@
                     <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
 
                     <!-- Modal delete  -->
-                    <div class="modal fade" id="delete_{{ id }}" tabindex="-1" aria-labelledby="delete_{{ id }}_Label">
+                    <div class="modal fade" id="delete_{{ data.metric_definition_id }}" tabindex="-1" aria-labelledby="delete_{{ data.metric_definition_id}}_Label">
                         <div class="modal-dialog modal-dialog-scrollable">
                             <div class="modal-content">
 
@@ -162,7 +153,7 @@
                                 <div class="modal-body">
                                     <form class="form_delete_metric_desc">
                                         <input type="hidden" name="type" value="delete"/>
-                                        <input type="hidden" value="{{ id }}" name="metricId"/>
+                                        <input type="hidden" value="{{ data.metric_definition_id }}" name="metricId"/>
 
                                         <div class="form-group m-2">
                                             <label for="metricName">Metric Name</label>
@@ -195,7 +186,7 @@
                     </div>
 
                     <!-- Modal update  -->
-                    <div class="modal fade" id="update_{{ id }}" tabindex="-1" aria-labelledby="update_{{ id }}_Label">
+                    <div class="modal fade" id="update_{{ data.metric_definition_id }}" tabindex="-1" aria-labelledby="update_{{ data.metric_definition_id}}_Label">
                         <div class="modal-dialog modal-dialog-scrollable">
                             <div class="modal-content">
 
@@ -208,7 +199,7 @@
                                     <form class="form_update_metric_desc">
                                         <input type="hidden" name="type" value="update"/>
 
-                                        <input type="hidden" value="{{ id }}" name="metricId"/>
+                                        <input type="hidden" value="{{ data.metric_definition_id }}" name="metricId"/>
                                         <div class="form-group m-2">
                                             <label for="metricName">Metric Name</label>
                                             <input type="text" class="form-control" id="metricName" name="metricName"
@@ -226,22 +217,25 @@
 
                                         <div class="form-group m-2">
                                             <label for="unit">Unit</label>
-                                            <select id="unit" name="metricUnit">
-                                                {% for unit in tabMetricsUnits %}
-
+                                            <select id="unit" name="metricUnit" class="form-select">
+                                                {% for key,units in tabMetricsUnits %}
+                                                    {% for unit in units %}
                                                     <option value="{{ unit.symbol }}"
                                                             {% if unit.symbol==data.unit_type %}selected{% endif %}>{{ unit.unit }}</option>
+                                                    {% endfor %}
                                                 {% endfor %}
                                             </select>
                                         </div>
 
                                         <div class="form-group m-2">
                                             <label for="type">Metric Type</label>
-                                            <select id="type" name="metricType">
-                                                {% for  type, metricType in tabMetricsTypes %}
-                                                    <option value="{{ type }}"
-                                                            {% if type==data.metric_type %}selected{% endif %}>{{ type }}</option>
+                                            <select id="type" name="metricType" class="form-select">
+                                                {% for types in tabMetricsTypes['metric_types'] %}
+                                                        <option value="{{ types.metric_type  }}"
+                                                                {% if types.metric_type==data.unit_type %}selected{% endif %}>{{ types.metric_type  }}</option>
+
                                                 {% endfor %}
+
                                             </select>
                                         </div>
 
@@ -278,6 +272,7 @@
 {% block javascripts %}
     <script>
         $(document).on('submit','.form_add_metric_desc, .form_update_metric_desc, .form_delete_metric_desc',function(event) {
+
             event.preventDefault(); // cancel default behavior
 
             let metricId=  $(this).find('input[name="metricId"]').val().trim();
@@ -296,7 +291,7 @@
             }
 
             let url= "{{ url('modify_metric_description') }}";
-            let redirection="{{ url('metrics-definitions')}}";
+
 
             let request = $.ajax({
                 type: "POST",
@@ -309,39 +304,35 @@
                         $('#loader_add').removeClass('d-none');
                 }});
 
-            request.done(function (output_success) {
-                $("#toast-update-success > .toast-body").html(output_success);
-                $("#toast-update-success").toast("show");
+            request.done(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.status;
+                var message = output.message;
+
 
                 if (type==='update') {
-
-                    $("#tr_"+metricId).find('td.metricName').text(metricName);
-                    $("#tr_"+metricId).find('td.metricDescription').text(metricDescription);
-                    $("#tr_"+metricId).find('td.metricUnit').text(metricUnit);
-                    $("#tr_"+metricId).find('td.metricType').text(metricType);
                     $("#update_" + metricId).modal('hide');
-
-
 
                 }
                 if (type==='addition') {
                     $("#add_metric_desc").modal('hide');
-                    $('#loader_add').addClass('d-none');
-                    window.location.href=redirection;
 
                 }
                 if (type==='delete') {
                     $("#delete_" + metricId).modal('hide');
-                    $("#tr_"+metricId).addClass('d-none');
 
                 }
 
+               $.redirect(window.location.href, {'status': status, 'message': message});
+
 
             });
-            request.fail(function (xhr, status, error) {
+            request.fail(function (output_json) {
 
-                $("#toast-update-failure > .toast-body").html(xhr.responseText);
-                $("#toast-update-failure").toast("show");
+                var output = jQuery.parseJSON(output_json);
+                var status = output.status;
+                var message = output.message;
 
                 if (type==='update')
                     $("#update_"+metricId).modal('hide');
@@ -350,9 +341,16 @@
                 if (type==='delete')
                     $("#delete_"+metricId).modal('hide');
 
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
+
             });
 
 
+        });
+
+        $("#message").fadeTo(5000, 1500).slideUp(2500, function () {
+            $("#message").slideUp(2500);
         });
 
     </script>

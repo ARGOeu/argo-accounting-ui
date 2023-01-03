@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Services;
+namespace App\Service;
 
 
 use Lavoisier\Hydrators\EntriesHydrator;

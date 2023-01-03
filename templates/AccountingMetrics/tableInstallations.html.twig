@@ -8,43 +8,29 @@
     <div class="row">
         <div class="offset-1 col-10 mt-1 mb-3">
             <h1><i class="bi bi-bar-chart-steps"></i>
-                Installations  <div class="ms-2 d-none spinner-border text-primary" id="loader_remove_installation" role="status">
+                Installations
+                <div class="ms-2 d-none spinner-border text-primary" id="loader_add_installation" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </h1>
             <hr/>
 
-            <div class="toast m-2" id="toast-update-success">
-                <div class="toast-header">
-                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-                        <rect fill="#007a00" width="100%" height="100%"/>
-                    </svg>
-                    <strong class="me-auto">Status</strong>
-                    <small>just now</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast-update-success" aria-label="Close"></button>
+            {% if message is defined and message!='' %}
+                <div class="card m-1 col-4 mb-2" id="message">
+                    <div class="card-header {% if status < 210 %} bg-success{% else %} bg-danger {% endif %}">
+                        {% if status < 210 %}
+                            <h3 class="card-title text-white "><i class="bi bi-check-circle m-1"></i> Update done</h3>
+                        {% else %}
+                            <h3 class="card-title text-white "><i class="bi bi-exclamation-triangle m-1"></i>Update failed</h3>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h4>Status {{ status }} - {{ message }}</h4>
+                    </div>
                 </div>
-                <div class="toast-body">
-                    The installation has been properly added !
-                </div>
-            </div>
+            {% endif %}
 
-            <div class="toast m-2" id="toast-update-failure">
-                <div class="toast-header">
-                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-                        <rect fill="#ff0000" width="100%" height="100%"/>
-                    </svg>
-                    <strong class="me-auto">Status</strong>
-                    <small>just now</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    The update has failed !
-                </div>
-            </div>
-
-                        <div class="text-end">
+            <div class="text-end">
                             <button class="btn btn-primary" id="addInstallation" data-bs-toggle="modal" data-bs-target="#add_installation">
                                 <i class="bi bi-plus-square me-1"></i> Add a new installation
                             </button>
@@ -60,27 +46,44 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                         </div>
+
+                        {% set browse = false %}
+                        {% for projects in tabProjects %}
+                            {% for project in projects %}
+                                {% if permissions[project.acronym]['Installation']['CREATE'] %}
+                                    {% set browse=true %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+
+                        {% if browse %}
                         <div class="modal-body">
                             <form class="form_add_installation">
 
 
+                                <input type="hidden" name="type" value="add"/>
                                 <div class="form-group m-2">
                                     <label for="project_id" class="m-1">Select your Project</label>
                                     <select class="form-control form-select projects" id="project_id" name="project_id">
-                                        {% for project in tabProjects %}
-                                            <option value="{{ project.id }}">{{ project.acronym }}</option>
+                                        {% for projects in tabProjects %}
+                                            {% for project in projects %}
+                                               {% if permissions[project.acronym]['Installation']['CREATE'] %}
+                                                    <option value="{{ project.id }}">{{ project.acronym }}</option>
+                                                {% endif %}
+                                            {% endfor %}
                                         {% endfor %}
                                     </select>
                                 </div>
 
 
-                                    {% for project in tabProjects %}
-                                        {%  if loop.index==1 %}
+                                    {% for projects in tabProjects %}
+                                            {% for project in projects %}
+
                                             <div class="form-group m-2 providers" id="providers_{{ project.id }}">
-                                                <label for="providers" class="m-1">Associates a new provider</label>
+                                                <label for="providers" class="m-1">Select a provider</label>
                                                 <select class="form-control form-select" id="providers_select_{{ project.id }}"  name="providers" >
 
-                                                            {% for provider in project  %}
+                                                            {% for provider in project['providers']  %}
                                                                 {%  if provider.name is defined %}
                                                                  <option value="{{ provider.id}}">{{ provider.name }}</option>
                                                                 {% endif %}
@@ -89,22 +92,8 @@
 
                                                 </select>
                                             </div>
-                                    {% else %}
-                                        <div class="form-group m-2 d-none  providers" id="providers_{{ project.id }}">
-                                            <label for="providers" class="m-1">Associates a new provider</label>
-                                            <select class="form-control form-select"  id="providers_select_{{ project.id }}" name="providers" >
 
-                                                {% for provider in project  %}
-                                                    {%  if provider.name is defined %}
-                                                        <option value="{{ provider.id}}">{{ provider.name }}</option>
-                                                    {% endif %}
-                                                {% endfor %}
-
-
-                                            </select>
-                                        </div>
-                                        {% endif %}
-
+                                    {% endfor %}
                                     {% endfor %}
 
 
@@ -123,9 +112,11 @@
                                 </div>
 
                                 <div class="form-group m-2">
+
                                     <label for="metric_definition" class="m-1">Metric Definition</label>
                                     <select class="form-control form-select" id="metric_definition" name="metric_definition" >
-                                        {% for def in tabMetricsDef %}
+
+                                        {% for def in tabMetricsDef['content'] %}
                                             <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
                                         {% endfor %}
 
@@ -142,12 +133,19 @@
                                 </div>
 
                             </form>
-
                         </div>
 
-                    </div>
+                    {% else %}
+                        <div class="modal-body">
+                            <span class="alert alert-danger m-2 p-2">You are not authorized to add any installation ! </span>
+                        </div>
+
+                        {% endif %}
+
+
                 </div>
             </div>
+        </div>
 
             <table class="dataTable table  border border-dark" id="TableInstallations">
 
@@ -163,43 +161,186 @@
                 </thead>
 
                 <tbody>
-                {%  for id, installation in tabInstallations %}
-                    <tr id="installation_{{ installation.id }}">
+                {%  for installations in tabInstallations %}
+                    {%  for id, installation in installations %}
 
-                        <td>{{ installation.installation}}</td>
-                        {%  set nameP = '' %}
-                        {%  for project in tabProjects %}
-                            {% if project.id==installation.project %}
-                                {% set nameP = project.acronym %}
-                            {% endif %}
-                        {% endfor %}
-                        <td>{{ nameP }}</td>
-                        <td>{{ installation.organisation}}</td>
-                        <td>{{ installation.infrastructure}}</td>
-                        <td>
+                        <tr id="installation_{{ installation.id }}">
+                            {%  set nameP = '' %}
+                            {%  for projects in tabProjects %}
+                                {% for project in projects %}
+                                    {% if project.id==installation.project %}
+                                        {% set nameP = project.acronym %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            <td>{{ installation.installation}}</td>
 
-                            <ul>
-                                    <li>
-                                        {{ installation.metrics.metric_name }} : {{ installation.metrics.metric_description}} ({{ installation.metrics.unit_type}} - {{  installation.metrics.metric_type}})
-                                    </li>
+                            <td>{{ nameP }}</td>
+                            <td>{{ installation.organisation}}</td>
+                            <td>{{ installation.infrastructure}}</td>
 
-                            </ul>
+                            <td>
+                                <ul>
+                                        <li>
+                                            {{ installation.unit_of_access.metric_name }} : {{ installation.unit_of_access.metric_description}} ({{ installation.unit_of_access.unit_type}} - {{  installation.unit_of_access.metric_type}})
+                                        </li>
 
-                        </td>
-                        <td> <a class="deleteInstallation" id="delete_{{ installation.id }}" ><i class="bi bi-trash-fill"></i></a>
+                                </ul>
 
-                        </td>
+                            </td>
 
-                    </tr>
+                            <td>
 
+                                <div class="btn-group dropstart">
+                                    {% if permissions[nameP]['Installation'] is defined %}
+                                    <button class="btn bg-light dropdown-toggle border border-dark text-dark"
+                                            type="button" id="dropdownActions" data-bs-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownActions">
+
+                                        {% if permissions[nameP]['Installation']['UPDATE'] is defined%}
+                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update_{{ installation.id}}">
+                                            <i class="bi bi-pencil-square"></i>
+                                            Update Installation
+                                        </a>
+                                        {% endif %}
+
+                                        {% if permissions[nameP]['Installation']['DELETE'] is defined%}
+                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#delete_{{ installation.id}}">
+                                                <i class="bi bi-x-circle"></i>
+                                                Delete Installation
+                                            </a>
+                                        {% endif %}
+
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
+
+                                <!-- Modal delete  -->
+                                <div class="modal fade" id="delete_{{ installation.id}}" tabindex="-1" aria-labelledby="delete_{{ installation.id}}_Label">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header  bg-light">
+                                                <h5 class="modal-title text-center">Delete Installation</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="form_delete_installation">
+                                                    <input type="hidden" name="type" value="delete"/>
+                                                    <input type="hidden" value="{{ installation.id}}" name="installationId"/>
+
+                                                    <div class="form-group m-2">
+                                                        <label for="installation">Installation</label>
+                                                        <input type="text" class="form-control" id="installation" name="installation"
+                                                               value="{{ installation.installation }}">
+                                                    </div>
+
+                                                    <div class="form-group m-2">
+                                                        <label for="organisation">Organisation</label>
+                                                        <input type="text" class="form-control" id="provider" name="provider"
+                                                               value="{{ installation.organisation }}">
+                                                    </div>
+
+                                                    <div class="form-group m-2">
+                                                        <label for="metricDescription">Infrastructure</label>
+                                                        <input type="text" class="form-control" id="metricDescription" name="metricDefinition"
+                                                               value="{{ installation.infrastructure}}">
+                                                    </div>
+
+
+                                                    <br/>
+                                                    <hr/>
+
+                                                    <span class="mb-1 alert alert-danger">You are going to delete the installation described previously !</span>
+                                                    <br/>
+                                                    <br/>
+                                                    <button type="submit" class="btn btn-danger" value="submit">Delete Installation</button>
+                                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                                            aria-label="Close">Close
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal update  -->
+                                <div class="modal fade" id="update_{{ installation.id}}" tabindex="-1" aria-labelledby="update_{{ installation.id}}_Label">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header  bg-light">
+                                                <h5 class="modal-title text-center">Update Installation</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="form_update_installation">
+                                                    <input type="hidden" name="type" value="update"/>
+                                                    <input type="hidden" value="{{ installation.id }}" name="installationId"/>
+                                                    <input type="hidden" value="{{ installation.project }}" name="projectId"/>
+                                                    <input type="hidden" name="provider" value="{{ installation.organisation }}"/>
+
+                                                    <div class="form-group m-2">
+                                                        <label for="metricName">Installation Name</label>
+                                                        <input type="text" class="form-control" id="installation" name="installation"  value="{{ installation.installation }}">
+                                                        <small id="installationHelp" class="form-text text-muted">Short name of the installation</small>
+                                                    </div>
+
+
+                                                    <div class="form-group m-2">
+                                                        <label for="infra" class="m-1">Infrastructure</label>
+                                                        <input type="text" class="form-control" name="infra" id="infra"    aria-describedby="infraHelp" value="{{ installation.infrastructure }}">
+                                                        <small id="infraHelp" class="form-text text-muted">Short name of infrastructure</small>
+                                                    </div>
+
+                                                    <div class="form-group m-2">
+
+                                                        <label for="metric_definition" class="m-1">Metric Definition</label>
+                                                        <select class="form-control form-select" id="metric_definition" name="metric_definition" >
+
+                                                            {% for def in tabMetricsDef['content'] %}
+                                                                <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
+                                                            {% endfor %}
+
+                                                        </select>
+
+
+                                                    </div>
+
+
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+
+
+                                                </form>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+
+
+                        </tr>
+
+                    {% endfor %}
                 {% endfor %}
-
                 </tbody>
 
             </table>
 
         </div>
+
     </div>
+
 
 
 {% endblock %}
@@ -214,90 +355,107 @@
             $('#providers_'+projectId).removeClass('d-none');
         });
 
-        $(document).on('click','.deleteInstallation',function(event) {
-            event.preventDefault();
+        $(document).on('submit','.form_add_installation, .form_update_installation, .form_delete_installation',function(event) {
+            event.preventDefault(); // cancel default behavior
 
-            var installationId= $(this).attr('id').split('delete_')[1];
+            let type=  $(this).find('input[name="type"]').val().trim();
+            let dataUrl;
+            let installationId;
+            let projectId;
+            let provider;
+            let url= "{{ url('modify_installation') }}";
 
-            var dataUrl="installation_id="+installationId;
+            if (type === 'delete') {
+                installationId=  $(this).find('input[name="installationId"]').val().trim();
+                dataUrl = 'type=' + type + '&installation_id='+installationId;
+                url= "{{ url('delete_installation') }}";
 
-            let url= "{{ url('delete_installation') }}";
-            let redirection="{{ url('installations')}}";
-            let rowId="#installation_"+installationId;
+            } else {
+                var installation = $(this).find('input[name="installation"]').val().trim();
+                var infra = $(this).find('input[name="infra"]').val().trim();
+                var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
+
+
+                if (type === 'update') {
+                    projectId = $(this).find('input[name="projectId"]').val().trim();
+                    provider = $(this).find('input[name="provider"]').val().trim();
+                    installationId=  $(this).find('input[name="installationId"]').val().trim();
+                    dataUrl = 'id='+installationId+'&type=' + type +"&project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
+                }
+                else {
+                    projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
+                    provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
+                    dataUrl = 'type=' + type +"&project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
+
+                }
+
+            }
+
+
+
 
             let request = $.ajax({
                 type: "POST",
                 url: url,
                 data: dataUrl,
+                crossDomain: true,
 
                 beforeSend: function () {
-                    $('#loader_remove_installation').removeClass('d-none');
+                        $('#loader_add').removeClass('d-none');
                 }});
 
-            request.done(function (output_success) {
-                $("#toast-update-success > .toast-body").html(output_success);
-                $("#toast-update-success").toast("show");
-                $('#loader_remove_installation').addClass('d-none');
+            request.done(function (output_json) {
 
-                $("#TableInstallations tbody").find(rowId).remove();
+                var output = jQuery.parseJSON(output_json);
+                var status = output.status;
+                var message = output.message;
+
+
+                $('#loader_add').addClass('d-none');
+
+                if (type==='update') {
+                    $("#update_" + installationId).modal('hide');
+
+                }
+                if (type==='add') {
+                    $("#add_installation").modal('hide');
+
+                }
+                if (type==='delete') {
+                    $("#delete_" + installationId).modal('hide');
+
+                }
+
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
 
 
             });
-            request.fail(function (xhr, status, error) {
-                $('#loader_remove_installation').addClass('d-none');
-                $("#toast-update-failure > .toast-body").html(xhr.responseText);
+            request.fail(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.status;
+                var message = output.message;
+
+                $("#toast-update-failure > .toast-body").html(message);
                 $("#toast-update-failure").toast("show");
 
+                if (type==='update')
+                    $("#update_" + installationId).modal('hide');
+                if (type==='add')
+                    $("#add_installation").modal('hide');
+                if (type==='delete')
+                    $("#delete_" + installationId).modal('hide');
+
+
+                    $.redirect(window.location.href, {'status': status, 'message': message});
+
             });
 
-        });
-
-    $(document).on('submit','.form_add_installation',function(event) {
-        event.preventDefault(); // cancel default behavior
-
-
-        var projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
-        var project = $('#project_id > option:selected').text().trim();
-        var provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
-
-        var installation = $(this).find('input[name="installation"]').val().trim();
-        var infra = $(this).find('input[name="infra"]').val().trim();
-        var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
-        var metric = $(this).find('select[name="metric_definition"] > option:selected').text().trim();
-
-        var dataUrl = "project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
-
-        let url = "{{ url('add_installation') }}";
-
-
-        let request = $.ajax({
-            type: "POST",
-            url: url,
-            data: dataUrl,
-            crossDomain: true,
-            beforeSend: function () {
-                $('#loader_add_installation').removeClass('d-none');
-            }});
-
-        request.done(function (output_success) {
-            $("#toast-update-success > .toast-body").html(output_success);
-            $("#toast-update-success").toast("show");
-            $("#add_installation").modal('hide');
-            $('#loader_add_installation').addClass('d-none');
-
-
-            var table = $('#TableInstallations').DataTable();
-            table.row.add( [installation,project, provider,infra,"<ul><li>"+metric+"</ul></li>",""]).draw();
 
         });
-        request.fail(function (xhr, status, error) {
-
-            $("#toast-update-failure > .toast-body").html(xhr.responseText);
-            $("#toast-update-failure").toast("show");
-            $("#add_installation").modal('hide');
 
 
-        });
-    });
+
     </script>
 {% endblock %}

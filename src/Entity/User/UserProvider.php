@@ -6,26 +6,25 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use App\Entity\User;
-use function PHPUnit\Framework\throwException;
+use App\Entity\User\User;
+
 use Symfony\Component\Security\Core\Exception;
 
-class UserProvider implements OAuthAwareUserProviderInterface
+class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInterface
 {
     protected $em;
     protected $factory;
 
-    public function __construct(EntityManager $em, EncoderFactory $factory)
+    public function __construct(EntityManager $em)
     {
         $this->em = $em;
-        $this->factory = $factory;
-    }
 
+    }
 
 
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
@@ -33,6 +32,7 @@ class UserProvider implements OAuthAwareUserProviderInterface
 
 
         $data=$response->getData();
+
 
         $id=$data['sub'];
 
@@ -55,15 +55,14 @@ class UserProvider implements OAuthAwareUserProviderInterface
         $roles= ['ROLE_USER'];
 
 
-        $existingUser=$this->em->getRepository('App:User')->findOneBy(array('id'=>$id));
+        $existingUser=$this->em->getRepository(\App\Entity\User\User::class)->findOneBy(array('id'=>$id));
 
         if ($existingUser!=null)
         {
             $user=$existingUser;
-
         }
         else {
-            $user = new User();
+            $user = new \App\Entity\User\User();
             $user->SetId($id);
             $user->setEmail($email);
             $user->setUsername($name);
@@ -86,7 +85,7 @@ class UserProvider implements OAuthAwareUserProviderInterface
     public function loadUserByUsername($username)
     {
 
-        $existingUser=$this->em->getRepository('App:User')->findOneBy(array('username'=>$username));
+        $existingUser=$this->em->getRepository(\App\Entity\User\User::class)->findOneBy(array('username'=>$username));
         if ($existingUser!=null)
             return $existingUser;
         else
@@ -109,9 +108,13 @@ class UserProvider implements OAuthAwareUserProviderInterface
 
     public function supportsClass($class): bool
     {
-        return $class === 'App\Entity\User';
+        return $class === 'App\Entity\User\User';
     }
 
 
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        // TODO: Implement loadUserByIdentifier() method.
+    }
 }
 

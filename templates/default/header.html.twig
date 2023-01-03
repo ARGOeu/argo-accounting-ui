@@ -48,34 +48,89 @@
 
 
 
-                <div class="uk-navbar-right align-self-center">
-                <ul id="mainTab" class="uk-navbar-nav nav nav-tabs ">
-                    {% set current_path = app.request.get('_route') %}
-                    <li class="nav-item">
-                        <a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >Installations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a>
-                    </li>
+                <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Resources
+                            </a>
+                            <ul class="dropdown-menu dropdown-large">
+                                {% set current_path = app.request.get('_route') %}
+                                <li><a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">Projects</a></li>
+                                <li><a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a></li>
+                                <li><a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >Installations</a></li>
+                                <li><a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a></li>
+                                <li><a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Metrics</a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="{{ path('metrics-types') }}" class="nav-link {% if current_path == 'metrics-types' %}  active {% endif %}">Metrics Type</a>
-                    </li>
+                        <li class="offset-4 text-end ml-5 nav-item dropdown">
+                              <a class="dropdown-toggle nav-link" href="#" role="button" id="dropdown_user" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="bi bi-person-fill-gear" style="color: #0a58ca;font-size: large"></i>
 
-                    <li class="nav-item">
-                        <a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Metrics</a>
-                    </li>
-                </ul>
+                                  <span class="text-default">{{ app.user.username}}</span>
+                            <br/><small class="ml-3 text-muted ml-1 navbar-email">{{ app.user.email }}</small>
+                            </a>
+                             <ul class="dropdown-menu" aria-labelledby="dropdown_user">
+                                 <li><a class="dropdown-item" href="{{ path('userInfo') }}"><i class="fa fa-user"></i> Your info</a></li>
+                                  <li><a class="dropdown-item" href="{{ path('aai_eosc_logout') }}"><i class="fa fa-lock"></i> Logout</a></li>
+
+                            </ul>
+
+                        </li>
+
+                    </ul>
                 </div>
+
+
+{#                <div class="uk-navbar-right align-self-center">#}
+
+{#                    <ul id="mainTab" class="uk-navbar-nav nav nav-tabs ">#}
+{#
+
+{#                        <li class="nav-item">#}
+{#                            <div class="dropdown">#}
+{#                                <div class="dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#                                    Ressources#}
+{#                                </div>#}
+{#                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">#}
+{#                                    <a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">Projects</a>#}
+{#                                    <a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a>#}
+{#                                    <a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >Installations</a>#}
+{#                                    <a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a>#}
+{#                                    <a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a>#}
+{#                                </div>#}
+{#                            </div>#}
+
+{#                            </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">Projects</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >Installations</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a>#}
+{#                    </li>#}
+
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('metrics-types') }}" class="nav-link {% if current_path == 'metrics-types' %}  active {% endif %}">Metrics Type</a>#}
+{#                    </li>#}
+
+{#                    <li class="nav-item">#}
+{#                        <a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Metrics</a>#}
+{#                    </li>#}
+{#                </ul>#}
+{#                </div>#}
 
 
 
