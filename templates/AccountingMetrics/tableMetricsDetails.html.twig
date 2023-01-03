@@ -57,14 +57,14 @@
 
                                     {% set sub_project= 'project_' %}
                                     {% if "#{sub_project}#{project.id}" in listIds %}
-                                        <button id="project_{{ project.id }}" type="button" class="projects btn btn-primary m-1" value="{{ project.acronym }}" >
+                                        <button id="project_{{ project.id }}" type="button" class="projects btn btn-sm btn-primary m-1" value="{{ project.acronym }}" >
                                             {{ project.acronym }}
                                             {% if access_right==1 %}
                                                 <i class="bi bi-star-fill" title="You can browse all metrics for this project"></i>
                                             {% endif %}
                                         </button>
                                     {% else %}
-                                        <button id="project_{{ project.id }}" type="button" class="projects btn btn-secondary m-1" value="{{ project.acronym }}" >
+                                        <button id="project_{{ project.id }}" type="button" class="projects btn btn-sm btn-secondary m-1" value="{{ project.acronym }}" >
                                             {{ project.acronym }}
                                             {% if access_right==1 %}
                                                 <i class="bi bi-star-fill" title="You can browse all metrics for this project"></i>
@@ -110,13 +110,13 @@
                                                 {% set sub_provider= 'provider_' %}
                                                 {% set separator='_' %}
                                                     {% if "#{sub_provider}#{ provider.id }#{separator}#{project.id}" in listIds %}
-                                                        <button type="button" id="provider_{{ provider.id }}_{{ project.id}}" class="providers  btn btn-primary m-1" value="{{ provider.name }}" >{{ provider.name }}
+                                                        <button type="button" id="provider_{{ provider.id }}_{{ project.id}}" class="providers btn-sm  btn btn-primary m-1" value="{{ provider.name }}" >{{ provider.name }}
                                                         {% if access_right==1 %}
                                                             <i class="bi bi-star-fill" title="You can browse all metrics for this provider"></i>
                                                         {% endif %}
                                                         </button>
                                                     {% else %}
-                                                        <button type="button" id="provider_{{ provider.id }}_{{ project.id}}" class="providers  btn btn-secondary m-1" value="{{ provider.name }}">{{ provider.name }}
+                                                        <button type="button" id="provider_{{ provider.id }}_{{ project.id}}" class="providers btn-sm  btn btn-secondary m-1" value="{{ provider.name }}">{{ provider.name }}
                                                             {% if access_right==1 %}
                                                                 <i class="bi bi-star-fill" title="You can browse all metrics for this provider"></i>
                                                             {% endif %}
@@ -166,13 +166,13 @@
                                                 {% set sub_installation= 'installation_' %}
                                                 {%  for installation in provider['installations'] %}
                                                     {% if "#{sub_installation}#{ provider.id }#{separator}#{project.id}#{separator}#{installation.id}" in listIds %}
-                                                    <button type="button" id="installation_{{ provider.id }}_{{ project.id}}_{{  installation.id  }}"  class="installations btn btn-primary m-1" value="{{ installation.installation }}">{{ installation.installation }}
+                                                    <button type="button" id="installation_{{ provider.id }}_{{ project.id}}_{{  installation.id  }}"  class="installations btn-sm btn btn-primary m-1" value="{{ installation.installation }}">{{ installation.installation }}
                                                         {% if access_right==1 %}
                                                             <i class="bi bi-star-fill" title="You can browse all metrics for this installation"></i>
                                                         {% endif %}
                                                     </button>
                                                     {% else %}
-                                                        <button type="button" id="installation_{{ provider.id }}_{{ project.id}}_{{  installation.id  }}"  class="installations btn btn-secondary m-1" value="{{ installation.installation }}">{{ installation.installation }}
+                                                        <button type="button" id="installation_{{ provider.id }}_{{ project.id}}_{{  installation.id  }}"  class="installations btn-sm  btn btn-secondary m-1" value="{{ installation.installation }}">{{ installation.installation }}
                                                             {% if access_right==1 %}
                                                                 <i class="bi bi-star-fill" title="You can browse all metrics for this installation"></i>
                                                             {% endif %}
