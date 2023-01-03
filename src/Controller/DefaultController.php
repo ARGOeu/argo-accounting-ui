@@ -50,6 +50,16 @@ class DefaultController extends AbstractController
         return $this->redirect("userInfo");
     }
 
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logoutAction()
+    {
+        return $this->redirect("/oauth/logout");
+    }
+
+
+
 
 
 }

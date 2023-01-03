@@ -13,13 +13,13 @@ security:
             oauth:
                 resource_owners:
                     aai_eosc: "/oauth/callback"
-                login_path:        /login
+                login_path:        /connect/aai_eosc
                 use_forward:       true
-                failure_path:      /login
+                failure_path:      /connect/aai_eosc
                 oauth_user_provider:
                     service: spl.user_provider
             logout:
-                path:   /logout
+                path:   /oauth/logout
                 target: /
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
