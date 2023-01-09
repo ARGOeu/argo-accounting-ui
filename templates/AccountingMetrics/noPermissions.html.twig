@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{%  endblock %}
+
+{% block body %}
+
+<div class="container">
+
+
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h3><i class="bi bi-exclamation-circle"></i> No roles associated to the client</h3>
+                    </div>
+                </div>
+
+
+                <div class="card-body">
+
+                    A client has been generated with your credentials extracted from EOSC AAI .<br/>
+                    But this client has currently no roles .<br/>
+                    To add roles please read the documentation linked from the button below !
+                </div>
+
+                <div class="card-footer text-center">
+                    <a class="btn btn-primary" href="https://argoeu.github.io/argo-accounting/docs/authorization/assigning_roles/" title="link to documentation">More information here</a>
+                </div>
+            </div>
+
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+{% endblock %}

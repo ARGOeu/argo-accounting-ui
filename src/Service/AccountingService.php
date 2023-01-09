@@ -51,23 +51,48 @@ class AccountingService extends AbstractController
 
         );
 
+        if ($response->getStatusCode()==403) {
 
-            $tabListPermissionsRaw=json_decode($response->getContent(), true);
+            $this->client->request('POST',
+                $this->getParameter('accounting_api_url') . '/clients',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . $accessToken
+                    ],
+                    'timeout'=>10
+                ],
+            );
 
-        if($summary==true) {
-            $tabListPermissions = array();
-            foreach ($tabListPermissionsRaw['content'] as $tabProjects) {
-                foreach ($tabProjects['permissions'] as $permissions) {
-                    foreach ($permissions as $key => $permission) {
-                        if (is_array($permission)) {
-                            foreach ($permission as $access_right) {
-                                $tabListPermissions[$tabProjects['acronym']][$permissions['collection']][$access_right['operation']] = $access_right['access_type'];
+            $response = $this->client->request('GET',
+                $this->getParameter('accounting_api_url') . '/clients/me',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . $accessToken
+                    ],
+                    'timeout'=>10]
+                );
+        }
+
+
+            $tabListPermissionsRaw = json_decode($response->getContent(), true);
+
+            if ($summary == true) {
+                $tabListPermissions = array();
+                foreach ($tabListPermissionsRaw['content'] as $tabProjects) {
+                    foreach ($tabProjects['permissions'] as $permissions) {
+                        foreach ($permissions as $key => $permission) {
+                            if (is_array($permission)) {
+                                foreach ($permission as $access_right) {
+                                    $tabListPermissions[$tabProjects['acronym']][$permissions['collection']][$access_right['operation']] = $access_right['access_type'];
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+
 
         if($summary==false)
             return $tabListPermissionsRaw;

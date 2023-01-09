@@ -82,15 +82,7 @@ class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInter
 
     }
 
-    public function loadUserByUsername($username)
-    {
 
-        $existingUser=$this->em->getRepository(\App\Entity\User\User::class)->findOneBy(array('username'=>$username));
-        if ($existingUser!=null)
-            return $existingUser;
-        else
-            return new User();
-    }
 
 
     public function refreshUser(UserInterface $user)
@@ -101,7 +93,7 @@ class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInter
             );
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        return $this->loadUserByIdentifier($user->getId());
     }
 
 
@@ -115,6 +107,11 @@ class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInter
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         // TODO: Implement loadUserByIdentifier() method.
+                $existingUser=$this->em->getRepository(\App\Entity\User\User::class)->findOneBy(array('id'=>$identifier));
+        if ($existingUser!=null)
+            return $existingUser;
+        else
+            return new User();
     }
 }
 
