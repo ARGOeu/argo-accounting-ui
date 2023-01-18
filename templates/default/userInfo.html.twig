@@ -38,6 +38,45 @@
     </div>
 
     <div class="card  offset-2 col-8 mt-2 mb-3">
+        <div class="card-header">
+            <span class="card-title h2 text-primary"><i class="fas fa-globe"></i> Global Permissions </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+
+
+                <table class="table dataTable">
+
+                    <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Access Type</th>
+                        <th>Operation</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    {%  for permissions in globalPermissions %}
+                        {% for permission in permissions['access_permissions'] %}
+                            <tr>
+                                <td>{{ permissions.collection }}</td>
+                                <td>{{ permission.access_type }}</td>
+                                <td>{{ permission.operation }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card  offset-2 col-8 mt-2 mb-3">
     <div class="card-header">
         <span class="card-title h2 text-primary"><i class="fas fa-globe"></i> Project Level - Permissions </span>
     </div>

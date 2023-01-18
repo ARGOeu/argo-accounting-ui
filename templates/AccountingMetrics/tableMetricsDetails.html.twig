@@ -239,8 +239,8 @@
                         </thead>
 
                         <tbody>
-                        {% for data in tabMetricsDetails['content'] %}
-
+                        {% for tabMetricsDetail in tabMetricsDetails %}
+                        {% for data in tabMetricsDetail %}
 
                             <tr>
 
@@ -265,15 +265,16 @@
 
                                 <td>{{ data.project }}</td>
                                 <td class="provider">{{ data.provider }}</td>
-                                {%for installation in tabInstallations['content'] %}
+                                {%for installations in tabInstallations %}
+                                    {%for installation in installations %}
                                     {% if data.installation_id == installation.id %}
                                         <td>{{  installation.installation}}</td>
                                     {%endif%}
                                 {% endfor %}
-
+                                {% endfor %}
                             </tr>
                         {% endfor %}
-
+                        {% endfor %}
 
                         </tbody>
 

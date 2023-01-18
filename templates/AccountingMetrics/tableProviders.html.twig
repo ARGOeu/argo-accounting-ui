@@ -5,47 +5,68 @@
 {% endblock %}
 
 {% block body %}
+    {% set access_create='DENY' %}
+    {% set access_update='DENY' %}
+    {% set access_read='DENY' %}
+    {% set access_delete='DENY' %}
+
+    {% for permission in permissions %}
+        {% if permission.collection=='Provider' %}
+            {%  for acls in permission %}
+                {%  for acl in acls %}
+                    {% if acl.operation=='CREATE'  %}
+                        {% set access_create=acl.access_type %}
+                    {% endif %}
+                    {% if acl.operation=='UPDATE'  %}
+                        {% set access_update=acl.access_type %}
+                    {% endif %}
+                    {% if acl.operation=='READ'  %}
+                        {% set access_read=acl.access_type %}
+                    {% endif %}
+                    {% if acl.operation=='DELETE'  %}
+                        {% set access_delete=acl.access_type %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
     <div class="row">
+
+
         <div class="offset-1 col-10 mt-1 mb-3">
             <h1><i class="bi bi-diagram-3-fill"></i>
-                Providers Table</h1>
+                My Providers Table</h1>
+            <div class="ms-2 d-none spinner-border text-primary" id="loader_add_provider" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
             <hr/>
 
-
-
-            <div class="toast m-2" id="toast-prov-update-success">
-                <div class="toast-header">
-                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-                        <rect fill="#007a00" width="100%" height="100%"/>
-                    </svg>
-                    <strong class="me-auto">Status</strong>
-                    <small>just now</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast-update-success"
-                            aria-label="Close"></button>
+            {% if message is defined and message!='' %}
+                <div class="card m-1 col-4 mb-2" id="message">
+                    <div class="card-header {% if status < 210 %} bg-success{% else %} bg-danger {% endif %}">
+                        {% if status < 210 %}
+                            <h3 class="card-title text-white "><i class="bi bi-check-circle m-1"></i> Update done</h3>
+                        {% else %}
+                            <h3 class="card-title text-white "><i class="bi bi-exclamation-triangle m-1"></i>Update failed</h3>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h4>Status {{ status }} - {{ message }}</h4>
+                    </div>
                 </div>
-                <div class="toast-body">
-                    The provider has been properly added !
-                </div>
-            </div>
-
-            <div class="toast m-2" id="toast-prov-update-failure">
-                <div class="toast-header">
-                    <svg class="rounded m-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-                         preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-                        <rect fill="#ff0000" width="100%" height="100%"/>
-                    </svg>
-                    <strong class="me-auto">Status</strong>
-                    <small>just now</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    The update has failed !
-                </div>
-            </div>
+            {% endif %}
 
 
             <!-- Modal ADD  -->
+            {% if access_create=='ALWAYS'%}
+
+                <div class="text-end">
+                    <button class="btn btn-primary" id="add_btn_provider" data-bs-toggle="modal" data-bs-target="#add_provider">
+                        <i class="bi bi-plus-square me-1"></i>Add a provider
+                    </button>
+                </div>
+
             <div class="modal fade" id="add_provider" tabindex="-1" aria-labelledby="add_provider_Label">
                 <div class="modal-dialog modal-dialog-scrollable">
                     <div class="modal-content">
@@ -58,8 +79,9 @@
                         <div class="modal-body">
                             <form class="form_add_provider">
 
+                                <input type="hidden" name="type" value="add">
                                 <div class="form-group m-2">
-                                    <label for="metricName">Provider Id</label>
+                                    <label for="providerId">Provider Id</label>
                                     <input type="text" class="form-control" name="providerId" id="providerId"
                                            aria-describedby="providerIdHelp">
                                     <small id="providerIdHelp" class="form-text text-muted">An unique alpha-numeric
@@ -67,7 +89,7 @@
                                 </div>
 
                                 <div class="form-group m-2">
-                                    <label for="metricName">Provider Name</label>
+                                    <label for="providerName">Provider Name</label>
                                     <input type="text" class="form-control" name="providerName" id="providerName">
                                 </div>
                                 <div class="form-group m-2">
@@ -93,8 +115,6 @@
 
 
                                 <button type="submit" class="btn btn-primary">Submit</button>
-                                <button class='d-none spinner-border text-primary m-1 bg-white' role='status'
-                                        id="loader_add_provider"><span class='sr-only'>Loading...</span></button>
 
                             </form>
 
@@ -103,10 +123,12 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <!-- This loop for bootstrap modals should be done outside of the table -->
             <!-- otherwise the dynamic ajax call will not work because of the inexisting dom -->
-            {% for id, data in tabProviders['content'] %}
+            {% for listProvider in tabProviders%}
+            {% for id, data in listProvider %}
                 <div class="modal fade providersDetails" id="provider_{{ data.id }}" tabindex="-1"
                      aria-labelledby="provider_{{ data.id }}_Label">
 
@@ -156,39 +178,167 @@
 
                 </div>
             {% endfor %}
-            <!-- end of loop -->
+            {% endfor %}
+            <! -- end of loop -->
 
+            {%  if access_read=='ALWAYS' %}
             <table class="dataTable table  border border-dark" id="TableProviders">
 
                 <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Actions</th>
+                    <th>Provider Name</th>
                     <th>Short Name</th>
-                    <th>Details</th>
 
                 </tr>
                 </thead>
 
                 <tbody>
-                {% for id, data in tabProviders['content'] %}
+
+
+                {% for listProvider in tabProviders%}
+                {% for id, data in listProvider %}
                     <tr>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group" aria-labelledby="Actions">
+
+                                <a class="btn btn-primary" data-bs-toggle="modal" title=" Browse more details"   data-bs-target="#provider_{{ data.id }}">
+                                    <i class="bi bi-plus-circle-fill" style="font-size: large"></i>
+                                </a>
+
+                                {%  if data.creator_id is defined %}
+                                    {% if access_update=='ALWAYS' or (access_update=='ENTITY' and data.creator_id==userId)%}
+                                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ data.id }}"  title="Update Provider">
+                                            <i class="bi bi-pencil-square" style="font-size: large"></i>
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                                {%  if data.creator_id is defined %}
+                                    {% if access_delete=='ALWAYS' or (access_delete=='ENTITY' and data.creator_id==userId) %}
+                                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ data.id }}" title="Delete Provider">
+                                            <i class="bi bi-x-circle" style="font-size: large"></i>
+
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
+
+                            <!-- Modal delete  -->
+                            <div class="modal fade" id="delete_{{ data.id }}" tabindex="-1" aria-labelledby="delete_{{ data.id }}}_Label">
+                                <div class="modal-dialog modal-dialog-scrollable">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header  bg-light">
+                                            <h5 class="modal-title text-center">Delete Provider</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form_delete_provider">
+                                                <input type="hidden" name="type" value="delete"/>
+                                                <input type="hidden" value="{{ data.id }}" name="providerId"/>
+
+                                                <div class="form-group m-2">
+                                                    <label for="installation">Provider Name</label>
+                                                    <input type="text" class="form-control" id="provider" name="provider"
+                                                           value="{{ data.name }}" disabled>
+                                                </div>
+                                                <div class="form-group m-2">
+                                                    <label for="installation">Provider Abbreviation Name</label>
+                                                    <input type="text" class="form-control" id="abbreviation " name="abbreviation"
+                                                           value="{{ data.abbreviation }}" disabled>
+                                                </div>
+
+
+                                                <br/>
+                                                <hr/>
+
+                                                <span class="mb-1 alert alert-danger">You are going to delete the provider described previously !</span>
+                                                <br/>
+                                                <br/>
+                                                <button type="submit" class="btn btn-danger" value="submit">Delete Provider</button>
+                                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                                        aria-label="Close">Close
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal update  -->
+
+                            <div class="modal fade" id="update_{{ data.id }}" tabindex="-1" aria-labelledby="update_{{ data.id }}}_Label">
+                                <div class="modal-dialog modal-dialog-scrollable">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header  bg-light">
+                                            <h5 class="modal-title text-center">Update Provider</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form_update_provider">
+                                                <input type="hidden" name="type" value="update"/>
+
+                                                <input type="hidden" value="{{ data.id }}" name="providerId"/>
+
+                                                <div class="form-group m-2">
+                                                    <label for="installation">Provider Name</label>
+                                                    <input type="text" class="form-control" id="provider" name="providerName"
+                                                           value="{{ data.name }}">
+                                                </div>
+                                                <div class="form-group m-2">
+                                                    <label for="installation">Provider Abbreviation Name</label>
+                                                    <input type="text" class="form-control" id="abbreviation " name="providerNameAbbr"
+                                                           value="{{ data.abbreviation }}">
+                                                </div>
+
+                                                <div class="form-group m-2">
+                                                    <label for="metricName">Provider Website</label>
+                                                    <input type="text" class="form-control" name="providerWebSite" id="providerWebSite" value="{{ data.website}}">
+                                                </div>
+
+                                                <div class="form-group m-2">
+                                                    <label for="metricName">Provider Logo</label>
+                                                    <input type="text" class="form-control" name="providerLogo" id="providerLogo"
+                                                           aria-describedby="providerLogoHelp" value="{{ data.logo}}">
+                                                    <small id="providerLogoHelp" class="form-text text-muted">An url pointing to the
+                                                        logo of the provider</small>
+                                                </div>
+
+
+                                                <br/>
+                                                <br/>
+                                                <button type="submit" class="btn btn-danger" value="submit">Update Provider</button>
+                                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                                        aria-label="Close">Close
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </td>
+
                         <td>{{ data.name }}</td>
                         <td>{{ data.abbreviation }} </td>
-
-
-                        <td><a class="dropdown-item" data-bs-toggle="modal"
-                               data-bs-target="#provider_{{ data.id }}">
-                                <i class="bi bi-plus-circle-fill" style="font-size:2em;color: orange"></i>
-                            </a></td>
 
                     </tr>
 
 
                 {% endfor %}
-
+                {% endfor %}
                 </tbody>
 
             </table>
+            {% else %}
+                <div class="m-1 alert alert-warning">You are not authorized to see the list of providers !</div>
+            {% endif %}
         </div>
     </div>
 
@@ -197,56 +347,55 @@
 {% block javascripts %}
     <script>
 
-        {#$(document).on('submit','.form_add_provider',function(event) {#}
-        {#    event.preventDefault(); // cancel default behavior#}
+        $(document).on('submit','.form_add_provider, .form_update_provider, .form_delete_provider',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+            var type = $(this).find('input[name="type"]').val().trim();
+            var id = $(this).find('input[name="providerId"]').val().trim();
+
+            if (type!=='delete') {
+                var name = $(this).find('input[name="providerName"]').val().trim();
+                var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();
+                var logo = $(this).find('input[name="providerLogo"]').val().trim();
+                var website = $(this).find('input[name="providerWebSite"]').val().trim();
+                dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website + '&type='+type;
+            }
+            else {
+                dataUrl = 'id=' + id + '&type='+type;
+            }
 
 
-        {#    var id = $(this).find('input[name="providerId"]').val().trim();#}
-        {#    var name = $(this).find('input[name="providerName"]').val().trim();#}
-        {#    var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();#}
-        {#    var logo = $(this).find('input[name="providerLogo"]').val().trim();#}
-        {#    var website = $(this).find('input[name="providerWebSite"]').val().trim();#}
-
-        {#    dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website;#}
+            let url= "{{ url('modify_provider') }}";
 
 
-        {#    let url= "{{ url('add_provider') }}";#}
-        {#    let redirection="{{ url('metrics')}}#providers";#}
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+                crossDomain: true,
 
-        {#    let request = $.ajax({#}
-        {#        type: "POST",#}
-        {#        url: url,#}
-        {#        data: dataUrl,#}
-        {#        crossDomain: true,#}
+                beforeSend: function () {
+                    $('#loader_add_provider').removeClass('d-none');
+                }});
 
-        {#        beforeSend: function () {#}
-        {#            $('#loader_add_provider').removeClass('d-none');#}
-        {#        }});#}
+            request.done(function (output_json) {
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+                console.log(output);
+               $.redirect(window.location.href, {'status': status, 'message': message});
 
-        {#    request.done(function (output_success) {#}
-        {#        $("#toast-prov-update-success > .toast-body").html(output_success);#}
-        {#        $("#toast-prov-update-success").toast("show");#}
+            });
+            request.fail(function (output_json) {
 
-        {#        $("#add_provider").modal('hide');#}
-        {#        $('#loader_add_provider').addClass('d-none');#}
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+                console.log(output);
+                $.redirect(window.location.href, {'status': status, 'message': message});
 
-        {#        window.setTimeout(function(){#}
-        {#            window.location.href=redirection;#}
-        {#        }, 5000);#}
-
-
-        {#    })#}
-
-        {#    request.fail(function (xhr, status, error) {#}
-
-        {#        $("#toast-prov-update-failure > .toast-body").html(xhr.responseText);#}
-        {#        $("#toast-prov-update-failure").toast("show");#}
-
-        {#        $("#add_provider").modal('hide');#}
-
-
-        {#    });#}
-        {#});#}
+            });
+        });
 
         $(document).ready(function () {
             $('.providersDetails').on('shown.bs.modal', function () {

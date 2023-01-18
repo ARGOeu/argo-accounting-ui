@@ -37,12 +37,22 @@ require('bootstrap-icons/font/bootstrap-icons.css');
 
 import 'select2'; // globally assign select2 fn to $ element
 import 'select2/dist/css/select2.css'; // optional if you have css loader
-
+import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.css';
 
 $(document).ready(function() {
 
-    $('.select2-enable').select2();
-    $(".dataTable").dataTable();
+    $('.select2-enable').select2(
+        {
+            theme: 'bootstrap-5'
+        }
+    );
+    $(".dataTable").dataTable({
+        "order":[[1, 'asc'], [2, 'asc']]
+        }
 
+    );
 
+    $("#message").fadeTo(5000, 1500).slideUp(2500, function () {
+        $("#message").slideUp(2500);
+    });
 })

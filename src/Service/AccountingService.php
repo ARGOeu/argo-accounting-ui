@@ -8,6 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -36,6 +37,45 @@ class AccountingService extends AbstractController
         );
     }
 
+
+    public function getUserGeneralPermissions($accessToken) {
+        $response= $this->client->request('GET',
+            $this->getParameter('accounting_api_url') . '/clients/general-permissions',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $accessToken
+                ],
+                'timeout'=>10]
+        );
+
+        if ($response->getStatusCode()==403) {
+
+            $this->client->request('POST',
+                $this->getParameter('accounting_api_url') . '/clients',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . $accessToken
+                    ],
+                    'timeout'=>10
+                ],
+            );
+
+            $response = $this->client->request('GET',
+                $this->getParameter('accounting_api_url') . '/clients/general-permissions',
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . $accessToken
+                    ],
+                    'timeout'=>10]
+            );
+        }
+
+
+        return  json_decode($response->getContent(), true);
+    }
 
     public function getUserPermissions($accessToken,$summary=true)
     {
@@ -76,9 +116,13 @@ class AccountingService extends AbstractController
         }
 
 
-            $tabListPermissionsRaw = json_decode($response->getContent(), true);
+
+
+        $tabListPermissionsRaw = json_decode($response->getContent(), true);
+
 
             if ($summary == true) {
+
                 $tabListPermissions = array();
                 foreach ($tabListPermissionsRaw['content'] as $tabProjects) {
                     foreach ($tabProjects['permissions'] as $permissions) {
@@ -91,6 +135,7 @@ class AccountingService extends AbstractController
                         }
                     }
                 }
+
             }
 
 
@@ -110,7 +155,7 @@ class AccountingService extends AbstractController
             $api_url = '/projects';
         }
         if ($resource_type === 'providers') {
-            $api_url = '/providers/all';
+            $api_url = '/providers';
         }
         if ($resource_type === 'installations') {
             $api_url = '/installations/all';
@@ -128,22 +173,41 @@ class AccountingService extends AbstractController
             $api_url = '/metric-definitions/metric-types';
         }
 
-        try {
-        $response = $this->client->request('GET',
-            $this->getParameter('accounting_api_url') . $api_url.'?size=100',
-            [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . $accessToken
-                ],
-                'timeout'=>10
-            ],
+        $Notterminated=true;
+        $i=0;
+        $responseTab=array();
 
-        );
-            return (json_decode($response->getContent(), true));
-            } catch (ClientException $e) {
-        return new JsonResponse(json_encode($e->getMessage()), $e->getCode());
+        // multiple pages in the output
+        while ($Notterminated and $i<50) {
+            $i++;
+            $response[$i] = $this->client->request('GET',
+                $this->getParameter('accounting_api_url') . $api_url . '?size=100&page=' . $i,
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . $accessToken
+                    ],
+                    'timeout' => 10
+                ],
+
+            );
+            $data=json_decode($response[$i]->getContent(),true);
+
+            if ( $resource_type === 'unit-types' or $resource_type === 'metric-types') {
+                $responseTab[]=$data;
+                $Notterminated=false;
+            }
+            else {
+                if (count($data['content'])==0){
+                $Notterminated=false;
+            }
+            else {
+                    $responseTab[] = $data['content'];
+                }
+            }
+
         }
+            return $responseTab;
 
     }
 
@@ -156,7 +220,6 @@ class AccountingService extends AbstractController
         }
 
 
-        try {
             $response = $this->client->request('POST',
                 $this->getParameter('accounting_api_url') . $api_url.'?size=100',
                 [
@@ -166,14 +229,16 @@ class AccountingService extends AbstractController
                     ],
                     'timeout'=>10,
                     'body'=>json_encode($search)
-                ],
+                ]);
 
 
-            );
-            return (json_decode($response->getContent(), true));
-        } catch (ClientException $e) {
-            return new JsonResponse(json_encode($e->getMessage()), $e->getCode());
-        }
+           if ( $response->getStatusCode() > 201) {
+               return (json_decode($response->getContent(false), true));
+           }
+           else {
+               return (json_decode($response->getContent(), true));
+           }
+        return $content;
 
     }
 
@@ -181,7 +246,6 @@ class AccountingService extends AbstractController
     public function addRessource($api_url,$body,$accessToken)
     {
 
-        try {
             $response = $this->client->request('POST',
                 $this->getParameter('accounting_api_url') . $api_url,
                 [
@@ -191,20 +255,21 @@ class AccountingService extends AbstractController
                     ],
                     'timeout'=>10,
                     'body'=>json_encode($body)
-                ],
+                ]);
 
-            );
-            return ($response);
-        } catch (ClientException $e) {
-            return new JsonResponse(json_encode($e->getMessage()), $e->getCode());
-        }
+             if ( $response->getStatusCode() > 201) {
+                 $content = $response->getContent(false); //this throws ClientException
+             }
+             else {
+                 $content = json_encode(array("code"=>$response->getStatusCode(),"message"=>"Creation successful"));
+             }
+        return $content;
 
     }
 
     public function updateRessource($api_url,$body,$accessToken)
     {
 
-        try {
             $response = $this->client->request('PATCH',
                 $this->getParameter('accounting_api_url') . $api_url,
                 [
@@ -218,17 +283,20 @@ class AccountingService extends AbstractController
 
             );
 
-            return ($response);
-        } catch (ClientException $e) {
-            return new JsonResponse(json_encode($e->getMessage()), $e->getCode());
+        if ( $response->getStatusCode() > 201) {
+            $content = $response->getContent(false); //this throws ClientException
         }
+        else {
+            $content = json_encode(array("code"=>$response->getStatusCode(),"message"=>"Update successful"));
+        }
+        return $content;
 
     }
 
     public function deleteRessource($api_url,$accessToken)
     {
 
-        try {
+
             $response = $this->client->request('DELETE',
             $this->getParameter('accounting_api_url') . $api_url,
             [
@@ -240,36 +308,43 @@ class AccountingService extends AbstractController
             ],
 
         );
-        return ($response);
-        } catch (ClientException $e) {
-        return new JsonResponse(json_encode($e->getMessage()), $e->getStatusCode());
+
+        if ( $response->getStatusCode() > 201) {
+            $content = $response->getContent(false); //this throws ClientException
         }
+        else {
+            $content = json_encode(array("code"=>$response->getStatusCode(),"message"=>"Deletion successful"));
+        }
+        return $content;
 
     }
 
     public function modifyProviders($mode,$project_id,$providers,$accessToken)
     {
-        $post=["providers"=>array($providers)];
+        $post = ["providers" => $providers];
 
 
-        try {
-            $response = $this->client->request('POST',
-                $this->getParameter('accounting_api_url') . '/projects/'.$project_id.'/'.$mode,
-                [
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer ' . $accessToken
-                    ],
-                    'timeout'=>10,
-                    'body'=>json_encode($post)
+        $response = $this->client->request('POST',
+            $this->getParameter('accounting_api_url') . '/projects/' . $project_id . '/' . $mode,
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . $accessToken
                 ],
-            );
-            return ($response);
-        } catch (ClientException $e) {
-            return new JsonResponse(json_encode($e->getMessage()), $e->getStatusCode());
-        }
+                'timeout' => 10,
+                'body' => json_encode($post)
+            ],
+        );
 
+        if ($response->getStatusCode() > 201) {
+            $content = $response->getContent(false); //this throws ClientException
+        } else {
+            $content = json_encode(array("code" => $response->getStatusCode(), "message" => "Item(s) successfuly ".$mode."d"));
+        }
+        return $content;
     }
+
+
 
 
 }

@@ -34,117 +34,107 @@
 
     <thead>
     <tr>
-
+        <th>Actions</th>
         <th class="col-1">Acronym</th>
         <th class="col-5">Title</th>
         <th class="col-5">Providers</th>
-        <th>Actions</th>
+
 
     </tr>
     </thead>
 
     <tbody>
+
 {% for projects in tabProjects %}
+
     {%  for id, data in projects %}
         <tr>
-
-            <td class="acronym">{{ data.acronym }} </td>
-            <td class="title">{{ data.title }} </td>
-            <td class="providers">
-                <ul id="row_provider_{{ data.id }}">
-
-            {% for provider in data['providers']  %}
-
-                {%  if provider.name is defined %}
-                    <li id="provider_{{ data.id }}_{{ provider.id }}">{{ provider.name }} </li>
-                {% endif %}
-            {% endfor %}
-                </ul>
-            </td>
             <td>
 
                 <div class="btn-group dropstart">
-                    <button class="btn bg-light dropdown-toggle border border-dark text-dark"
-                            type="button" id="dropdownActions" data-bs-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                        Actions
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownActions">
+
+                    <div class="btn-group btn-group-sm" role="group" aria-labelledby="Actions">
 
                         {% if permissions[data.acronym]['Project']['ASSOCIATE'] is defined and permissions[data.acronym]['Project']['ASSOCIATE']=='ALWAYS' %}
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#add_provider_{{ data.id }}">
-                            <i class="bi bi-pencil-square"></i>
-                           Associates a new provider
-                        </a>
+                            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_provider_{{ data.id }}" title="Associates a new provider">
+                                <i class="bi bi-pencil-square" style="font-size: large"></i>
+                            </a>
+
+
                         {% endif %}
                         {% if permissions[data.acronym]['Project']['ASSOCIATE'] is defined and permissions[data.acronym]['Project']['DISSOCIATE']=='ALWAYS' %}
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#dissociates_provider_{{ data.id }}">
-                            <i class="bi bi-x-circle"></i>
-                            Dissociates provider(s)
-                        </a>
-                        {% endif %}
-                        {% if permissions[data.acronym]['Project']['READ'] is defined and permissions[data.acronym]['Project']['READ']=='ALWAYS' %}
-                            <a class="dropdown-item" href=" {{ path('metrics', { 'project': data.id }) }}">
-                                <i class="bi bi-bar-chart"></i>
-                                Browse Metrics for this project
+
+                            <a  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dissociates_provider_{{ data.id }}" title="Dissociates provider(s)">
+                                <i class="bi bi-x-circle" style="font-size: large"></i>
+
                             </a>
 
                         {% endif %}
+                        {% if permissions[data.acronym]['Project']['READ'] is defined and permissions[data.acronym]['Project']['READ']=='ALWAYS' %}
+
+                            <a class="btn btn-primary" href=" {{ path('metrics', { 'project': data.id }) }}" title="Browse Metrics for this project">
+                                <i class="bi bi-bar-chart" style="font-size: large"></i>
+
+                            </a>
+
+
+                        {% endif %}
 
                     </div>
                 </div>
 
 
-        <div class="modal fade" id="add_provider_{{ data.id }}" tabindex="-1" aria-labelledby="add_provider_Label">
-            <div class="modal-dialog modal-dialog-scrollable">
-                <div class="modal-content">
+                <div class="modal fade" id="add_provider_{{ data.id }}" tabindex="-1" aria-labelledby="add_provider_Label">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
 
-                    <div class="modal-header  bg-light">
-                        <h5 class="modal-title text-center">Associates a new provider - Project {{ data.acronym }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form_add_provider_project">
-                            <div class="form-group m-2">
-                               <input  type="hidden" value="{{ data.id}}" name="project">
-                                <input  type="hidden" value="associate" name="mode">
+                            <div class="modal-header  bg-light">
+                                <h5 class="modal-title text-center">Associates a new provider - Project {{ data.acronym }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                             </div>
+                            <div class="modal-body">
+                                <form class="form_add_provider_project">
+                                    <div class="form-group m-2">
+                                        <input  type="hidden" value="{{ data.id}}" name="project">
+                                        <input  type="hidden" value="associate" name="mode">
+                                    </div>
 
-                            <div class="form-group m-2">
+                                    <div class="form-group m-2">
 
-                                <label for="provider" class="m-1">Choose a provider</label>
+                                        <label for="provider" class="m-1">Choose a provider</label>
 
 
-                                <select class="form-control form-select"  name="providers" >
+                                        <select class="select2-enable"  multiple="multiple" name="providers_added" >
 
-                                    {% for providersT in tabProviders['content'] %}
-                                        {% set alreadySelected=false %}
+                                            {% for providersTb in tabProviders %}
+                                                {%for  providersT in providersTb %}
+                                                    {% set alreadySelected=false %}
 
-                                            {% for proL in data['providers'] %}
-                                                {%  if providersT.name == proL.name %}
-                                                    {% set   alreadySelected=true %}
-                                                {% endif %}
-                                             {% endfor%}
+                                                    {% for proL in data['providers'] %}
+                                                        {%  if providersT.name == proL.name %}
+                                                            {% set   alreadySelected=true %}
+                                                        {% endif %}
+                                                    {% endfor%}
 
-                                            {%  if alreadySelected == false %}
-                                                <option class="m-1" value="{{ providersT.id}}">{{ providersT.name }}</option>
-                                             {% endif %}
+                                                    {%  if alreadySelected == false %}
+                                                        <option class="m-1" value="{{ providersT.id}}">{{ providersT.name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
 
-                                    {% endfor %}
-                                </select>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                                    <div class="ms-2 d-none spinner-border text-primary" id="loader_add_provider" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </form>
                             </div>
-
-                            <button type="submit" class="btn btn-primary">Submit</button>
-
-                            <div class="ms-2 d-none spinner-border text-primary" id="loader_add_provider" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
                 <div class="modal fade  modal-lg" id="dissociates_provider_{{ data.id }}" tabindex="-1" aria-labelledby="remove_provider_Label">
                     <div class="modal-dialog modal-dialog-scrollable">
@@ -166,14 +156,13 @@
                                     <div class="form-group m-2">
 
                                         <label for="provider" class="m-1 fw-bold">Choose one or several providers</label>
-                                        <ul name="provider" style="list-style: none">
-                                        {% for provider in data['providers']  %}
+                                        <select class="select2-enable"  multiple="multiple" name="providers_removed" >
 
-                                            {%  if provider.name is defined %}
-                                                <li id="provider_{{ data.id }}_{{ provider.id }}"><input type="radio" value="{{ provider.id }}" name="providers"> {{ provider.name }}</li>
-                                            {% endif %}
-                                        {% endfor %}
-                                        </ul>
+                                            {% for proL in data['providers'] %}
+                                                <option class="m-1" value="{{ proL.id}}">{{ proL.name }}</option>
+                                            {% endfor%}
+
+                                        </select>
                                     </div>
 
                                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -190,7 +179,21 @@
 
 
 
-        </td>
+            </td>
+            <td class="acronym">{{ data.acronym }} </td>
+            <td class="title">{{ data.title }} </td>
+            <td class="providers">
+                <ul id="row_provider_{{ data.id }}">
+
+            {% for provider in data['providers']  %}
+
+                {%  if provider.name is defined %}
+                    <li id="provider_{{ data.id }}_{{ provider.id }}">{{ provider.name }} </li>
+                {% endif %}
+            {% endfor %}
+                </ul>
+            </td>
+
 
         </tr>
 
@@ -215,19 +218,22 @@
 
             var projectId= $(this).find('input[name="project"]').val().trim();
             var mode =$(this).find('input[name="mode"]').val().trim();
+            var provider="";
 
             if (mode=='associate') {
-                var provider = $(this).find('select[name="providers"] > option:selected').val().trim();
+                $(this).find('select[name="providers_added"] > option:selected').each(function( index,val ) {
+                    provider=provider+","+$(this).val().trim();
+                });
             }
             else {
-                var provider=$("input[name='providers']:checked").val();
+                $(this).find('select[name="providers_removed"] > option:selected').each(function( index, val ) {
+                    provider=provider+","+$(this).val().trim();
+                });
             }
 
             var dataUrl="project="+projectId+"&provider="+provider+"&mode="+mode;
 
-
             let url= "{{ url('modify_providers_project') }}";
-
 
             let request = $.ajax({
                 type: "POST",
@@ -239,7 +245,7 @@
 
             request.done(function (output_json) {
                 var output = jQuery.parseJSON(output_json);
-                var status = output.status;
+                var status = output.code;
                 var message = output.message;
                 $.redirect(window.location.href, {'status': status, 'message': message});
 
@@ -248,7 +254,7 @@
             request.fail(function (output_json) {
 
                 var output = jQuery.parseJSON(output_json);
-                var status = output.status;
+                var status = output.code;
                 var message = output.message;
                 $.redirect(window.location.href, {'status': status, 'message': message});
 

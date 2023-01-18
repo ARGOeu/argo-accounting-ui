@@ -31,7 +31,7 @@
             {% endif %}
 
             <div class="text-end">
-                            <button class="btn btn-primary" id="addInstallation" data-bs-toggle="modal" data-bs-target="#add_installation">
+                            <button class="btn btn-primary" id="addInstallation" data-bs-toggle="modal" data-bs-target="#add_installation" disabled>
                                 <i class="bi bi-plus-square me-1"></i> Add a new installation
                             </button>
                         </div>
@@ -116,8 +116,10 @@
                                     <label for="metric_definition" class="m-1">Metric Definition</label>
                                     <select class="form-control form-select" id="metric_definition" name="metric_definition" >
 
-                                        {% for def in tabMetricsDef['content'] %}
-                                            <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
+                                        {% for definitions  in tabMetricsDef %}
+                                            {%  for def in definitions %}
+                                                <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
+                                            {% endfor %}
                                         {% endfor %}
 
                                     </select>
@@ -151,12 +153,13 @@
 
                 <thead>
                 <tr>
+                    <th>Actions</th>
                     <th>Name</th>
                     <th>Project</th>
                     <th>Organization</th>
                     <th>Infrastructure</th>
                     <th>Metric Name: Description (Unit Type - Metric Type)</th>
-                    <th>&nbsp;</th>
+
                 </tr>
                 </thead>
 
@@ -165,6 +168,7 @@
                     {%  for id, installation in installations %}
 
                         <tr id="installation_{{ installation.id }}">
+
                             {%  set nameP = '' %}
                             {%  for projects in tabProjects %}
                                 {% for project in projects %}
@@ -173,48 +177,27 @@
                                     {% endif %}
                                 {% endfor %}
                             {% endfor %}
-                            <td>{{ installation.installation}}</td>
-
-                            <td>{{ nameP }}</td>
-                            <td>{{ installation.organisation}}</td>
-                            <td>{{ installation.infrastructure}}</td>
-
-                            <td>
-                                <ul>
-                                        <li>
-                                            {{ installation.unit_of_access.metric_name }} : {{ installation.unit_of_access.metric_description}} ({{ installation.unit_of_access.unit_type}} - {{  installation.unit_of_access.metric_type}})
-                                        </li>
-
-                                </ul>
-
-                            </td>
 
                             <td>
 
                                 <div class="btn-group dropstart">
                                     {% if permissions[nameP]['Installation'] is defined %}
-                                    <button class="btn bg-light dropdown-toggle border border-dark text-dark"
-                                            type="button" id="dropdownActions" data-bs-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                        Actions
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownActions">
 
-                                        {% if permissions[nameP]['Installation']['UPDATE'] is defined%}
-                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update_{{ installation.id}}">
-                                            <i class="bi bi-pencil-square"></i>
-                                            Update Installation
-                                        </a>
-                                        {% endif %}
 
-                                        {% if permissions[nameP]['Installation']['DELETE'] is defined%}
-                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#delete_{{ installation.id}}">
-                                                <i class="bi bi-x-circle"></i>
-                                                Delete Installation
-                                            </a>
-                                        {% endif %}
+                                            {% if permissions[nameP]['Installation']['UPDATE'] is defined%}
+                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ installation.id}}" title="Update Installation">
+                                                    <i class="bi bi-pencil-square" style="font-size: large"></i>
 
-                                    </div>
+                                                </a>
+                                            {% endif %}
+
+                                            {% if permissions[nameP]['Installation']['DELETE'] is defined%}
+                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ installation.id}}" title="Delete Installation">
+                                                    <i class="bi bi-x-circle" style="font-size: large"></i>
+                                                </a>
+                                            {% endif %}
+
+
                                     {% endif %}
                                 </div>
                                 <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
@@ -305,10 +288,11 @@
                                                         <label for="metric_definition" class="m-1">Metric Definition</label>
                                                         <select class="form-control form-select" id="metric_definition" name="metric_definition" >
 
-                                                            {% for def in tabMetricsDef['content'] %}
-                                                                <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
+                                                            {% for definitions  in tabMetricsDef %}
+                                                                {%  for def in definitions %}
+                                                                    <option value="{{ def.metric_definition_id}}">{{ def.metric_name }} - {{ def.metric_description }} ({{ def.unit_type }} - {{ def.metric_type }}) </option>
+                                                                {% endfor %}
                                                             {% endfor %}
-
                                                         </select>
 
 
@@ -326,6 +310,25 @@
                                     </div>
                                 </div>
                             </td>
+
+
+
+                            <td>{{ installation.installation}}</td>
+
+                            <td>{{ nameP }}</td>
+                            <td>{{ installation.organisation}}</td>
+                            <td>{{ installation.infrastructure}}</td>
+
+                            <td>
+                                <ul>
+                                        <li>
+                                            {{ installation.unit_of_access.metric_name }} : {{ installation.unit_of_access.metric_description}} ({{ installation.unit_of_access.unit_type}} - {{  installation.unit_of_access.metric_type}})
+                                        </li>
+
+                                </ul>
+
+                            </td>
+
 
 
 
@@ -407,7 +410,7 @@
             request.done(function (output_json) {
 
                 var output = jQuery.parseJSON(output_json);
-                var status = output.status;
+                var status = output.code;
                 var message = output.message;
 
 
@@ -434,11 +437,9 @@
             request.fail(function (output_json) {
 
                 var output = jQuery.parseJSON(output_json);
-                var status = output.status;
+                var status = output.code;
                 var message = output.message;
 
-                $("#toast-update-failure > .toast-body").html(message);
-                $("#toast-update-failure").toast("show");
 
                 if (type==='update')
                     $("#update_" + installationId).modal('hide');

@@ -5,6 +5,33 @@
 {%  endblock %}
 
 {% block body %}
+
+    {% set access_create='DENY' %}
+    {% set access_update='DENY' %}
+    {% set access_read='DENY' %}
+    {% set access_delete='DENY' %}
+
+    {% for permission in permissions %}
+        {% if permission.collection=='MetricDefinition' %}
+            {%  for acls in permission %}
+                {%  for acl in acls %}
+                    {% if acl.operation=='CREATE'  %}
+                        {% set access_create=acl.access_type %}
+                    {% endif %}
+                    {% if acl.operation=='UPDATE'  %}
+                        {% set access_update=acl.access_type %}
+                    {% endif %}
+                    {% if acl.operation=='READ'  %}
+                        {% set access_read=acl.access_type %}
+                    {% endif %}
+                    {% if acl.operation=='DELETE'  %}
+                        {% set access_delete=acl.access_type %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
     <div class="row">
         <div class="offset-1 col-10 mt-1 mb-3">
             <h1><i class="bi bi-clipboard-data"></i>
@@ -21,15 +48,17 @@
                         {% endif %}
                     </div>
                     <div class="card-body">
-                        <h4>Status {{ status }} - {{ message }}</h4>
+                        <p>Status {{ status }} - {{ message }}</p>
                     </div>
                 </div>
             {% endif %}
 
-<div class="text-end">
-    <button class="btn btn-primary" id="addMetricDefinition" data-bs-toggle="modal" data-bs-target="#add_metric_desc"> <i class="bi bi-plus-square me-1"></i>Add a new metric definition
-    </button>
-</div>
+            {% if access_create=='ALWAYS'%}
+                <div class="text-end">
+                    <button class="btn btn-primary" id="addMetricDefinition" data-bs-toggle="modal" data-bs-target="#add_metric_desc"> <i class="bi bi-plus-square me-1"></i>Add a new metric definition
+                    </button>
+                </div>
+            {% endif %}
 
 <!-- Modal ADD  -->
 <div class="modal fade" id="add_metric_desc" tabindex="-1" aria-labelledby="add_metric_desc_Label">
@@ -62,10 +91,12 @@
                     <div class="form-group m-2">
                         <label for="unit">Unit</label>
                         <select id="unit" name="metricUnit" class="form-select">
-                            {% for units in tabMetricsUnits %}
+                            {% for tabMetricsUnit in tabMetricsUnits %}
+                            {% for units in tabMetricsUnit %}
                                 {% for unit in units %}
                                     <option value="{{ unit.symbol }}">{{ unit.unit }}</option>
                                 {% endfor %}
+                            {% endfor %}
                             {% endfor %}
                         </select>
                     </div>
@@ -73,8 +104,10 @@
                     <div class="form-group m-2">
                         <label for="type">Metric Type</label>
                         <select id="type" name="metricType" class="form-select">
-                            {% for types in tabMetricsTypes['metric_types'] %}
-                                <option value="{{ types.metric_type  }}">{{ types.metric_type  }}</option>
+                            {% for tabMetricsType in tabMetricsTypes %}
+                                {% for types in tabMetricsType['metric_types'] %}
+                                    <option value="{{ types.metric_type  }}">{{ types.metric_type  }}</option>
+                                {% endfor %}
                             {% endfor %}
 
                         </select>
@@ -98,45 +131,40 @@
 
     <thead>
     <tr>
+        <th>Actions</th>
         <th>Metric Name</th>
         <th>Metric Description</th>
         <th>Unit</th>
         <th>Metric Type</th>
-        <th>Actions</th>
+
     </tr>
     </thead>
 
     <tbody>
-    {% for data in tabMetricsDef['content'] %}
-
+    {% for definition in tabMetricsDef %}
+    {% for data in definition %}
+        {%  if data.creator_id ==userId %}
 
 
         <tr id="tr_{{ data.metric_definition_id }}">
-            <td class="metricName">{{ data.metric_name }} </td>
-            <td class="metricDescription">{{ data.metric_description }} </td>
-            <td class="metricUnit">{{ data.unit_type }} </td>
-            <td class="metricType">{{ data.metric_type }}</td>
-
             <td>
                 <div class="btn-group dropstart">
 
-                    <button class="btn bg-light dropdown-toggle border border-dark text-dark"
-                            type="button" id="dropdownActions" data-bs-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                        Actions
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownActions">
-
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update_{{ data.metric_definition_id }}">
-                            <i class="bi bi-pencil-square"></i>
-                            Update Metric Definition
+        {%  if data.creator_id is defined %}
+            {% if access_update=='ALWAYS' or (access_update=='ENTITY' and data.creator_id==userId)%}
+                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ data.metric_definition_id }}" title="Update Metric Definition">
+                            <i class="bi bi-pencil-square" style="font-size: large"></i>
                         </a>
-                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#delete_{{ data.metric_definition_id}}">
-                            <i class="bi bi-x-circle"></i>
-                             Delete Metric Definition
-                        </a>
+                {% endif %}
+        {% endif %}
+        {%  if data.creator_id is defined %}
+            {% if access_delete=='ALWAYS' or (access_delete=='ENTITY' and data.creator_id==userId)%}
+                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ data.metric_definition_id}}" title="Delete Metric Definition">
+                            <i class="bi bi-x-circle" style="font-size: large"></i>
 
-                    </div>
+                        </a>
+            {% endif %}
+        {% endif %}
 
                     <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
 
@@ -158,26 +186,26 @@
                                         <div class="form-group m-2">
                                             <label for="metricName">Metric Name</label>
                                             <input type="text" class="form-control" id="metricName" name="metricName"
-                                                   value="{{ data.metric_name }}">
+                                                   value="{{ data.metric_name }}" disabled>
                                         </div>
 
                                         <div class="form-group m-2">
                                             <label for="metricDescription">Metric Description</label>
                                             <input type="text" class="form-control" id="metricDescription" name="metricDefinition"
-                                                   value="{{ data.metric_description }}">
+                                                   value="{{ data.metric_description }}" disabled>
                                         </div>
 
 
-                                <br/>
-                                <hr/>
+                                        <br/>
+                                        <hr/>
 
-                                    <span class="mb-1 alert alert-danger">You are going to delete the metrics definition described previously !</span>
+                                        <span class="mb-1 alert alert-danger">You are going to delete the metrics definition described previously !</span>
                                         <br/>
                                         <br/>
-                                    <button type="submit" class="btn btn-danger" value="submit">Delete Metric Defintition</button>
-                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                                            aria-label="Close">Close
-                                    </button>
+                                        <button type="submit" class="btn btn-danger" value="submit">Delete Metric Defintition</button>
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                                aria-label="Close">Close
+                                        </button>
                                     </form>
                                 </div>
 
@@ -218,10 +246,12 @@
                                         <div class="form-group m-2">
                                             <label for="unit">Unit</label>
                                             <select id="unit" name="metricUnit" class="form-select">
-                                                {% for key,units in tabMetricsUnits %}
-                                                    {% for unit in units %}
-                                                    <option value="{{ unit.symbol }}"
-                                                            {% if unit.symbol==data.unit_type %}selected{% endif %}>{{ unit.unit }}</option>
+                                                {% for tabMetricsUnit in tabMetricsUnits %}
+                                                    {% for key,units in tabMetricsUnit %}
+                                                        {% for unit in units %}
+                                                            <option value="{{ unit.symbol }}"
+                                                                    {% if unit.symbol==data.unit_type %}selected{% endif %}>{{ unit.unit }}</option>
+                                                        {% endfor %}
                                                     {% endfor %}
                                                 {% endfor %}
                                             </select>
@@ -230,12 +260,13 @@
                                         <div class="form-group m-2">
                                             <label for="type">Metric Type</label>
                                             <select id="type" name="metricType" class="form-select">
-                                                {% for types in tabMetricsTypes['metric_types'] %}
+                                                {% for tabMetricsType in tabMetricsTypes %}
+                                                    {% for types in tabMetricsType['metric_types'] %}
                                                         <option value="{{ types.metric_type  }}"
                                                                 {% if types.metric_type==data.unit_type %}selected{% endif %}>{{ types.metric_type  }}</option>
 
+                                                    {% endfor %}
                                                 {% endfor %}
-
                                             </select>
                                         </div>
 
@@ -257,10 +288,18 @@
                 </div>
 
             </td>
+            <td class="metricName">{{ data.metric_name }} </td>
+            <td class="metricDescription">{{ data.metric_description }} </td>
+            <td class="metricUnit">{{ data.unit_type }} </td>
+            <td class="metricType">{{ data.metric_type }}</td>
+
+
+
         </tr>
 
+        {% endif %}
     {% endfor %}
-
+    {% endfor %}
     </tbody>
 </table>
 
@@ -307,7 +346,7 @@
             request.done(function (output_json) {
 
                 var output = jQuery.parseJSON(output_json);
-                var status = output.status;
+                var status = output.code;
                 var message = output.message;
 
 
@@ -331,7 +370,7 @@
             request.fail(function (output_json) {
 
                 var output = jQuery.parseJSON(output_json);
-                var status = output.status;
+                var status = output.code;
                 var message = output.message;
 
                 if (type==='update')
@@ -349,9 +388,7 @@
 
         });
 
-        $("#message").fadeTo(5000, 1500).slideUp(2500, function () {
-            $("#message").slideUp(2500);
-        });
+
 
     </script>
 {% endblock %}

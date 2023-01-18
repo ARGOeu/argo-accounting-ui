@@ -23,9 +23,10 @@
     </thead>
 
     <tbody>
-
-    {%  for id, units in tabMetricsUnits %}
+    {% for tabMetricsUnit in tabMetricsUnits %}
+    {%  for id, units in tabMetricsUnit %}
         {%  for unit in units  %}
+
         <tr>
 
             <td>{{ unit.unit }} </td>
@@ -35,7 +36,7 @@
         </tr>
         {% endfor %}
     {% endfor %}
-
+    {% endfor %}
     </tbody>
 
 </table>

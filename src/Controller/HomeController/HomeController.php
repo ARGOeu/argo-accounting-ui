@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
@@ -63,9 +64,11 @@ class HomeController extends AbstractController
         }
 
        $permissions=$api->getUserPermissions($bearerToken,false);
+        $globalPermissions=$api->getUserGeneralPermissions($bearerToken);
 
-        if (count($permissions)>1) {
-            return $this->render('default/userInfo.html.twig', array('user' => $this->getUser(), 'listEntities' => $permissions));
+
+        if (count($permissions)>=1) {
+            return $this->render('default/userInfo.html.twig', array('user' => $this->getUser(), 'listEntities' => $permissions, 'globalPermissions'=>$globalPermissions));
         }
         else {
             return $this->render("AccountingMetrics/noPermissions.html.twig");
@@ -129,7 +132,8 @@ class HomeController extends AbstractController
         $permissions=$api->getUserPermissions($bearerToken);
 
 
-        if (count($permissions)>1) {
+
+        if (count($permissions)>=1) {
             return $this->render("AccountingMetrics/tableProjects.html.twig", [
                 'tabProjects' => $tabProjects,
                 'tabProviders' => $tabProviders,
@@ -163,13 +167,16 @@ class HomeController extends AbstractController
         catch (ClientException $exception) {
             return new RedirectResponse('/login');
         }
-                $permissions=$api->getUserPermissions($bearerToken);
 
+        $permissions=$api->getUserGeneralPermissions($bearerToken);
+        $id=$this->getUser()->getUserIdentifier();
 
-        if (count($permissions)>1) {
+        if (count($permissions)>=1) {
         $tabProviders=$api->getRessources('providers',$bearerToken);
         return $this->render("AccountingMetrics/tableProviders.html.twig", [
             'tabProviders' => $tabProviders,
+            'permissions'=>$permissions,
+            'userId'=>$id
         ]);
     }
         else {
@@ -204,7 +211,7 @@ class HomeController extends AbstractController
         $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
         $permissions=$api->getUserPermissions($bearerToken);
 
-        if (count($permissions)>1) {
+        if (count($permissions)>=1) {
             return $this->render("AccountingMetrics/tableInstallations.html.twig", [
                 'tabInstallations' => $tabInstallations,
                 'tabProjects' => $tabProjects,
@@ -270,13 +277,16 @@ class HomeController extends AbstractController
         $tabMetricsUnits=$api->getRessources('unit-types',$bearerToken);
         $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
         $tabMetricsTypes=$api->getRessources('metric-types',$bearerToken);
+        $permissions=$api->getUserGeneralPermissions($bearerToken);
 
         return $this->render("AccountingMetrics/tableDefinitions.html.twig", [
             'tabMetricsDef' => $tabMetricsDef,
             'tabMetricsUnits' => $tabMetricsUnits,
             'tabMetricsTypes'=>$tabMetricsTypes,
             "message"=>$message,
-            "status"=> $status
+            "status"=> $status,
+            "userId"=>$this->getUser()->getUserIdentifier(),
+            "permissions"=>$permissions
 
         ]);
 
@@ -355,25 +365,25 @@ class HomeController extends AbstractController
      */
     public function modifyProviders( Request $request,AccountingService $api)
     {
-
-            $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
-            $response=$api->modifyProviders($request->get('mode'), $request->get('project'),$request->get('provider'),$bearerToken);
-
-        try {
-            $status = $response->getStatusCode();
-            $headers = $response->getHeaders();
-            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
-
-        } catch (\Exception $exception) {
-
-            $status = $response->getStatusCode();
-            $message = $exception->getResponse()->getInfo()['response_headers'][2];
-            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
-
-        }
+        $providers=explode(",",substr($request->get('provider'),1),);
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $response=$api->modifyProviders($request->get('mode'), $request->get('project'),$providers,$bearerToken);
+        return new JsonResponse($response);
     }
 
 
+    /**
+     * @Route("/ajax/deleteProvider",  name="delete_provider")
+     *
+     * ajax calls to remove installation
+     * @return Response
+     */
+    public function deleteProvider(AccountingService $api, Request $request)
+    {
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $response=$api->deleteRessource('/providers/'.$request->get('provider_id'),$bearerToken);
+        return new JsonResponse($response);
+    }
 
 
     /**
@@ -384,27 +394,9 @@ class HomeController extends AbstractController
      */
     public function deleteInstallation(AccountingService $api, Request $request)
     {
-
-
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
-
         $response=$api->deleteRessource('/installations/'.$request->get('installation_id'),$bearerToken);
-
-
-        try {
-            $status = $response->getStatusCode();
-            $headers = $response->getHeaders();
-            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
-
-        } catch (\Exception $exception) {
-
-            $status = $response->getStatusCode();
-            $message = $exception->getResponse()->getInfo()['response_headers'][0];
-            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
-
-        }
-
-
+        return new JsonResponse($response);
     }
 
     /**
@@ -428,18 +420,38 @@ class HomeController extends AbstractController
 
         $response=$api->addRessource('/installations',$body,$bearerToken );
 
-        try {
-            $status = $response->getStatusCode();
-            $headers = $response->getHeaders();
-            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
+        return new JsonResponse($response);
+    }
 
-        } catch (\Exception $exception) {
+    /**
 
-            $status = $response->getStatusCode();
-            $message = $exception->getResponse()->getInfo()['response_headers'][0];
-            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
+     * @Route("/ajax/modifyProvider",  name="modify_provider")
+     *
+     * ajax calls to add  provider
+     * @return Response
+     */
+    public function modifyProvider(AccountingService $api, Request $request)
+    {
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
-        }
+        $body = [
+            'id' => $request->get('id'),
+            'name' => $request->get('name'),
+            'website' => $request->get('website'),
+            'abbreviation' => $request->get('abbreviation'),
+            'logo' => $request->get('logo')
+        ];
+
+       if ($request->get('type')==='add')
+       $response=$api->addRessource('/providers',$body,$bearerToken );
+
+        if ($request->get('type')==='update')
+            $response=$api->updateRessource('/providers/'.$request->get('id'),$body,$bearerToken );
+
+        if ($request->get('type')==='delete')
+            $response=$api->deleteRessource('/providers/'.$request->get('id'),$bearerToken );
+
+        return new JsonResponse($response);
     }
 
     /**
@@ -469,18 +481,7 @@ class HomeController extends AbstractController
             $response = $api->updateRessource('/installations/' .$request->get('id'),$body,$bearerToken);
         }
 
-        try {
-            $status = $response->getStatusCode();
-            $headers = $response->getHeaders();
-            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
-
-        } catch (\Exception $exception) {
-
-            $status = $response->getStatusCode();
-            $message = $exception->getResponse()->getInfo()['response_headers'][0];
-            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
-
-        }
+        return new JsonResponse($response);
 
 
     }
@@ -521,23 +522,11 @@ class HomeController extends AbstractController
             } // last case : delete
             else {
                 $response=$api->deleteRessource('/metric-definitions/'.$request->get('metricId'),$bearerToken);
-
             }
-        }
-
-        try {
-            $status = $response->getStatusCode();
-            $headers = $response->getHeaders();
-            return new JsonResponse(json_encode(["message" => "Action successful", "status" => $status]));
-
-        } catch (\Exception $exception) {
-
-            $status = $response->getStatusCode();
-            $message = $exception->getResponse()->getInfo()['response_headers'][0];
-
-            return new JsonResponse(json_encode(["message" => $message, "status" => $status]));
 
         }
+
+        return new JsonResponse($response);
 
 
     }
