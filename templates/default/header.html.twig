@@ -50,6 +50,7 @@
 
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
+                        {% if app.user.username is defined %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Resources
@@ -67,6 +68,7 @@
                             <a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Metrics</a>
                         </li>
 
+
                         <li class="offset-4 text-end ml-5 nav-item dropdown">
                               <a class="dropdown-toggle nav-link" href="#" role="button" id="dropdown_user" data-bs-toggle="dropdown" aria-expanded="false">
                                   <i class="bi bi-person-fill-gear" style="color: #0a58ca;font-size: large"></i>
@@ -81,6 +83,7 @@
                             </ul>
 
                         </li>
+                        {% endif %}
 
                     </ul>
                 </div>

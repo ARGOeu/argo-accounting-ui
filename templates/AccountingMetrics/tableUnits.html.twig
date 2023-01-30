@@ -18,25 +18,25 @@
     <tr>
         <th>Unit Description</th>
         <th>Unit Type</th>
-        <th>Unit Symbol</th>
+
     </tr>
     </thead>
 
     <tbody>
     {% for tabMetricsUnit in tabMetricsUnits %}
-    {%  for id, units in tabMetricsUnit %}
-        {%  for unit in units  %}
+
+        {%  for unit in tabMetricsUnit  %}
 
         <tr>
 
-            <td>{{ unit.unit }} </td>
-            <td>{{ id }}</td>
-            <td>{{ unit.symbol }} </td>
+            <td>{{ unit.description}} </td>
+            <td>{{ unit.unit_type }} </td>
+
 
         </tr>
         {% endfor %}
     {% endfor %}
-    {% endfor %}
+
     </tbody>
 
 </table>

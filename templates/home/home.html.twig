@@ -4,33 +4,67 @@
 
 
 
-            <div class="row row-cols-1 row-cols-md-3 mb-2 text-center">
-                {% for key, module in menu %}
-                <div class="col-3">
-                    <div class="card m-5     shadow-sm">
-                        <div class="card-header">
-                            <h4 class="my-0 fw-normal">{{ module["title"] }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="card-title pricing-card-title"><i class="fas {{ module["icon"] }} fa-2x"></i></h1>
-                            <ul class="list-unstyled mt-2 mb-3">
 
-                                        {% for items in module["items"] %}
-                                            {% if items["parameter"] is not defined %}
-                                                <button type="button" class="w-100 m-1 btn btn-lg btn-outline-light small btn-sm "><a class="text-dark" href="{{ path(items["name"]) }}">{{ items["title"] }}</a></button>
-                                            {% else %}
-                                                <button type="button" class="w-100 m-1 btn btn-lg btn-outline-light small btn-sm "><a class="text-dark" href="{{ path(items["name"], { 'type':items["parameter"]["value"] } )}}">{{ items["title"] }}</a></button>
-                                            {% endif %}
-                                        {% endfor %}
+{%  if app.user.username is not defined %}
+    <div class="card offset-1" style="width: 75%">
+        <div class="card-body">
+            <h4 class="card-title">ARGO Accounting Portal</h4>
+            <h6 class="card-subtitle mb-2 text-muted"><a href="https://argoeu.github.io/argo-accounting/" title="documentation">Detailed description available here</a></h6>
+            <ul>
+                <li class="card-text">The Accounting System is a service that is responsible for collecting, aggregating, and exchanging the Virtual Access metrics. </li> 
+                <li class="card-text">The ARGO Accounting Portal is providing a user friendly interface to this service </li> 
+                <li class="card-text">To access the portal, please log-in trough EOSC Core Infrastructure Proxy  </li>    
+            </ul>
+        </div>
+        <div class="card-footer text-center"> <a class="btn btn-primary" href="{{ url('aai_eosc_login') }}"><i class="bi bi-box-arrow-in-right"></i> LOGIN</a></div>
+    </div>
+    {% else %}
+        <div class="row">
+            <div class="col">
+                <div class="card">
 
-
-                            </ul>
-
+                    <div class="card-header">
+                        <div class="card-title">
+                            <h4>Resources</h4>
                         </div>
                     </div>
+                    <div class="card-body">
+
+                        <ul>
+
+                            <li><a href="{{ path('projects') }}" class="nav-link">Projects</a></li>
+                            <li><a href="{{ path('providers') }}" class="nav-link" >Providers</a></li>
+                            <li><a href="{{ path('installations') }}" class="nav-link" >Installations</a></li>
+                            <li><a href="{{ path('metrics-definitions') }}" class="nav-link" >Metrics Definitions</a></li>
+                            <li><a href="{{ path('metrics-units') }}" class="nav-link" >Metrics Units</a></li>
+                        </ul>
+                    </div>
                 </div>
-                {% endfor %}
+
+
             </div>
+            <div class="offset-1 col">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="card-title">
+                            <h4>Metrics</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <ul>
+
+                            <li>  <a href="{{ path('metrics') }}" class="nav-link">Browse Metrics</a></li>
+
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    {% endif %}
 
 
 

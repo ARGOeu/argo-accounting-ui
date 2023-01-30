@@ -80,11 +80,10 @@ class HomeController extends AbstractController
     /**
      * @Route(path="/",  name="homepage")
      */
-    public function index(): RedirectResponse
+    public function index()
     {
-        // redirects to the "homepage" route
-        return $this->redirectToRoute('projects');
 
+        return $this->render("/home/home.html.twig");
     }
 
     /**

@@ -60,6 +60,8 @@
                 </div>
             {% endif %}
 
+
+
 <!-- Modal ADD  -->
 <div class="modal fade" id="add_metric_desc" tabindex="-1" aria-labelledby="add_metric_desc_Label">
     <div class="modal-dialog modal-dialog-scrollable">
@@ -92,11 +94,9 @@
                         <label for="unit">Unit</label>
                         <select id="unit" name="metricUnit" class="form-select">
                             {% for tabMetricsUnit in tabMetricsUnits %}
-                            {% for units in tabMetricsUnit %}
-                                {% for unit in units %}
-                                    <option value="{{ unit.symbol }}">{{ unit.unit }}</option>
+                                {% for units in tabMetricsUnit %}
+                                        <option value="{{ units.unit_type }}">{{ units.unit_type }} :  {{ units.description }}</option>
                                 {% endfor %}
-                            {% endfor %}
                             {% endfor %}
                         </select>
                     </div>
@@ -105,7 +105,7 @@
                         <label for="type">Metric Type</label>
                         <select id="type" name="metricType" class="form-select">
                             {% for tabMetricsType in tabMetricsTypes %}
-                                {% for types in tabMetricsType['metric_types'] %}
+                                {% for types in tabMetricsType %}
                                     <option value="{{ types.metric_type  }}">{{ types.metric_type  }}</option>
                                 {% endfor %}
                             {% endfor %}
@@ -127,6 +127,8 @@
         </div>
     </div>
 </div>
+
+
 <table class="dataTable table  border border-dark" id="Tabledefinitions">
 
     <thead>
@@ -141,10 +143,8 @@
     </thead>
 
     <tbody>
-    {% for definition in tabMetricsDef %}
-    {% for data in definition %}
-        {%  if data.creator_id ==userId %}
-
+    {% for definitions in tabMetricsDef %}
+            {% for data in definitions %}
 
         <tr id="tr_{{ data.metric_definition_id }}">
             <td>
@@ -202,7 +202,7 @@
                                         <span class="mb-1 alert alert-danger">You are going to delete the metrics definition described previously !</span>
                                         <br/>
                                         <br/>
-                                        <button type="submit" class="btn btn-danger" value="submit">Delete Metric Defintition</button>
+                                        <button type="submit" class="btn btn-danger" value="submit">Delete Metric Definition</button>
                                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
                                                 aria-label="Close">Close
                                         </button>
@@ -245,13 +245,11 @@
 
                                         <div class="form-group m-2">
                                             <label for="unit">Unit</label>
+
                                             <select id="unit" name="metricUnit" class="form-select">
                                                 {% for tabMetricsUnit in tabMetricsUnits %}
-                                                    {% for key,units in tabMetricsUnit %}
-                                                        {% for unit in units %}
-                                                            <option value="{{ unit.symbol }}"
-                                                                    {% if unit.symbol==data.unit_type %}selected{% endif %}>{{ unit.unit }}</option>
-                                                        {% endfor %}
+                                                    {% for units in tabMetricsUnit %}
+                                                        <option value="{{ units.unit_type }}" {% if units.unit_type== data.unit_type%} selected{% endif %}>{{ units.unit_type }} :  {{ units.description }}</option>
                                                     {% endfor %}
                                                 {% endfor %}
                                             </select>
@@ -261,9 +259,9 @@
                                             <label for="type">Metric Type</label>
                                             <select id="type" name="metricType" class="form-select">
                                                 {% for tabMetricsType in tabMetricsTypes %}
-                                                    {% for types in tabMetricsType['metric_types'] %}
+                                                    {% for types in tabMetricsType %}
                                                         <option value="{{ types.metric_type  }}"
-                                                                {% if types.metric_type==data.unit_type %}selected{% endif %}>{{ types.metric_type  }}</option>
+                                                                {% if types.metric_type==data.metric_type %}selected{% endif %}>{{ types.metric_type  }}</option>
 
                                                     {% endfor %}
                                                 {% endfor %}
@@ -297,9 +295,10 @@
 
         </tr>
 
-        {% endif %}
+
     {% endfor %}
     {% endfor %}
+
     </tbody>
 </table>
 
