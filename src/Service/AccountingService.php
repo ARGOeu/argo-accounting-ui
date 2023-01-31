@@ -208,7 +208,6 @@ class AccountingService extends AbstractController
     public function searchRessources($resource_type, $search, $accessToken)
     {
 
-
         if ($resource_type === 'metrics') {
             $api_url = '/metrics/search';
         }
@@ -274,6 +273,9 @@ class AccountingService extends AbstractController
 
     public function updateRessource($api_url, $body, $accessToken)
     {
+
+
+        unset($body["id"]);
 
         $response = $this->client->request('PATCH',
             $this->getParameter('accounting_api_url') . $api_url,

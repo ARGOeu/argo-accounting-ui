@@ -31,7 +31,7 @@
             {% endif %}
 
             <div class="text-end">
-                            <button class="btn btn-primary" id="addInstallation" data-bs-toggle="modal" data-bs-target="#add_installation" disabled>
+                            <button class="btn btn-primary" id="addInstallation" data-bs-toggle="modal" data-bs-target="#add_installation">
                                 <i class="bi bi-plus-square me-1"></i> Add a new installation
                             </button>
                         </div>
@@ -79,7 +79,7 @@
                                     {% for projects in tabProjects %}
                                             {% for project in projects %}
 
-                                            <div class="form-group m-2 providers" id="providers_{{ project.id }}">
+                                            <div class="form-group m-2 providers d-none" id="providers_{{ project.id }}">
                                                 <label for="providers" class="m-1">Select a provider</label>
                                                 <select class="form-control form-select" id="providers_select_{{ project.id }}"  name="providers" >
 
@@ -153,13 +153,13 @@
 
                 <thead>
                 <tr>
-                    <th>Actions</th>
+
                     <th>Name</th>
                     <th>Project</th>
                     <th>Organization</th>
                     <th>Infrastructure</th>
                     <th>Metric Name: Description (Unit Type - Metric Type)</th>
-
+                    <th>Actions</th>
                 </tr>
                 </thead>
 
@@ -178,24 +178,44 @@
                                 {% endfor %}
                             {% endfor %}
 
+
+
+
+
+                            <td>{{ installation.installation}}</td>
+
+                            <td>{{ nameP }}</td>
+                            <td>{{ installation.organisation}}</td>
+                            <td>{{ installation.infrastructure}}</td>
+
+                            <td>
+                                <ul>
+                                        <li>
+                                            {{ installation.unit_of_access.metric_name }} : {{ installation.unit_of_access.metric_description}} ({{ installation.unit_of_access.unit_type}} - {{  installation.unit_of_access.metric_type}})
+                                        </li>
+
+                                </ul>
+
+                            </td>
+
                             <td>
 
                                 <div class="btn-group dropstart">
                                     {% if permissions[nameP]['Installation'] is defined %}
 
 
-                                            {% if permissions[nameP]['Installation']['UPDATE'] is defined%}
-                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ installation.id}}" title="Update Installation">
-                                                    <i class="bi bi-pencil-square" style="font-size: large"></i>
+                                        {% if permissions[nameP]['Installation']['UPDATE'] is defined%}
+                                            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ installation.id}}" title="Update Installation">
+                                                <i class="bi bi-pencil-square" style="font-size: large"></i>
 
-                                                </a>
-                                            {% endif %}
+                                            </a>
+                                        {% endif %}
 
-                                            {% if permissions[nameP]['Installation']['DELETE'] is defined%}
-                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ installation.id}}" title="Delete Installation">
-                                                    <i class="bi bi-x-circle" style="font-size: large"></i>
-                                                </a>
-                                            {% endif %}
+                                        {% if permissions[nameP]['Installation']['DELETE'] is defined%}
+                                            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ installation.id}}" title="Delete Installation">
+                                                <i class="bi bi-x-circle" style="font-size: large"></i>
+                                            </a>
+                                        {% endif %}
 
 
                                     {% endif %}
@@ -312,26 +332,6 @@
                             </td>
 
 
-
-                            <td>{{ installation.installation}}</td>
-
-                            <td>{{ nameP }}</td>
-                            <td>{{ installation.organisation}}</td>
-                            <td>{{ installation.infrastructure}}</td>
-
-                            <td>
-                                <ul>
-                                        <li>
-                                            {{ installation.unit_of_access.metric_name }} : {{ installation.unit_of_access.metric_description}} ({{ installation.unit_of_access.unit_type}} - {{  installation.unit_of_access.metric_type}})
-                                        </li>
-
-                                </ul>
-
-                            </td>
-
-
-
-
                         </tr>
 
                     {% endfor %}
@@ -351,8 +351,11 @@
 
     <script>
 
-        $(document).on('change','#project_id',function(event) {
+        $("#TableInstallations").dataTable({
+            "order": [[ 5, 'asc' ], [ 0, 'asc' ]]
+        })
 
+        $(document).on('change','#project_id',function(event) {
             var projectId = $('#project_id > option:selected').val().trim();
             $(".providers").addClass('d-none');
             $('#providers_'+projectId).removeClass('d-none');

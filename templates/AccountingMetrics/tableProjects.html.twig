@@ -34,11 +34,11 @@
 
     <thead>
     <tr>
-        <th>Actions</th>
+
         <th class="col-1">Acronym</th>
         <th class="col-5">Title</th>
         <th class="col-5">Providers</th>
-
+        <th>Actions</th>
 
     </tr>
     </thead>
@@ -49,6 +49,19 @@
 
     {%  for id, data in projects %}
         <tr>
+            <td class="acronym">{{ data.acronym }} </td>
+            <td class="title">{{ data.title }} </td>
+            <td class="providers">
+                <ul id="row_provider_{{ data.id }}">
+
+            {% for provider in data['providers']  %}
+
+                {%  if provider.name is defined %}
+                    <li id="provider_{{ data.id }}_{{ provider.id }}">{{ provider.name }} </li>
+                {% endif %}
+            {% endfor %}
+                </ul>
+            </td>
             <td>
 
                 <div class="btn-group dropstart">
@@ -57,7 +70,7 @@
 
                         {% if permissions[data.acronym]['Project']['ASSOCIATE'] is defined and permissions[data.acronym]['Project']['ASSOCIATE']=='ALWAYS' %}
                             <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_provider_{{ data.id }}" title="Associates a new provider">
-                                <i class="bi bi-pencil-square" style="font-size: large"></i>
+                                <i class="bi bi-plus-circle" style="font-size: large"></i>
                             </a>
 
 
@@ -70,15 +83,15 @@
                             </a>
 
                         {% endif %}
-                        {% if permissions[data.acronym]['Project']['READ'] is defined and permissions[data.acronym]['Project']['READ']=='ALWAYS' %}
+{#                        {% if permissions[data.acronym]['Project']['READ'] is defined and permissions[data.acronym]['Project']['READ']=='ALWAYS' %}#}
 
-                            <a class="btn btn-primary" href=" {{ path('metrics', { 'project': data.id }) }}" title="Browse Metrics for this project">
-                                <i class="bi bi-bar-chart" style="font-size: large"></i>
+{#                            <a class="btn btn-primary" href=" {{ path('metrics', { 'project': data.id }) }}" title="Browse Metrics for this project">#}
+{#                                <i class="bi bi-bar-chart" style="font-size: large"></i>#}
 
-                            </a>
+{#                            </a>#}
 
 
-                        {% endif %}
+{#                        {% endif %}#}
 
                     </div>
                 </div>
@@ -180,19 +193,6 @@
 
 
             </td>
-            <td class="acronym">{{ data.acronym }} </td>
-            <td class="title">{{ data.title }} </td>
-            <td class="providers">
-                <ul id="row_provider_{{ data.id }}">
-
-            {% for provider in data['providers']  %}
-
-                {%  if provider.name is defined %}
-                    <li id="provider_{{ data.id }}_{{ provider.id }}">{{ provider.name }} </li>
-                {% endif %}
-            {% endfor %}
-                </ul>
-            </td>
 
 
         </tr>
@@ -212,6 +212,9 @@
 
     <script>
 
+        $("#TableProjects").dataTable({
+            "order": [[ 3, 'asc' ], [ 0, 'asc' ]]
+        })
 
         $(document).on('submit','.form_add_provider_project, .form_remove_provider_project',function(event) {
             event.preventDefault(); // cancel default behavior

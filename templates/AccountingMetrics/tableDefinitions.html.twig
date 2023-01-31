@@ -129,16 +129,16 @@
 </div>
 
 
-<table class="dataTable table  border border-dark" id="Tabledefinitions">
+<table class="dataTable table  border border-dark" id="TableDefinitions">
 
     <thead>
     <tr>
-        <th>Actions</th>
+
         <th>Metric Name</th>
         <th>Metric Description</th>
         <th>Unit</th>
         <th>Metric Type</th>
-
+        <th>Actions</th>
     </tr>
     </thead>
 
@@ -147,24 +147,29 @@
             {% for data in definitions %}
 
         <tr id="tr_{{ data.metric_definition_id }}">
+
+            <td class="metricName">{{ data.metric_name }} </td>
+            <td class="metricDescription">{{ data.metric_description }} </td>
+            <td class="metricUnit">{{ data.unit_type }} </td>
+            <td class="metricType">{{ data.metric_type }}</td>
             <td>
                 <div class="btn-group dropstart">
 
-        {%  if data.creator_id is defined %}
-            {% if access_update=='ALWAYS' or (access_update=='ENTITY' and data.creator_id==userId)%}
-                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ data.metric_definition_id }}" title="Update Metric Definition">
-                            <i class="bi bi-pencil-square" style="font-size: large"></i>
-                        </a>
-                {% endif %}
-        {% endif %}
-        {%  if data.creator_id is defined %}
-            {% if access_delete=='ALWAYS' or (access_delete=='ENTITY' and data.creator_id==userId)%}
-                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ data.metric_definition_id}}" title="Delete Metric Definition">
-                            <i class="bi bi-x-circle" style="font-size: large"></i>
+                    {%  if data.creator_id is defined %}
+                        {% if access_update=='ALWAYS' or (access_update=='ENTITY' and data.creator_id==userId)%}
+                            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#update_{{ data.metric_definition_id }}" title="Update Metric Definition">
+                                <i class="bi bi-pencil-square" style="font-size: large"></i>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    {%  if data.creator_id is defined %}
+                        {% if access_delete=='ALWAYS' or (access_delete=='ENTITY' and data.creator_id==userId)%}
+                            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ data.metric_definition_id}}" title="Delete Metric Definition">
+                                <i class="bi bi-x-circle" style="font-size: large"></i>
 
-                        </a>
-            {% endif %}
-        {% endif %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
 
                     <!-- il faut positionner les modales en dehors du menu pour éviter les problèmes -->
 
@@ -286,11 +291,6 @@
                 </div>
 
             </td>
-            <td class="metricName">{{ data.metric_name }} </td>
-            <td class="metricDescription">{{ data.metric_description }} </td>
-            <td class="metricUnit">{{ data.unit_type }} </td>
-            <td class="metricType">{{ data.metric_type }}</td>
-
 
 
         </tr>
@@ -309,6 +309,11 @@
 {% endblock %}
 {% block javascripts %}
     <script>
+        $("#TableDefinitions").dataTable({
+            "order": [[ 4, 'asc' ], [ 0, 'asc' ]]
+        })
+
+
         $(document).on('submit','.form_add_metric_desc, .form_update_metric_desc, .form_delete_metric_desc',function(event) {
 
             event.preventDefault(); // cancel default behavior

@@ -155,9 +155,11 @@ class HomeController extends AbstractController
      * @return Response
      */
 
-    public function listProviders( AccountingService $api)
+    public function listProviders( AccountingService $api, Request $request)
     {
 
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
 
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
         try {
@@ -175,7 +177,9 @@ class HomeController extends AbstractController
         return $this->render("AccountingMetrics/tableProviders.html.twig", [
             'tabProviders' => $tabProviders,
             'permissions'=>$permissions,
-            'userId'=>$id
+            'userId'=>$id,
+            'status'=>$status,
+            'message'=>$message
         ]);
     }
         else {

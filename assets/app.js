@@ -46,10 +46,6 @@ $(document).ready(function() {
             theme: 'bootstrap-5'
         }
     );
-    $(".dataTable").dataTable({
-        "order":[[1, 'asc'], [2, 'asc']]
-        }
-    );
 
     $("#message").fadeTo(5000, 1500).slideUp(2500, function () {
         $("#message").slideUp(2500);
