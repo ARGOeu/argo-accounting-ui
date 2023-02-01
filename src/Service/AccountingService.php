@@ -274,9 +274,6 @@ class AccountingService extends AbstractController
     public function updateRessource($api_url, $body, $accessToken)
     {
 
-
-        unset($body["id"]);
-
         $response = $this->client->request('PATCH',
             $this->getParameter('accounting_api_url') . $api_url,
             [
@@ -287,7 +284,6 @@ class AccountingService extends AbstractController
                 'timeout' => 10,
                 'body' => json_encode($body)
             ],
-
         );
 
         if ($response->getStatusCode() > 201) {

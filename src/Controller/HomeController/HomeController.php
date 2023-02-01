@@ -378,7 +378,7 @@ class HomeController extends AbstractController
     /**
      * @Route("/ajax/deleteProvider",  name="delete_provider")
      *
-     * ajax calls to remove installation
+     * ajax calls to remove provider
      * @return Response
      */
     public function deleteProvider(AccountingService $api, Request $request)
@@ -389,42 +389,7 @@ class HomeController extends AbstractController
     }
 
 
-    /**
-     * @Route("/ajax/deleteInstallation",  name="delete_installation")
-     *
-     * ajax calls to remove installation
-     * @return Response
-     */
-    public function deleteInstallation(AccountingService $api, Request $request)
-    {
-        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
-        $response=$api->deleteRessource('/installations/'.$request->get('installation_id'),$bearerToken);
-        return new JsonResponse($response);
-    }
 
-    /**
-
-     * @Route("/ajax/addInstallation",  name="add_installation")
-     *
-     * ajax calls to add installation
-     * @return Response
-     */
-    public function addInstallation(AccountingService $api, Request $request)
-    {
-        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
-
-        $body = [
-            'project' => $request->get('project'),
-            'infrastructure' => $request->get('infrastructure'),
-            'organisation' => $request->get('provider'),
-            'installation' => $request->get('installation'),
-            'unit_of_access' => $request->get('metric_definition')
-        ];
-
-        $response=$api->addRessource('/installations',$body,$bearerToken );
-
-        return new JsonResponse($response);
-    }
 
     /**
 
@@ -437,19 +402,16 @@ class HomeController extends AbstractController
     {
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
-        $body = [
-            'id' => $request->get('id'),
-            'name' => $request->get('name'),
-            'website' => $request->get('website'),
-            'abbreviation' => $request->get('abbreviation'),
-            'logo' => $request->get('logo')
-        ];
+        $body =$request->request->all();
+        unset($body['type']);
 
        if ($request->get('type')==='add')
-       $response=$api->addRessource('/providers',$body,$bearerToken );
+            $response=$api->addRessource('/providers',$body,$bearerToken );
 
-        if ($request->get('type')==='update')
-            $response=$api->updateRessource('/providers/'.$request->get('id'),$body,$bearerToken );
+        if ($request->get('type')==='update') {
+            unset($body['id']);
+            $response = $api->updateRessource('/providers/' . $request->get('id'), $body, $bearerToken);
+        }
 
         if ($request->get('type')==='delete')
             $response=$api->deleteRessource('/providers/'.$request->get('id'),$bearerToken );
@@ -466,24 +428,21 @@ class HomeController extends AbstractController
 
     public function modifyInstallation(AccountingService $api, Request $request)
     {
-
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $body =$request->request->all();
+        unset($body['type']);
 
-        $body = [
-            'project' => $request->get('project'),
-            'infrastructure' => $request->get('infrastructure'),
-            'organisation' => $request->get('provider'),
-            'installation' => $request->get('installation'),
-            'unit_of_access' => $request->get('metric_definition')
-        ];
-
-        if ($request->get('type') === 'add') {
-            $response=$api->addRessource('/installations',$body,$bearerToken );
+        if ($request->get('type')==='add') {
+            $response = $api->addRessource('/installations', $body, $bearerToken);
         }
-        else {
-            $response = $api->updateRessource('/installations/' .$request->get('id'),$body,$bearerToken);
+        if ($request->get('type')==='update') {
+            unset($body['installation_id']);
+            $response = $api->updateRessource('/installations/' . $request->get('installation_id'),$body, $bearerToken);
         }
 
+        if ($request->get('type')==='delete') {
+            $response = $api->deleteRessource('/installations/' . $request->get('installation_id'), $bearerToken);
+        }
         return new JsonResponse($response);
 
 
@@ -502,29 +461,19 @@ class HomeController extends AbstractController
     {
 
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $body =$request->request->all();
+        unset($body['type']);
 
-        if ($request->get('type') === 'addition') {
-            $body = [
-                'metric_name' => $request->get('metricName'),
-                'metric_description' => $request->get('metricDescription'),
-                'unit_type' => $request->get('metricUnit'),
-                'metric_type' => $request->get('metricType')];
 
+        if ($request->get('type') === 'add') {
             $response=$api->addRessource('/metric-definitions',$body,$bearerToken );
-
-
         } else {
             if ($request->get('type') === 'update') {
-                $body = [
-                    'metric_id' => $request->get('metricId'),
-                    'metric_name' => $request->get('metricName'),
-                    'metric_description' => $request->get('metricDescription'),
-                    'unit_type' => $request->get('metricUnit'),
-                    'metric_type' => $request->get('metricType')];
-                $response=$api->updateRessource('/metric-definitions/'.$request->get('metricId'),$body,$bearerToken );
+                unset($body['metric_id']);
+                $response=$api->updateRessource('/metric-definitions/'.$request->get('metric_id'),$body,$bearerToken );
             } // last case : delete
             else {
-                $response=$api->deleteRessource('/metric-definitions/'.$request->get('metricId'),$bearerToken);
+                $response=$api->deleteRessource('/metric-definitions/'.$request->get('metric_id'),$bearerToken);
             }
 
         }

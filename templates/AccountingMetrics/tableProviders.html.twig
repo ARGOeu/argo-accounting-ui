@@ -310,11 +310,19 @@
                                                             <input type="text" class="form-control" id="provider"
                                                                    name="providerName"
                                                                    value="{{ data.name }}">
+
+                                                            <input type="hidden" class="form-control" id="provider_ref"
+                                                                   name="providerName_ref"
+                                                                   value="{{ data.name }}">
                                                         </div>
                                                         <div class="form-group m-2">
                                                             <label for="installation">Provider Abbreviation Name</label>
-                                                            <input type="text" class="form-control" id="abbreviation "
+                                                            <input type="text" class="form-control" id="abbreviation"
                                                                    name="providerNameAbbr"
+                                                                   value="{{ data.abbreviation }}">
+
+                                                            <input type="hidden" class="form-control" id="abbreviation_ref"
+                                                                   name="providerNameAbbr_ref"
                                                                    value="{{ data.abbreviation }}">
                                                         </div>
 
@@ -323,12 +331,19 @@
                                                             <input type="text" class="form-control"
                                                                    name="providerWebSite" id="providerWebSite"
                                                                    value="{{ data.website }}">
+                                                            <input type="hidden" class="form-control"
+                                                                   name="providerWebSite_ref" id="providerWebSite_ref"
+                                                                   value="{{ data.website }}">
                                                         </div>
 
                                                         <div class="form-group m-2">
                                                             <label for="metricName">Provider Logo</label>
                                                             <input type="text" class="form-control" name="providerLogo"
                                                                    id="providerLogo"
+                                                                   aria-describedby="providerLogoHelp"
+                                                                   value="{{ data.logo }}">
+                                                            <input type="hidden" class="form-control" name="providerLogo_ref"
+                                                                   id="providerLogo_ref"
                                                                    aria-describedby="providerLogoHelp"
                                                                    value="{{ data.logo }}">
                                                             <small id="providerLogoHelp" class="form-text text-muted">An
@@ -381,14 +396,46 @@
 
             var type = $(this).find('input[name="type"]').val().trim();
             var id = $(this).find('input[name="providerId"]').val().trim();
+            var dataUrl='id=' + id +'&type=' + type;
 
             if (type !== 'delete') {
                 var name = $(this).find('input[name="providerName"]').val().trim();
                 var abbreviation = $(this).find('input[name="providerNameAbbr"]').val().trim();
                 var logo = $(this).find('input[name="providerLogo"]').val().trim();
                 var website = $(this).find('input[name="providerWebSite"]').val().trim();
-                dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website + '&type=' + type;
-            } else {
+
+                if (type === 'add') {
+                    dataUrl = 'id=' + id + '&name=' + name + '&abbreviation=' + abbreviation + '&logo=' + logo + '&website=' + website + '&type=' + type;
+                }
+
+                if (type === 'update') {                   
+
+                    var name_ref = $(this).find('input[name="providerName_ref"]').val().trim();
+                    var abbreviation_ref = $(this).find('input[name="providerNameAbbr_ref"]').val().trim();
+                    var logo_ref = $(this).find('input[name="providerLogo_ref"]').val().trim();
+                    var website_ref = $(this).find('input[name="providerWebSite_ref"]').val().trim();
+
+                    if (name!==name_ref) {
+                        dataUrl = dataUrl + '&name=' + name;
+                    }
+
+                    if (abbreviation !==abbreviation_ref ) {
+                        dataUrl = dataUrl + '&abbreviation=' + abbreviation;
+                    }
+
+                    if (logo!==logo_ref ) {
+                        dataUrl = dataUrl + '&logo=' + logo;
+                    }
+                    
+                    if (website!==website_ref ) {
+                        dataUrl = dataUrl + '&website=' + website;
+                    }
+                }
+                
+            }
+
+
+            if (type === 'delete') {
                 dataUrl = 'id=' + id + '&type=' + type;
             }
 

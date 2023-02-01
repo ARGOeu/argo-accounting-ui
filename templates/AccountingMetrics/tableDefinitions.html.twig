@@ -76,7 +76,7 @@
                 <form class="form_add_metric_desc">
 
                     <input type="hidden" value="0" name="metricId"/>
-                    <input type="hidden" name="type" value="addition"/>
+                    <input type="hidden" name="type" value="add"/>
 
                     <div class="form-group m-2">
                         <label for="metricName">Metric Name</label>
@@ -235,8 +235,9 @@
                                         <input type="hidden" value="{{ data.metric_definition_id }}" name="metricId"/>
                                         <div class="form-group m-2">
                                             <label for="metricName">Metric Name</label>
-                                            <input type="text" class="form-control" id="metricName" name="metricName"
-                                                   value="{{ data.metric_name }}">
+                                            <input type="text" class="form-control" id="metricName" name="metricName"  value="{{ data.metric_name }}">
+                                            <input type="hidden" class="form-control" id="metricName_ref" name="metricName_ref"  value="{{ data.metric_name }}">
+
                                         </div>
                                         <div class="form-group m-2">
                                             <label for="metricDescription">Metric Description</label>
@@ -244,6 +245,8 @@
                                             <input type="text" class="form-control" id="metricDescription"
                                                    name="metricDescription" aria-describedby="metricDescriptionHelp"
                                                    value="{{ data.metric_description }}">
+                                            <input type="hidden" class="form-control" id="metricDescription_ref" name="metricDescription_ref"  value="{{ data.metric_description }}">
+
                                             <small id="metricDescriptionHelp" class="form-text text-muted">Please
                                                 describe the usage and the perimeter of the metric</small>
                                         </div>
@@ -258,6 +261,7 @@
                                                     {% endfor %}
                                                 {% endfor %}
                                             </select>
+                                            <input type="hidden" class="form-control" id="metricUnit_ref" name="metricUnit_ref"  value="{{ data.unit_type }}">
                                         </div>
 
                                         <div class="form-group m-2">
@@ -271,6 +275,8 @@
                                                     {% endfor %}
                                                 {% endfor %}
                                             </select>
+                                            <input type="hidden" class="form-control" id="metricType_ref" name="metricType_ref"  value="{{ data.metric_type }}">
+
                                         </div>
 
 
@@ -322,16 +328,49 @@
             let type=  $(this).find('input[name="type"]').val().trim();
             let dataUrl;
 
+
             if (type === 'delete') {
-                dataUrl = 'type=' + type + '&metricId=' + metricId;
+                dataUrl = 'type=' + type + '&metric_id=' + metricId;
 
             } else {
+
                 var metricDescription = $(this).find('input[name="metricDescription"]').val().trim();
                 var metricName = $(this).find('input[name="metricName"]').val().trim();
                 var metricUnit = $(this).find('select[name="metricUnit"] > option:selected').val().trim();
                 var metricType = $(this).find('select[name="metricType"] > option:selected').val().trim();
-                dataUrl = 'type=' + type + '&metricId=' + metricId + '&metricDescription=' + metricDescription + '&metricName=' + metricName + '&metricUnit=' + metricUnit + '&metricType=' + metricType;
+
+                dataUrl = 'type=' + type ;
+
+                if (type==='add') {
+                    dataUrl = dataUrl + '&metric_description=' + metricDescription + '&metric_name=' + metricName + '&unit_type=' + metricUnit + '&metric_type=' + metricType;
+                }
+
+                if (type==='update') {
+                    var metricDescription_ref = $(this).find('input[name="metricDescription_ref"]').val().trim();
+                    var metricName_ref = $(this).find('input[name="metricName_ref"]').val().trim();
+                    var metricUnit_ref = $(this).find('input[name="metricUnit_ref"]').val().trim();
+                    var metricType_ref = $(this).find('input[name="metricType_ref"]').val().trim();
+
+                    dataUrl=dataUrl+'&metric_id=' + metricId;
+
+                    if (metricDescription_ref!==metricDescription) {
+                        dataUrl = dataUrl + '&metric_description=' + metricDescription;
+                    }
+
+                    if (metricName_ref!==metricName) {
+                        dataUrl = dataUrl + '&metric_name=' + metricName;
+                    }
+
+                    if (metricUnit_ref!==metricUnit) {
+                        dataUrl = dataUrl + '&unit_type=' + metricUnit;
+                    }
+
+                    if (metricType_ref!==metricType) {
+                        dataUrl = dataUrl + '&metric_type=' + metricType;
+                    }
+                }
             }
+
 
             let url= "{{ url('modify_metric_description') }}";
 
@@ -343,7 +382,6 @@
                 crossDomain: true,
 
                 beforeSend: function () {
-                    if (type==='addition')
                         $('#loader_add').removeClass('d-none');
                 }});
 
@@ -353,21 +391,7 @@
                 var status = output.code;
                 var message = output.message;
 
-
-                if (type==='update') {
-                    $("#update_" + metricId).modal('hide');
-
-                }
-                if (type==='addition') {
-                    $("#add_metric_desc").modal('hide');
-
-                }
-                if (type==='delete') {
-                    $("#delete_" + metricId).modal('hide');
-
-                }
-
-               $.redirect(window.location.href, {'status': status, 'message': message});
+              $.redirect(window.location.href, {'status': status, 'message': message});
 
 
             });
@@ -377,15 +401,7 @@
                 var status = output.code;
                 var message = output.message;
 
-                if (type==='update')
-                    $("#update_"+metricId).modal('hide');
-                if (type==='addition')
-                    $("#add_metric_desc").modal('hide');
-                if (type==='delete')
-                    $("#delete_"+metricId).modal('hide');
-
-
-                $.redirect(window.location.href, {'status': status, 'message': message});
+               $.redirect(window.location.href, {'status': status, 'message': message});
 
             });
 

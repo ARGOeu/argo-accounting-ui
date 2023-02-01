@@ -293,6 +293,8 @@
                                                     <div class="form-group m-2">
                                                         <label for="metricName">Installation Name</label>
                                                         <input type="text" class="form-control" id="installation" name="installation"  value="{{ installation.installation }}">
+                                                        <input type="hidden" class="form-control" id="installation_ref" name="installation_ref"  value="{{ installation.installation }}">
+
                                                         <small id="installationHelp" class="form-text text-muted">Short name of the installation</small>
                                                     </div>
 
@@ -300,6 +302,8 @@
                                                     <div class="form-group m-2">
                                                         <label for="infra" class="m-1">Infrastructure</label>
                                                         <input type="text" class="form-control" name="infra" id="infra"    aria-describedby="infraHelp" value="{{ installation.infrastructure }}">
+                                                        <input type="hidden" class="form-control" name="infra_ref" id="infra_ref"    aria-describedby="infraHelp" value="{{ installation.infrastructure }}">
+
                                                         <small id="infraHelp" class="form-text text-muted">Short name of infrastructure</small>
                                                     </div>
 
@@ -314,6 +318,7 @@
                                                                 {% endfor %}
                                                             {% endfor %}
                                                         </select>
+                                                        <input type="hidden" class="form-control" name="metric_definition_ref" id="metric_definition_ref"    value="{{ installation.unit_of_access.metric_definition_id }}">
 
 
                                                     </div>
@@ -374,26 +379,39 @@
             if (type === 'delete') {
                 installationId=  $(this).find('input[name="installationId"]').val().trim();
                 dataUrl = 'type=' + type + '&installation_id='+installationId;
-                url= "{{ url('delete_installation') }}";
 
             } else {
                 var installation = $(this).find('input[name="installation"]').val().trim();
                 var infra = $(this).find('input[name="infra"]').val().trim();
                 var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
 
-
-                if (type === 'update') {
-                    projectId = $(this).find('input[name="projectId"]').val().trim();
-                    provider = $(this).find('input[name="provider"]').val().trim();
-                    installationId=  $(this).find('input[name="installationId"]').val().trim();
-                    dataUrl = 'id='+installationId+'&type=' + type +"&project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
-                }
-                else {
+                if (type === 'add') {
                     projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
                     provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
-                    dataUrl = 'type=' + type +"&project=" + projectId + "&provider=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&metric_definition=" + metric_def;
-
+                    dataUrl = 'type=' + type +"&project=" + projectId + "&organisation=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&unit_of_access=" + metric_def;
                 }
+
+                if (type === 'update') {
+                    installationId=  $(this).find('input[name="installationId"]').val().trim();
+                    var installation_ref = $(this).find('input[name="installation_ref"]').val().trim();
+                    var infra_ref = $(this).find('input[name="infra_ref"]').val().trim();
+                    var metric_def_ref = $(this).find('input[name="metric_definition_ref"]').val().trim();
+
+                    dataUrl = 'type=' + type+ '&installation_id='+installationId;
+                
+                    if (installation!==installation_ref) {
+                        dataUrl = dataUrl + "&installation=" + installation;
+                    }
+
+                    if (infra!==infra_ref) {
+                        dataUrl = dataUrl + "&infrastructure=" + infra;
+                    }
+                    if (metric_def!==metric_def_ref) {
+                        dataUrl = dataUrl + "&unit_of_access=" + metric_def;
+                    }
+                }
+
+
 
             }
 
