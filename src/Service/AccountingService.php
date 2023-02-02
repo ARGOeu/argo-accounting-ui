@@ -236,10 +236,15 @@ class AccountingService extends AbstractController
 
             $data = json_decode($response[$i]->getContent(false), true);
 
-            if (count($data['content']) == 0) {
+            if (isset($data['content'])) {
+                if (count($data['content']) == 0) {
+                    $Notterminated = false;
+                } else {
+                    $responseTab[] = $data['content'];
+                }
+            }
+            else {
                 $Notterminated = false;
-            } else {
-                $responseTab[] = $data['content'];
             }
         }
 

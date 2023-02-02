@@ -8,7 +8,8 @@
 {%  if app.user.username is not defined %}
     <div class="card offset-1" style="width: 75%">
         <div class="card-body">
-            <h4 class="card-title">ARGO Accounting Portal</h4>
+            <h4 class="card-title"> <img alt="logo" class="m-2" src="{{ asset('build/images/argo_logo.png') }}" height="50px"/>
+                ARGO Accounting Portal</h4>
             <h6 class="card-subtitle mb-2 text-muted"><a href="https://argoeu.github.io/argo-accounting/" title="documentation">Detailed description available here</a></h6>
             <ul>
                 <li class="card-text">The Accounting System is a service that is responsible for collecting, aggregating, and exchanging the Virtual Access metrics. </li> 
@@ -20,30 +21,48 @@
     </div>
     {% else %}
         <div class="row">
-            <div class="col">
+            <div class="m-1 col">
                 <div class="card">
 
                     <div class="card-header">
                         <div class="card-title">
-                            <h4>Resources</h4>
+                            <h4>My Resources</h4>
                         </div>
                     </div>
                     <div class="card-body">
 
                         <ul>
 
-                            <li><a href="{{ path('projects') }}" class="nav-link">Projects</a></li>
-                            <li><a href="{{ path('providers') }}" class="nav-link" >Providers</a></li>
-                            <li><a href="{{ path('installations') }}" class="nav-link" >Installations</a></li>
+                            <li><a href="{{ path('projects') }}" class="nav-link">My Project(s)</a></li>
+                            <li><a href="{{ path('providers',{'restricted':true}) }}" class="nav-link" >Provider(s)</a></li>
+                            <li><a href="{{ path('installations') }}" class="nav-link" >My Installation(s)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="m-1 col">
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="card-title">
+                            <h4>Other Resources</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <ul>
+                            <li><a href="{{ path('providers') }}" class="nav-link" >Provider(s)</a></li>
                             <li><a href="{{ path('metrics-definitions') }}" class="nav-link" >Metrics Definitions</a></li>
                             <li><a href="{{ path('metrics-units') }}" class="nav-link" >Metrics Units</a></li>
+                            <li><a href="{{ path('metrics-types') }}" class="nav-link" >Unit Types</a></li>
+
                         </ul>
                     </div>
                 </div>
 
 
             </div>
-            <div class="offset-1 col">
+            <div class="m-1 col">
                 <div class="card">
 
                     <div class="card-header">
@@ -56,6 +75,7 @@
                         <ul>
 
                             <li>  <a href="{{ path('metrics') }}" class="nav-link">Browse Metrics</a></li>
+                            <li>  <a href="{{ path('add_metrics') }}" class="nav-link">Add Metrics</a></li>
 
                         </ul>
                     </div>

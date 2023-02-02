@@ -206,6 +206,7 @@
 
 
         <div class="card mt-2">
+
             {% if details >= 1 %}
 
             <div class="card-header">
@@ -215,11 +216,9 @@
             <div class="card-body">
 
 
-
-
                 {% if tabMetricsDetails!=null %}
 
-                    <table class="dataTable table  border border-dark" id="TableMetricsProject">
+                    <table class="dataTable table  border border-dark" id="TableMetricsDetails">
 
                         <thead>
                         <tr>
@@ -232,7 +231,6 @@
                             <th>Provider</th>
                             <th>Installation</th>
                             <th>Details</th>
-
 
                         </tr>
                         </thead>
@@ -342,7 +340,9 @@
 
 {% block javascripts %}
     <script>
-
+        $("#TableMetricsDetails").dataTable({
+            "order": [[0, 'asc']]
+        })
 
         $(document).on('click', '#submit_metrics', function (event) {
 
@@ -365,6 +365,8 @@
                 }
 
             });
+
+
 
             $( "button.providers" ).each(function( index ) {
 
@@ -389,92 +391,109 @@
                 }
             });
 
+
             var parameters_project = {};
             parameters_project.type="filter";
-            parameters_project.operator="AND";
+            parameters_project.operator="OR";
             parameters_project.criteria=[];
-            var temp_project={};
+
+            var temp_project=[];
+
 
             $(listProjects).each(function( index , value) {
-
-                    temp_project.type="query";
-                    temp_project.field="project";
-                    temp_project.operand="eq";
-                    var projectValue=$("#project_"+value).val();
-                    temp_project.values=projectValue;
-
-                parameters_project.criteria.push(temp_project);
+                temp_project[index]={};
+                temp_project[index].type = "query";
+                temp_project[index].field = "project";
+                temp_project[index].operand = "eq";
+                var projectValue = $("#project_" + value).val();
+                temp_project[index].values = projectValue;
             });
 
-            var parameters_provider = {};
-            parameters_provider.type="filter";
-            parameters_provider.operator="AND";
-            parameters_provider.criteria=[];
+            parameters_project.criteria=temp_project;
 
-            var temp_project_provider={};
-            var temp_provider={};
+
+
+            var temp_project_provider=[];
+            var temp_provider=[];
+            var parameters_providers = [];
 
             $(listProviders).each(function( index , value) {
+                var parameters_provider={};
+                parameters_provider.type="filter";
+                parameters_provider.operator="AND";
+                parameters_provider.criteria=[];
 
-                temp_project_provider.type="query";
-                temp_project_provider.field="project";
-                temp_project_provider.operand="eq";
+
+                temp_project_provider[index]={};
+                temp_project_provider[index].type="query";
+                temp_project_provider[index].field="project";
+                temp_project_provider[index].operand="eq";
 
                 var projectId=value.split('_')[1];
                 var providerId=value.split('_')[0];
 
                 var projectValue=$("#project_"+projectId).val();
-                temp_project_provider.values=projectValue;
-                parameters_provider.criteria.push(temp_project_provider);
+                temp_project_provider[index].values=projectValue;
 
-                temp_provider.type="query";
-                temp_provider.field="provider";
-                temp_provider.operand="eq";
+
+                temp_provider[index]={};
+                temp_provider[index].type="query";
+                temp_provider[index].field="provider";
+                temp_provider[index].operand="eq";
                 var providerValue=providerId;
-                temp_provider.values=providerValue;
+                temp_provider[index].values=providerValue;
+                parameters_provider.criteria.push(temp_project_provider[index]);
+                parameters_provider.criteria.push(temp_provider[index]);
+                parameters_providers.push(parameters_provider);
 
-                parameters_provider.criteria.push(temp_provider);
             });
 
-            var parameters_installation = {};
-            parameters_installation.type="filter";
-            parameters_installation.operator="AND";
-            parameters_installation.criteria=[];
 
-            var temp_installation_project={};
-            var temp_installation_provider={};
-            var temp_installation={};
+
+            var temp_installation_project=[];
+            var temp_installation_provider=[];
+            var temp_installation=[];
+            var parameters_installations = [];
 
             $(listInstallations).each(function( index , value) {
+                var parameters_installation = {};
+                parameters_installation.type="filter";
+                parameters_installation.operator="AND";
+                parameters_installation.criteria=[];
 
-                temp_installation_project.type="query";
-                temp_installation_project.field="project";
-                temp_installation_project.operand="eq";
+
+                temp_installation_project[index]={};
+                temp_installation_project[index].type="query";
+                temp_installation_project[index].field="project";
+                temp_installation_project[index].operand="eq";
 
                 var installationId=value.split('_')[2];
                 var projectId=value.split('_')[1];
                 var providerId=value.split('_')[0];
 
 
-
-
                 var projectValue=$("#project_"+projectId).val();
-                temp_installation_project.values=projectValue;
-                parameters_installation.criteria.push(temp_installation_project);
+                temp_installation_project[index].values=projectValue;
 
-                temp_installation_provider.type="query";
-                temp_installation_provider.field="provider";
-                temp_installation_provider.operand="eq";
-                temp_installation_provider.values=providerId;
-                parameters_installation.criteria.push(temp_installation_provider);
 
-                temp_installation.type="query";
-                temp_installation.field="installation";
-                temp_installation.operand="eq";
+                temp_installation_provider[index]={};
+                temp_installation_provider[index].type="query";
+                temp_installation_provider[index].field="provider";
+                temp_installation_provider[index].operand="eq";
+                temp_installation_provider[index].values=providerId;
+
+                temp_installation[index]={};
+                temp_installation[index].type="query";
+                temp_installation[index].field="installation";
+                temp_installation[index].operand="eq";
                 var installationValue=$("#installation_"+value).val();
-                temp_installation.values=installationValue;
+                temp_installation[index].values=installationValue;
 
-                parameters_installation.criteria.push(temp_installation);
+                parameters_installation.criteria.push(temp_installation_project[index]);
+                parameters_installation.criteria.push(temp_installation_provider[index]);
+                parameters_installation.criteria.push(temp_installation[index]);
+
+                parameters_installations.push(parameters_installation);
 
             });
 
@@ -485,19 +504,20 @@
                 parameters.operator = "OR";
                 parameters.criteria=[];
 
+
                 if (Object.keys(temp_project).length>0)
-                    parameters.criteria.push(temp_project);
+                    parameters.criteria=parameters_project;
 
                 if (Object.keys(temp_provider).length>0)
-                    parameters.criteria.push(temp_provider);
+                    parameters.criteria=parameters_providers;
 
-            if (Object.keys(temp_installation).length>0)
-                parameters.criteria.push(temp_installation);
-
-
+                  if (Object.keys(temp_installation).length>0)
+                    parameters.criteria=parameters_installations;
 
 
-       $.redirect(window.location.href, {'parameters': JSON.stringify(parameters), 'listIds':JSON.stringify(listIds)});
+            console.log(JSON.stringify(parameters));
+
+      $.redirect(window.location.href, {'parameters': JSON.stringify(parameters), 'listIds':JSON.stringify(listIds)});
 
         });
 

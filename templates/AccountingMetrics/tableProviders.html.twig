@@ -35,7 +35,7 @@
 
 
         <div class="offset-1 col-10 mt-1 mb-3">
-            <h1><i class="bi bi-diagram-3-fill"></i>
+            <h1><i class="bi bi-diagram-3-fill"></i>{% if restricted==true %} My {% endif %}
                 Providers</h1>
             <div class="ms-2 d-none spinner-border text-primary" id="loader_add_provider" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -204,6 +204,7 @@
 
                     {% for listProvider in tabProviders %}
                         {% for id, data in listProvider %}
+                            {% if restricted==false or (restricted==true and data.creator_id==userId) %}
                             <tr>
 
 
@@ -372,6 +373,7 @@
                             </tr>
 
 
+                            {% endif %}
                         {% endfor %}
                     {% endfor %}
                     </tbody>

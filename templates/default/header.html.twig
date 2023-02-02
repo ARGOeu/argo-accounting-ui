@@ -53,19 +53,36 @@
                         {% if app.user.username is defined %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Resources
+                                My Resources
                             </a>
                             <ul class="dropdown-menu dropdown-large">
                                 {% set current_path = app.request.get('_route') %}
-                                <li><a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">Projects</a></li>
-                                <li><a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a></li>
-                                <li><a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >Installations</a></li>
-                                <li><a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a></li>
-                                <li><a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a></li>
+                                <li><a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">My Project(s)</a></li>
+                                <li><a href="{{ path('providers',{'restricted':'true'}) }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >My Provider(s)</a></li>
+                                <li><a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >My Installation(s)</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Metrics</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Other Resources
+                                </a>
+                                <ul class="dropdown-menu dropdown-large">
+                                    <li><a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a></li>
+                                    <li><a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a></li>
+                                    <li><a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a></li>
+                                    <li><a href="{{ path('metrics-types') }}" class="nav-link {% if current_path == 'metrics-types' %}  active {% endif %}" >Units Types</a></li>
+
+                                </ul>
+                            </li>
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Metrics
+                            </a>
+                            <ul class="dropdown-menu dropdown-large">
+                                <li><a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Browse Metrics</a></li>
+                                <li><a href="{{ path('add_metrics') }}" class="nav-link {% if current_path == 'add_metrics' %}  active {% endif %}">Add Metrics</a></li>
+                            </ul>
                         </li>
 
 

@@ -1,0 +1,284 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{%  endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="offset-1 col-10 mt-1 mb-3">
+            <h1><i class="bi bi-bar-chart-steps"></i>
+                Add metrics to Installations
+                <div class="ms-2 d-none spinner-border text-primary" id="loader_add_installation" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </h1>
+            <hr/>
+
+            {% if message is defined and message!='' %}
+                <div class="card m-1 col-4 mb-2" id="message">
+                    <div class="card-header {% if status < 210 %} bg-success{% else %} bg-danger {% endif %}">
+                        {% if status < 210 %}
+                            <h3 class="card-title text-white "><i class="bi bi-check-circle m-1"></i> Update done</h3>
+                        {% else %}
+                            <h3 class="card-title text-white "><i class="bi bi-exclamation-triangle m-1"></i>Update failed</h3>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h4>Status {{ status }} - {{ message }}</h4>
+                    </div>
+                </div>
+            {% endif %}
+
+
+
+
+
+            <table class="dataTable table  border border-dark" id="TableMetricsAdd">
+
+                <thead>
+                <tr>
+
+                    <th>Name</th>
+                    <th>Project</th>
+                    <th>Organization</th>
+                    <th>Infrastructure</th>
+                    <th>Metric Name: Description (Unit Type - Metric Type)</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {%  for installations in tabInstallations %}
+                    {%  for id, installation in installations %}
+
+                        <tr id="installation_{{ installation.id }}">
+
+                            {%  set nameP = '' %}
+                            {%  for projects in tabProjects %}
+                                {% for project in projects %}
+                                    {% if project.id==installation.project %}
+                                        {% set nameP = project.acronym %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+
+
+
+                            <td>{{ installation.installation}}</td>
+
+                            <td>{{ nameP }}</td>
+                            <td>{{ installation.organisation}}</td>
+                            <td>{{ installation.infrastructure}}</td>
+
+                            <td>
+                                <ul>
+                                        <li>
+                                            {{ installation.unit_of_access.metric_name }} : {{ installation.unit_of_access.metric_description}} ({{ installation.unit_of_access.unit_type}} - {{  installation.unit_of_access.metric_type}})
+                                        </li>
+
+                                </ul>
+
+                            </td>
+
+                            <td>
+
+                                <div class="btn-group dropstart">
+                                    {% if permissions[nameP]['Metric'] is defined and  permissions[nameP]['Metric']['CREATE']=='ALWAYS' %}
+
+                                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_metric_installation_{{ installation.id }}" title="Add a metric">
+                                            <i class="bi bi-plus-circle" style="font-size: large"></i>
+                                        </a>
+
+                                        <div class="modal fade" id="add_metric_installation_{{ installation.id }}" tabindex="-1" aria-labelledby="add_metric_desc_Label">
+                                            <div class="modal-dialog modal-dialog-scrollable">
+                                                <div class="modal-content">
+
+                                                    <div class="modal-header  bg-light">
+                                                        <h5 class="modal-title text-center">Add Metric</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form class="form_add_metric">
+
+                                                            <div class="form-group m-2">
+                                                                <label for="time_period_start">Time period - Start</label>
+                                                                <input type="text" class="form-control" name="time_period_start" id="time_period_start">
+                                                            </div>
+
+                                                            <div class="form-group m-2">
+                                                                <label for="time_period_end">Time period - End</label>
+                                                                <input type="text" class="form-control" name="time_period_end" id="time_period_end">
+                                                            </div>
+
+                                                            <div class="form-group m-2">
+                                                                <label for="value">Value - {{ installation.unit_of_access.unit_type  }}</label>
+                                                                <input type="text" class="form-control" name="value" id="value">
+
+                                                            </div>
+
+
+                                                            <button type="submit" class="btn btn-primary">Submit</button>
+
+                                                            <div class="ms-2 d-none spinner-border text-primary" id="loader_add" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+
+
+                                                        </form>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+
+                        </tr>
+
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+{% endblock %}
+{% block javascripts %}
+
+    <script>
+
+        $("#TableInstallations").dataTable({
+            "order": [[ 5, 'asc' ], [ 0, 'asc' ]]
+        })
+
+
+        $(document).on('submit','.form_add_installation, .form_update_installation, .form_delete_installation',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+            let type=  $(this).find('input[name="type"]').val().trim();
+            let dataUrl;
+            let installationId;
+            let projectId;
+            let provider;
+            let url= "{{ url('modify_installation') }}";
+
+            if (type === 'delete') {
+                installationId=  $(this).find('input[name="installationId"]').val().trim();
+                dataUrl = 'type=' + type + '&installation_id='+installationId;
+
+            } else {
+                var installation = $(this).find('input[name="installation"]').val().trim();
+                var infra = $(this).find('input[name="infra"]').val().trim();
+                var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
+
+                if (type === 'add') {
+                    projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
+                    provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
+                    dataUrl = 'type=' + type +"&project=" + projectId + "&organisation=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&unit_of_access=" + metric_def;
+                }
+
+                if (type === 'update') {
+                    installationId=  $(this).find('input[name="installationId"]').val().trim();
+                    var installation_ref = $(this).find('input[name="installation_ref"]').val().trim();
+                    var infra_ref = $(this).find('input[name="infra_ref"]').val().trim();
+                    var metric_def_ref = $(this).find('input[name="metric_definition_ref"]').val().trim();
+
+                    dataUrl = 'type=' + type+ '&installation_id='+installationId;
+
+                    if (installation!==installation_ref) {
+                        dataUrl = dataUrl + "&installation=" + installation;
+                    }
+
+                    if (infra!==infra_ref) {
+                        dataUrl = dataUrl + "&infrastructure=" + infra;
+                    }
+                    if (metric_def!==metric_def_ref) {
+                        dataUrl = dataUrl + "&unit_of_access=" + metric_def;
+                    }
+                }
+
+
+
+            }
+
+
+
+
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+                crossDomain: true,
+
+                beforeSend: function () {
+                        $('#loader_add').removeClass('d-none');
+                }});
+
+            request.done(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+
+
+                $('#loader_add').addClass('d-none');
+
+                if (type==='update') {
+                    $("#update_" + installationId).modal('hide');
+
+                }
+                if (type==='add') {
+                    $("#add_installation").modal('hide');
+
+                }
+                if (type==='delete') {
+                    $("#delete_" + installationId).modal('hide');
+
+                }
+
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
+
+
+            });
+            request.fail(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+
+
+                if (type==='update')
+                    $("#update_" + installationId).modal('hide');
+                if (type==='add')
+                    $("#add_installation").modal('hide');
+                if (type==='delete')
+                    $("#delete_" + installationId).modal('hide');
+
+
+                    $.redirect(window.location.href, {'status': status, 'message': message});
+
+            });
+
+
+        });
+
+
+
+    </script>
+{% endblock %}

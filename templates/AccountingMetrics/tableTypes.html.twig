@@ -16,6 +16,7 @@
     <thead>
     <tr>
         <th>Metric Type</th>
+        <th>Description</th>
     </tr>
     </thead>
 
@@ -25,6 +26,7 @@
         {%  for metric in metrics %}
             <tr>
                 <td>{{ metric.metric_type }} </td>
+                <td>{{ metric.description }} </td>
             </tr>
         {% endfor %}
     {% endfor %}
@@ -37,6 +39,13 @@
 
 {% endblock %}
 {% block javascripts %}
+
+    <script>
+        $("#TableTypes").dataTable({
+            "order": [[ 0, 'asc' ]]
+        })
+
+    </script>
 {% endblock %}
 
 

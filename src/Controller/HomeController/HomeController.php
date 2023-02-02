@@ -161,6 +161,11 @@ class HomeController extends AbstractController
         $status = $request->request->get('status');
         $message = $request->request->get('message');
 
+
+        $restricted=false;
+        if ($request->query->get('restricted')==true)
+            $restricted=true;
+
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
         try {
             $api->checkValidityToken($bearerToken);
@@ -179,7 +184,8 @@ class HomeController extends AbstractController
             'permissions'=>$permissions,
             'userId'=>$id,
             'status'=>$status,
-            'message'=>$message
+            'message'=>$message,
+            'restricted'=>$restricted
         ]);
     }
         else {
@@ -323,6 +329,44 @@ class HomeController extends AbstractController
     }
 
 
+    /**
+     * @Route("/add_metrics",  name="add_metrics")
+     *
+     * form to get metrics provider list
+     * @return Response
+     */
+    public function addMetrics(Request $request, AccountingService $api)
+    {
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+        $tabProjects=$api->getRessources('projects',$bearerToken);
+        $tabInstallations=$api->getRessources('installations',$bearerToken);
+        $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
+        $permissions=$api->getUserPermissions($bearerToken);
+
+        if (count($permissions)>=1) {
+            return $this->render("AccountingMetrics/addMetrics.html.twig", [
+                'tabInstallations' => $tabInstallations,
+                'tabProjects' => $tabProjects,
+                'tabMetricsDef' => $tabMetricsDef,
+                "permissions" => $permissions,
+                "message" => $message,
+                "status" => $status
+            ]);
+        } else {
+            return $this->render("AccountingMetrics/noPermissions.html.twig");
+
+        }
+
+    }
 
     /**
      * @Route("/metrics",  name="metrics")
@@ -337,6 +381,10 @@ class HomeController extends AbstractController
         $details=0;
         $listIds=0;
         $tabMetricsDetails=null;
+        if ($request->request->has('parameters'))
+            $parameters= json_decode($request->request->get('parameters'));
+        else
+            $parameters="";
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
         try {
@@ -348,15 +396,19 @@ class HomeController extends AbstractController
 
         $permissions=$api->getUserPermissions($bearerToken,false);
 
-            if ($request->request->has('parameters')) {
-                $tabMetricsDetails=$api->searchRessources('metrics',json_decode($request->request->get('parameters'),true),$bearerToken);
+            if ($parameters!=='') {
+                $tabMetricsDetails=$api->searchRessources('metrics',$parameters,$bearerToken);
                 $details=1;
                 $listIds=json_decode($request->request->get('listIds'),true);
             }
 
            $tabInstallations=$api->getRessources('installations',$bearerToken);
 
-       return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", ["listIds"=>$listIds,"tabInstallations"=>$tabInstallations, "listEntities"=>$permissions , 'details'=>$details,'tabMetricsDetails'=>$tabMetricsDetails]);
+       return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", ["listIds"=>$listIds,
+           "tabInstallations"=>$tabInstallations,
+           "listEntities"=>$permissions ,
+          "parameters"=>$parameters,
+           'details'=>$details,'tabMetricsDetails'=>$tabMetricsDetails]);
 
     }
 
