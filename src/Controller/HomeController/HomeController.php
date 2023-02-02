@@ -46,9 +46,6 @@ class HomeController extends AbstractController
 
 
 
-
-
-
     /**
      * @Route("/user/userInfo", name="userInfo")
      */
@@ -126,16 +123,16 @@ class HomeController extends AbstractController
             return new RedirectResponse('/login');
         }
 
-        $tabProjects=$api->getRessources('projects',$bearerToken);
+
         $tabProviders=$api->getRessources('providers',$bearerToken);
-        $permissions=$api->getUserPermissions($bearerToken);
+        $permissions=$api->getUserPermissions($bearerToken,false);
 
 
 
         if (count($permissions)>=1) {
             return $this->render("AccountingMetrics/tableProjects.html.twig", [
-                'tabProjects' => $tabProjects,
-                'tabProviders' => $tabProviders,
+
+               'tabProviders' => $tabProviders,
                 'permissions' => $permissions,
                 "message" => $message,
                 "status" => $status
@@ -145,6 +142,48 @@ class HomeController extends AbstractController
             return $this->render("AccountingMetrics/noPermissions.html.twig");
 
         }
+
+    }
+
+    /**
+     * @Route("/myProviders",  name="my_providers")
+     *
+     * list all providers
+     * @return Response
+     */
+
+    public function listmyProviders( AccountingService $api, Request $request)
+    {
+
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
+
+
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        try {
+            $api->checkValidityToken($bearerToken);
+        }
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+
+        $permissions=$api->getUserPermissions($bearerToken,false);
+
+
+        $id=$this->getUser()->getUserIdentifier();
+
+
+        return $this->render("AccountingMetrics/tableMyProviders.html.twig", [
+
+                'permissions'=>$permissions,
+                'userId'=>$id,
+                'status'=>$status,
+                'message'=>$message
+
+            ]);
+
+
 
     }
 
@@ -162,9 +201,6 @@ class HomeController extends AbstractController
         $message = $request->request->get('message');
 
 
-        $restricted=false;
-        if ($request->query->get('restricted')==true)
-            $restricted=true;
 
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
         try {
@@ -184,8 +220,8 @@ class HomeController extends AbstractController
             'permissions'=>$permissions,
             'userId'=>$id,
             'status'=>$status,
-            'message'=>$message,
-            'restricted'=>$restricted
+            'message'=>$message
+
         ]);
     }
         else {
@@ -404,7 +440,7 @@ class HomeController extends AbstractController
 
            $tabInstallations=$api->getRessources('installations',$bearerToken);
 
-       return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", ["listIds"=>$listIds,
+       return $this->render("AccountingMetrics/tableMetrics.html.twig", ["listIds"=>$listIds,
            "tabInstallations"=>$tabInstallations,
            "listEntities"=>$permissions ,
           "parameters"=>$parameters,
@@ -428,6 +464,24 @@ class HomeController extends AbstractController
 
 
     /**
+     * @Route("/ajax/addMetric",  name="add_one_metric")
+     *
+     * ajax calls to add a signel metric
+     * @return Response
+     */
+    public function addOneMetric(AccountingService $api, Request $request)
+    {
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+
+        $body =$request->request->all();
+        unset($body['installation_id']);
+
+
+        $response=$api->addRessource('/installations/'.$request->get('installation_id').'/metrics',$body,$bearerToken);
+        return new JsonResponse($response);
+    }
+
+    /**
      * @Route("/ajax/deleteProvider",  name="delete_provider")
      *
      * ajax calls to remove provider
@@ -439,7 +493,6 @@ class HomeController extends AbstractController
         $response=$api->deleteRessource('/providers/'.$request->get('provider_id'),$bearerToken);
         return new JsonResponse($response);
     }
-
 
 
 
@@ -537,38 +590,50 @@ class HomeController extends AbstractController
 
 
     /**
-     * @Route("/metrics/project/{projectId}",  name="accounting-metrics_byProject")
+     * @Route("/metricsProject",  name="metrics_project")
      *
      * form to get metrics provider list
      * @param LavoisierService $lavoisierService
      * @return Response
      */
 
-    public function listMetricsforProject(LavoisierService $lavoisierService, string $projectId)
+    public function listMetricsbyEntity(AccountingService $api, Request $request)
     {
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $parameters=[];
 
-        $hydrator = new EntriesHydrator();
-
-        $lavoisierUrl = $this->getParameter('lavoisierUrl');
-        $lavoisierPort = $this->getParameter("lavoisierPort");
-
-
-        $lavQuery = new Query($lavoisierUrl, 'listMetricsbyProject', 'lavoisier', 'xml', $lavoisierPort);
-        $lavQuery->setMethod('POST');
-        $lavQuery->setPostFields(array('projectId' => $projectId));
-        $lavQuery->setHydrator($hydrator);
         try {
-            $result = $lavQuery->execute();
-        } catch (CurlException $e) {
-        } catch (HTTPStatusException $e) {
-            return new Response("Exception", 500);
+            $api->checkValidityToken($bearerToken);
         }
-        $tabMetrics = $result->getArrayCopy();
+        catch (ClientException $exception) {
+            return new RedirectResponse('/login');
+        }
+        $tabInstallations=$api->getRessources('installations',$bearerToken);
 
+        if ($request->get('type') === 'providers')
+        {
+            $url='/projects/'.$request->get('project_id').'/'.$request->get('type') .'/'.$request->get('id').'/metrics';
+            $parameters['type']=$request->get('type');
+            $parameters['id']=$request->get('id');
+            $parameters['project_id']=$request->get('project_id');
 
-        return $this->render("AccountingMetrics/MetricsProject.html.twig", [
-            'tabMetrics' => $tabMetrics
+        }
+        else {
+            $url='/'.$request->get('type') .'/'.$request->get('id').'/metrics';
+            $parameters['type']=$request->get('type');
+            $parameters['id']=$request->get('id');
+            $parameters['project_id']=$request->get('project_id');
 
+        }
+
+        $permissions=$api->getUserPermissions($bearerToken,false);
+        $tabMetricsDetails=$api->getRessources($url,$bearerToken,true);
+
+        return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", [
+            'tabMetricsDetails' => $tabMetricsDetails,
+            'tabInstallations'=>$tabInstallations,
+            'permissions'=>$permissions,
+            'parameters'=>$parameters
         ]);
 
     }

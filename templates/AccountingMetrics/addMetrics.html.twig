@@ -100,21 +100,20 @@
                                                                 aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form class="form_add_metric">
+                                                        <form class="form_add_metric" id="form_{{ installation.id }}">
 
+
+                                                            <input type="hidden" name="metric_definition_id" value="{{ installation.unit_of_access.metric_definition_id}}"/>
                                                             <div class="form-group m-2">
-                                                                <label for="time_period_start">Time period - Start</label>
-                                                                <input type="text" class="form-control" name="time_period_start" id="time_period_start">
+                                                                <label for="time_period_start">Period</label>
+                                                                <input type="text" class="form-control" name="period" >
                                                             </div>
 
-                                                            <div class="form-group m-2">
-                                                                <label for="time_period_end">Time period - End</label>
-                                                                <input type="text" class="form-control" name="time_period_end" id="time_period_end">
-                                                            </div>
+
 
                                                             <div class="form-group m-2">
                                                                 <label for="value">Value - {{ installation.unit_of_access.unit_type  }}</label>
-                                                                <input type="text" class="form-control" name="value" id="value">
+                                                                <input type="text" class="form-control" name="value" >
 
                                                             </div>
 
@@ -167,57 +166,36 @@
         })
 
 
-        $(document).on('submit','.form_add_installation, .form_update_installation, .form_delete_installation',function(event) {
+        $(function() {
+            $('input[name="period"]').daterangepicker({
+                timePicker: true,
+                startDate: moment().startOf('hour').add(-48, 'hour'),
+                endDate: moment().startOf('hour').add(-24, 'hour'),
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
+            });
+        });
+
+
+        $(document).on('submit','.form_add_metric',function(event) {
             event.preventDefault(); // cancel default behavior
 
-            let type=  $(this).find('input[name="type"]').val().trim();
-            let dataUrl;
-            let installationId;
-            let projectId;
-            let provider;
-            let url= "{{ url('modify_installation') }}";
+            let period=  $(this).find('input[name="period"]').val().trim();
+            let metric_definition_id=  $(this).find('input[name="metric_definition_id"]').val().trim();
+            let value=  $(this).find('input[name="value"]').val().trim();
+            let installation_id=$(this).attr('id').split('form_')[1];
 
-            if (type === 'delete') {
-                installationId=  $(this).find('input[name="installationId"]').val().trim();
-                dataUrl = 'type=' + type + '&installation_id='+installationId;
+            var start=period.split(' - ')[0].replace(' ','T');
+            var end=period.split(' - ')[1].replace(' ','T');
 
-            } else {
-                var installation = $(this).find('input[name="installation"]').val().trim();
-                var infra = $(this).find('input[name="infra"]').val().trim();
-                var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
+            var time_period_start=start+'Z';
+            var time_period_end=end+'Z';
 
-                if (type === 'add') {
-                    projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
-                    provider = $("#providers_select_"+projectId +"> option:selected").val().trim();
-                    dataUrl = 'type=' + type +"&project=" + projectId + "&organisation=" + provider+ "&installation=" + installation+ "&infrastructure=" + infra+ "&unit_of_access=" + metric_def;
-                }
-
-                if (type === 'update') {
-                    installationId=  $(this).find('input[name="installationId"]').val().trim();
-                    var installation_ref = $(this).find('input[name="installation_ref"]').val().trim();
-                    var infra_ref = $(this).find('input[name="infra_ref"]').val().trim();
-                    var metric_def_ref = $(this).find('input[name="metric_definition_ref"]').val().trim();
-
-                    dataUrl = 'type=' + type+ '&installation_id='+installationId;
-
-                    if (installation!==installation_ref) {
-                        dataUrl = dataUrl + "&installation=" + installation;
-                    }
-
-                    if (infra!==infra_ref) {
-                        dataUrl = dataUrl + "&infrastructure=" + infra;
-                    }
-                    if (metric_def!==metric_def_ref) {
-                        dataUrl = dataUrl + "&unit_of_access=" + metric_def;
-                    }
-                }
+            let url = "{{ url('add_one_metric') }}";
 
 
-
-            }
-
-
-
+            var dataUrl='installation_id='+installation_id+'&metric_definition_id='+metric_definition_id+'&time_period_start='+time_period_start+'&time_period_end='+time_period_end+'&value='+value;
 
             let request = $.ajax({
                 type: "POST",
@@ -235,21 +213,7 @@
                 var status = output.code;
                 var message = output.message;
 
-
                 $('#loader_add').addClass('d-none');
-
-                if (type==='update') {
-                    $("#update_" + installationId).modal('hide');
-
-                }
-                if (type==='add') {
-                    $("#add_installation").modal('hide');
-
-                }
-                if (type==='delete') {
-                    $("#delete_" + installationId).modal('hide');
-
-                }
 
 
                 $.redirect(window.location.href, {'status': status, 'message': message});
@@ -262,16 +226,7 @@
                 var status = output.code;
                 var message = output.message;
 
-
-                if (type==='update')
-                    $("#update_" + installationId).modal('hide');
-                if (type==='add')
-                    $("#add_installation").modal('hide');
-                if (type==='delete')
-                    $("#delete_" + installationId).modal('hide');
-
-
-                    $.redirect(window.location.href, {'status': status, 'message': message});
+                $.redirect(window.location.href, {'status': status, 'message': message});
 
             });
 

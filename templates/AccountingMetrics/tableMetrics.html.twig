@@ -1,0 +1,464 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col text-start">
+                        <H3 class="card-title"><i class="bi bi-gear"></i> Browse metrics</H3>
+                    </div>
+                    <div class="col text-end align-top align-text-top">
+                        <a class="btn btn-primary  align-top" data-bs-toggle="collapse" href="#collapse-body"
+                           role="button" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="bi bi-arrows-collapse"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="card-body" id="collapse-body">
+                <div class="row">
+                    <div class="m-2">
+                        <i class="bi bi-gear" style="display: inline-block "></i> Select the different entities by starting with projects then submit to browse metrics related to these entities<br/>
+                        <i class="bi bi-star-fill" style="display: inline-block "></i> The star indicates that you have the permissions to see the metrics at this level, if there isn't a star you should drill down to next level to browse potentially metrics
+
+                    </div>
+                    <div>
+                        <hr/>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col text-center  border-end">
+
+                            <h3 class="card-title">Projects</h3>
+                        <hr class="border border-secondary border-1 opacity-50">
+                            <div class="btn-group-vertical" role="group">
+                                {% for project in listEntities['content'] %}
+                                    {% set access_right = 0 %}
+
+                                    {%  for permissions in project['permissions'] %}
+                                        {% for permission in permissions['access_permissions'] %}
+
+                                            {% if permissions.collection == 'Metric' and permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                                                {% set access_right=1 %}
+                                            {% endif %}
+
+                                        {% endfor %}
+                                    {% endfor %}
+
+                                    {% set sub_project= 'project_' %}
+                                    {% if "#{sub_project}#{project.id}" in listIds %}
+                                        <button id="project_{{ project.id }}" type="button" class="projects btn btn-sm btn-primary m-1" value="{{ project.acronym }}" >
+                                            {{ project.acronym }}
+                                            {% if access_right==1 %}
+                                                <i class="bi bi-star-fill" title="You can browse all metrics for this project"></i>
+                                            {% endif %}
+                                        </button>
+                                    {% else %}
+                                        <button id="project_{{ project.id }}" type="button" class="projects btn btn-sm btn-secondary m-1" value="{{ project.acronym }}" >
+                                            {{ project.acronym }}
+                                            {% if access_right==1 %}
+                                                <i class="bi bi-star-fill" title="You can browse all metrics for this project"></i>
+                                            {% endif %}
+                                        </button>
+                                    {% endif %}
+
+                                    <input type="hidden" id="metrics_access_{{ project.id }}" value="{{ access_right }}"/>
+
+                                {% endfor %}
+
+                            </div>
+
+                    </div>
+
+                    <div class="col text-center border-end">
+
+                            <h3 class="card-title">Providers</h3>
+                        <hr class="border border-secondary border-1 opacity-50">
+                                {% for project in listEntities['content'] %}
+                                    {% set sub_project= 'project_' %}
+
+                                    <div id="providers_project_{{ project.id }}"    {% if "#{sub_project}#{project.id}" in listIds %} class="ok" {% else %} class="d-none"  {% endif %}>
+                                        <ul class="list-group list-group-horizontal m-1">
+                                            <li class="list-group-item">{{ project.acronym }}</li>
+                                        </ul>
+
+                                        {% set access_right=0 %}
+
+                                            {% for provider in project['providers'] %}
+                                                {%  for permissions in provider['permissions'] %}
+                                                    {% for permission in permissions['access_permissions'] %}
+                                                        {% if permissions.collection == 'Metric' and permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                                                            {% set access_right=1 %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            {% endfor %}
+
+
+                                        <div class="btn-group-vertical" role="group">
+                                            {% for provider in project['providers'] %}
+                                                {% set sub_provider= 'provider_' %}
+                                                {% set separator='_' %}
+                                                    {% if "#{sub_provider}#{ provider.id }#{separator}#{project.id}" in listIds %}
+                                                        <button type="button" id="provider_{{ provider.id }}_{{ project.id}}" class="providers btn-sm  btn btn-primary m-1" value="{{ provider.name }}" >{{ provider.name }}
+                                                        {% if access_right==1 %}
+                                                            <i class="bi bi-star-fill" title="You can browse all metrics for this provider"></i>
+                                                        {% endif %}
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="button" id="provider_{{ provider.id }}_{{ project.id}}" class="providers btn-sm  btn btn-secondary m-1" value="{{ provider.name }}">{{ provider.name }}
+                                                            {% if access_right==1 %}
+                                                                <i class="bi bi-star-fill" title="You can browse all metrics for this provider"></i>
+                                                            {% endif %}
+                                                        </button>
+                                                    {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <hr class="border border-secondary border-1 opacity-50">
+                                    </div>
+                                {% endfor %}
+
+
+                    </div>
+
+                    <div class="col text-center">
+
+                            <h3 class="card-title">Installations</h3>
+                        <hr class="border border-secondary border-1 opacity-50">
+
+                                {% for project in listEntities['content'] %}
+                                    {% for provider in project['providers'] %}
+
+                                        {% set access_right=0 %}
+
+
+                                            {%  for installations in provider['installations'] %}
+                                                {%  for permissions in installations['permissions'] %}
+                                                    {% for permission in permissions['access_permissions'] %}
+                                                        {% if permissions.collection == 'Metric' and permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                                                            {% set access_right=1 %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            {% endfor %}
+
+
+
+                                            {% set sub_provider= 'provider_' %}
+                                            {% set separator='_' %}
+                                        <div id="installations_provider_{{ provider.id }}_{{ project.id}}"   rel="project_{{ project.id}}"  {% if "#{sub_provider}#{ provider.id }#{separator}#{project.id}" in listIds %} class="m-1" {% else %} class="m-1 d-none" {% endif %}>
+
+                                            <ul class="list-group list-group-horizontal m-1">
+                                                <li class="list-group-item">{{ project.acronym }}</li>
+                                                <li class="list-group-item">{{ provider.name }}</li>
+                                            </ul>
+                                            <div class="btn-group-vertical" role="group">
+                                                {% set sub_installation= 'installation_' %}
+                                                {%  for installation in provider['installations'] %}
+                                                    {% if "#{sub_installation}#{ provider.id }#{separator}#{project.id}#{separator}#{installation.id}" in listIds %}
+                                                    <button type="button" id="installation_{{ provider.id }}_{{ project.id}}_{{  installation.id  }}"  class="installations btn-sm btn btn-primary m-1" value="{{ installation.installation }}">{{ installation.installation }}
+                                                        {% if access_right==1 %}
+                                                            <i class="bi bi-star-fill" title="You can browse all metrics for this installation"></i>
+                                                        {% endif %}
+                                                    </button>
+                                                    {% else %}
+                                                        <button type="button" id="installation_{{ provider.id }}_{{ project.id}}_{{  installation.id  }}"  class="installations btn-sm  btn btn-secondary m-1" value="{{ installation.installation }}">{{ installation.installation }}
+                                                            {% if access_right==1 %}
+                                                                <i class="bi bi-star-fill" title="You can browse all metrics for this installation"></i>
+                                                            {% endif %}
+                                                        </button>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+
+
+
+            <div class="card-footer text-center">
+                {% if listIds |length > 0 %}
+                    <input type="submit" class="btn btn-primary" id="submit_metrics" value="Browse Metrics"/>
+                {% else %}
+                    <input type="submit" class="btn btn-primary disabled" id="submit_metrics" value="Browse Metrics"/>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'AccountingMetrics/tableMetricsSearch.html.twig' %}
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $("#TableMetricsDetails").dataTable({
+            "order": [[0, 'asc']]
+        })
+
+        $(document).on('click', '#submit_metrics', function (event) {
+
+
+            var listProjects=[];
+            var listProviders=[];
+            var listInstallations=[];
+            var listProjectsAlreadySelected=[];
+            var listProvidersAlreadySelected=[];
+            var listIds=[];
+
+
+            $( "button.installations" ).each(function( index ) {
+
+                if ($(this).hasClass('btn-primary') && !($(this).hasClass('d-none'))){
+                    listIds.push($(this).attr('id'));
+                    listInstallations.push($(this).attr('id').split('installation_')[1]);
+                    listProjectsAlreadySelected.push($(this).attr('id').split('_')[2]);
+                    listProvidersAlreadySelected.push($(this).attr('id').split('_')[1]+'_'+$(this).attr('id').split('_')[2]);
+                }
+
+            });
+
+
+
+            $( "button.providers" ).each(function( index ) {
+
+                if ($(this).hasClass('btn-primary') && !($(this).hasClass('d-none'))){
+                    listIds.push($(this).attr('id'));
+                    if (jQuery.inArray( $(this).attr('id').split('provider_')[1], listProvidersAlreadySelected)===-1) {
+                        listProviders.push($(this).attr('id').split('provider_')[1]);
+                        listProjectsAlreadySelected.push($(this).attr('id').split('_')[2]);
+                    }
+                }
+
+            });
+
+
+            $( "button.projects" ).each(function( index ) {
+
+                if ($(this).hasClass('btn-primary') && !($(this).hasClass('d-none'))){
+                    listIds.push($(this).attr('id'));
+                    if (jQuery.inArray( $(this).attr('id').split('_')[1], listProjectsAlreadySelected)===-1) {
+                        listProjects.push($(this).attr('id').split('_')[1]);
+                    }
+                }
+            });
+
+
+
+
+            var temp_project=[];
+            var parameters_projects = [];
+
+            $(listProjects).each(function( index , value) {
+
+                var parameters_project = {};
+                parameters_project.type="filter";
+                parameters_project.operator="AND";
+                parameters_project.criteria=[];
+
+                temp_project[index]={};
+                temp_project[index].type = "query";
+                temp_project[index].field = "project";
+                temp_project[index].operand = "eq";
+                var projectValue = $("#project_" + value).val();
+                temp_project[index].values = projectValue;
+                parameters_project.criteria.push(temp_project[index]);
+                parameters_projects.push(parameters_project);
+            });
+
+
+
+
+
+            var temp_project_provider=[];
+            var temp_provider=[];
+            var parameters_providers = [];
+
+            $(listProviders).each(function( index , value) {
+                var parameters_provider={};
+                parameters_provider.type="filter";
+                parameters_provider.operator="AND";
+                parameters_provider.criteria=[];
+
+
+                temp_project_provider[index]={};
+                temp_project_provider[index].type="query";
+                temp_project_provider[index].field="project";
+                temp_project_provider[index].operand="eq";
+
+                var projectId=value.split('_')[1];
+                var providerId=value.split('_')[0];
+
+                var projectValue=$("#project_"+projectId).val();
+                temp_project_provider[index].values=projectValue;
+
+
+                temp_provider[index]={};
+                temp_provider[index].type="query";
+                temp_provider[index].field="provider";
+                temp_provider[index].operand="eq";
+                var providerValue=providerId;
+                temp_provider[index].values=providerValue;
+                parameters_provider.criteria.push(temp_project_provider[index]);
+                parameters_provider.criteria.push(temp_provider[index]);
+                parameters_providers.push(parameters_provider);
+
+            });
+
+
+
+            var temp_installation_project=[];
+            var temp_installation_provider=[];
+            var temp_installation=[];
+            var parameters_installations = [];
+
+            $(listInstallations).each(function( index , value) {
+                var parameters_installation = {};
+                parameters_installation.type="filter";
+                parameters_installation.operator="AND";
+                parameters_installation.criteria=[];
+
+
+                temp_installation_project[index]={};
+                temp_installation_project[index].type="query";
+                temp_installation_project[index].field="project";
+                temp_installation_project[index].operand="eq";
+
+                var installationId=value.split('_')[2];
+                var projectId=value.split('_')[1];
+                var providerId=value.split('_')[0];
+
+
+                var projectValue=$("#project_"+projectId).val();
+                temp_installation_project[index].values=projectValue;
+
+
+                temp_installation_provider[index]={};
+                temp_installation_provider[index].type="query";
+                temp_installation_provider[index].field="provider";
+                temp_installation_provider[index].operand="eq";
+                temp_installation_provider[index].values=providerId;
+
+                temp_installation[index]={};
+                temp_installation[index].type="query";
+                temp_installation[index].field="installation";
+                temp_installation[index].operand="eq";
+                var installationValue=$("#installation_"+value).val();
+                temp_installation[index].values=installationValue;
+
+                parameters_installation.criteria.push(temp_installation_project[index]);
+                parameters_installation.criteria.push(temp_installation_provider[index]);
+                parameters_installation.criteria.push(temp_installation[index]);
+
+                parameters_installations.push(parameters_installation);
+
+            });
+
+
+
+                var parameters = {};
+                parameters.type = "filter";
+                parameters.operator = "OR";
+                parameters.criteria=[];
+
+
+                if (Object.keys(temp_project).length>0)
+                    parameters.criteria=parameters_projects;
+
+                if (Object.keys(temp_provider).length>0)
+                    parameters.criteria=parameters_providers;
+
+                  if (Object.keys(temp_installation).length>0)
+                    parameters.criteria=parameters_installations;
+
+
+            console.log(JSON.stringify(parameters));
+
+      $.redirect(window.location.href, {'parameters': JSON.stringify(parameters), 'listIds':JSON.stringify(listIds)});
+
+        });
+
+        $(document).on('click', '.projects', function (event) {
+
+           var id=$(this).attr('id').split('project_')[1];
+
+            if ($(this).hasClass('btn-secondary')){
+                $("#providers_project_"+id).removeClass('d-none');
+                $(this).removeClass('btn-secondary').addClass('btn-primary');
+
+            } else {
+                $("#providers_project_"+id).addClass('d-none');
+                $("#providers_project_"+id).find('button.btn-primary').removeClass('btn-primary').addClass('btn-secondary');
+                $(this).removeClass('btn-primary').addClass('btn-secondary');
+                $("div[rel='project_"+id+"']").addClass('d-none');
+                $("div[rel='project_"+id+"']").find('button.btn-primary').removeClass('btn-primary').addClass('btn-secondary');
+            }
+
+            var disabled=true;
+            $('#submit_metrics').removeClass('disabled');
+
+            $( "button.projects" ).each(function( index ) {
+                if ($(this).hasClass('btn-primary') && !($(this).hasClass('d-none'))) {
+                disabled=false;
+                }
+            });
+
+            if (disabled===true) {
+                $('#submit_metrics').addClass('disabled');
+            }
+
+        });
+
+        $(document).on('click', '.providers', function (event) {
+
+            var id=$(this).attr('id').split('_')[1];
+            var project_id=$(this).attr('id').split('_')[2];
+
+
+            if ($(this).hasClass('btn-secondary')){
+                $("#installations_provider_"+id+"_"+project_id).removeClass('d-none');
+                $(this).removeClass('btn-secondary').addClass('btn-primary');
+            } else {
+                $("#installations_provider_"+id+"_"+project_id).addClass('d-none');
+                $(this).removeClass('btn-primary').addClass('btn-secondary');
+            }
+        });
+
+        $(document).on('click', '.installations', function (event) {
+            var id=$(this).attr('id').split('installation_')[1];
+
+           if( $('#installation_'+id).hasClass('btn-secondary')) {
+               $('#installation_' + id).addClass('btn-primary').removeClass('btn-secondary')
+           }
+           else {
+               $('#installation_' + id).removeClass('btn-primary').addClass('btn-secondary')
+           }
+
+        });
+
+
+
+
+
+
+    </script>
+{% endblock %}

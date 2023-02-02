@@ -147,7 +147,7 @@ class AccountingService extends AbstractController
 
     }
 
-    public function getRessources($resource_type, $accessToken)
+    public function getRessources($resource_type, $accessToken,$url=false)
     {
 
 
@@ -171,6 +171,9 @@ class AccountingService extends AbstractController
 
         if ($resource_type === 'metric-types') {
             $api_url = '/metric-types';
+        }
+        if ($url) {
+            $api_url=$resource_type;
         }
 
         $Notterminated = true;

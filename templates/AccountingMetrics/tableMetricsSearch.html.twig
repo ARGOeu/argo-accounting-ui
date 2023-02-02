@@ -1,0 +1,142 @@
+
+
+        {% if details >= 1 %}
+        <div class="card mt-2">
+
+
+            <div class="card-header">
+                <h3 class="card-title"><i class="bi bi-bar-chart"></i> Metrics Table </h3>
+            </div>
+
+            <div class="card-body">
+
+
+                {% if tabMetricsDetails!=null %}
+
+
+                    <table class="dataTable table  border border-dark" id="TableMetricsDetails">
+
+                        <thead>
+                        <tr>
+
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Value</th>
+                            <th>Unit</th>
+                            <th>Project</th>
+                            <th>Provider</th>
+                            <th>Installation</th>
+                            <th>Details</th>
+
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for tabMetricsDetail in tabMetricsDetails %}
+                        {% for data in tabMetricsDetail %}
+
+                            {% set installationName='N.A' %}
+                            {%for installations in tabInstallations %}
+                                {%for installation in installations %}
+                                    {% if data.installation_id == installation.id %}
+                                        {%  set installationName=installation.installation %}
+                                    {%endif%}
+                                {% endfor %}
+                            {% endfor %}
+
+                            <tr>
+
+
+
+                                {% if data.time_period_start is defined %}
+                                    <td class="start">{{ data.time_period_start }} </td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+
+                                {% if data.time_period_end  is defined %}
+                                    <td class="end">{{ data.time_period_end }} </td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+
+                                {% if data.value  is defined %}
+                                    <td class="value">{{ data.value }} </td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+
+                                {% if data.metric_definition[0].unitType is defined %}
+                                <td class="value">{{data.metric_definition[0].unitType}} </td>
+                                {% else %}
+                                    <td>N.A</td>
+                                {% endif %}
+
+                                <td>{{ data.project }}</td>
+                                <td class="provider">{{ data.provider }}</td>
+
+                                <td>{{  installationName}}</td>
+
+                                <td> <a class="btn btn-primary" data-bs-toggle="modal" title=" Browse more details"   data-bs-target="#metric_{{ data.id }}">
+                                        <i class="bi bi-plus-circle-fill" style="font-size: large"></i>
+                                    </a>
+
+                                    <div class="modal fade metricsDetails" id="metric_{{ data.id }}" tabindex="-1"
+                                         aria-labelledby="metric_{{ data.id }}{{ data.id }}_Label">
+
+                                        <div class="modal-dialog modal-dialog-scrollable">
+                                            <form>
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-light">
+                                                        <h5 class="modal-title text-center">Metrics details</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+
+                                                            {% for details  in data["metric_definition"] %}
+                                                                {% for key, detail   in details %}
+                                                                    <div class="form-group m-2">
+                                                                        <label for="name">{{ key }}</label>
+                                                                        <input type="text" class="form-control" name="name" value="{{ detail}}"
+                                                                               disabled="true"/>
+                                                                    </div>
+                                                                {% endfor %}
+                                                                {% endfor %}
+                                                    </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close
+                                                            </button>
+                                                        </div>
+
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                    </div>
+
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+
+                {% else %}
+                    <div class="mt-4 p-2"><span
+                                class="alert alert-info">No metrics registered for this configuration</span>
+                    </div>
+                {% endif %}
+
+
+
+            </div>
+        </div>
+        {% endif %}
+

@@ -38,16 +38,45 @@
         <th class="col-1">Acronym</th>
         <th class="col-5">Title</th>
         <th class="col-5">Providers</th>
-        <th>Add/Remove Providers</th>
+        <th>Actions</th>
+
 
     </tr>
     </thead>
 
     <tbody>
 
-{% for projects in tabProjects %}
+    {% for id ,data in permissions['content'] %}
 
-    {%  for id, data in projects %}
+        {% set read = false %}
+        {% set browse = false %}
+        {% set associates=false %}
+        {% set dissociates=false %}
+
+        {% for permissions in data['permissions'] %}
+            {% if permissions.collection=='Project' %}
+                {% for permission in permissions['access_permissions'] %}
+                    {% if permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                        {% set read=true %}
+                    {% endif %}
+                    {% if permission.operation=='ASSOCIATE' and permission.access_type=='ALWAYS' %}
+                        {% set associates=true %}
+                    {% endif %}
+                    {% if permission.operation=='DISSOCIATE' and permission.access_type=='ALWAYS' %}
+                        {% set dissociates=true %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if permissions.collection=='Metric' %}
+                {% for permission in permissions['access_permissions'] %}
+                    {% if permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                        {% set browse=true %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+
+        {% if read==true %}
         <tr>
             <td class="acronym">{{ data.acronym }} </td>
             <td class="title">{{ data.title }} </td>
@@ -64,34 +93,31 @@
             </td>
             <td>
 
+
                 <div class="btn-group dropstart">
 
                     <div class="btn-group btn-group-sm" role="group" aria-labelledby="Actions">
 
-                        {% if permissions[data.acronym]['Project']['ASSOCIATE'] is defined and permissions[data.acronym]['Project']['ASSOCIATE']=='ALWAYS' %}
-                            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_provider_{{ data.id }}" title="Associates a new provider">
-                                <i class="bi bi-plus-circle" style="font-size: large"></i>
+                            {% if associates==true %}
+                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_provider_{{ data.id }}" title="Associates a new provider">
+                                    <i class="bi bi-plus-circle" style="font-size: large"></i>
+                                </a>
+                            {% endif %}
+
+
+                            {% if dissociates==true %}
+                                <a  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dissociates_provider_{{ data.id }}" title="Dissociates provider(s)">
+                                    <i class="bi bi-x-circle" style="font-size: large"></i>
+                                </a>
+                            {% endif %}
+
+                        {% if browse==true %}
+                            <a class="btn btn-primary" href=" {{ path('metrics_project', { 'type': 'projects','id': data.id , 'project_id':data.id}) }}" title="Browse Metrics for this project">
+                                <i class="bi bi-cast" style="font-size: large"></i>
                             </a>
-
-
                         {% endif %}
-                        {% if permissions[data.acronym]['Project']['ASSOCIATE'] is defined and permissions[data.acronym]['Project']['DISSOCIATE']=='ALWAYS' %}
-
-                            <a  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dissociates_provider_{{ data.id }}" title="Dissociates provider(s)">
-                                <i class="bi bi-x-circle" style="font-size: large"></i>
-
-                            </a>
-
-                        {% endif %}
-{#                        {% if permissions[data.acronym]['Project']['READ'] is defined and permissions[data.acronym]['Project']['READ']=='ALWAYS' %}#}
-
-{#                            <a class="btn btn-primary" href=" {{ path('metrics', { 'project': data.id }) }}" title="Browse Metrics for this project">#}
-{#                                <i class="bi bi-bar-chart" style="font-size: large"></i>#}
-
-{#                            </a>#}
 
 
-{#                        {% endif %}#}
 
                     </div>
                 </div>
@@ -197,8 +223,9 @@
 
         </tr>
 
+        {% endif %}
     {% endfor %}
-{% endfor %}
+
     </tbody>
 
 </table>
