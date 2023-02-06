@@ -46,6 +46,18 @@ nginx-image-build:
 #  script:
 #    - docker run -v $PHP_UNIT:/var/www/html/php-unit.xml "$IMAGE_PHP" vendor/bin/phpunit --configuration /var/www/html/tms/phpunit.xml.dist
 
+deploy-to-wok-dev:
+  image: docker.io/appuio/oc:v3.11
+  stage: deploy
+  services:
+    - docker:dind
+  script: |
+    oc login $WOK_URL --token=$WOK_TOKEN --insecure-skip-tls-verify
+    oc project $WOK_PROJECT
+    oc patch deployment php-acc-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"php-acc-dev\", \"image\":\"$IMAGE_PHP\"}]}}}}"
+    oc patch deployment nginx-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"nginx-dev\", \"image\":\"$IMAGE_NGINX\"}]}}}}"
+  only:
+    - develop
 
 deploy-to-wok:
   image: docker.io/appuio/oc:v3.11
