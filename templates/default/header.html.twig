@@ -31,7 +31,7 @@
 
     <nav class="navbar navbar-expand-lg" style="background-color: rgb(255, 255, 255);">
         <div class="container-fluid row" >
-            <div class="col-6">
+            <div class="col-4">
                 <a class="navbar-brand" href="/">
                         <img alt="logo" class="offset-2 m-4" src="{{ asset('build/images/logo_eosc.png') }}" height="100px"/>
                 </a>
@@ -51,39 +51,24 @@
                 <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                     <ul class="navbar-nav">
                         {% if app.user.username is defined %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                My Resources
-                            </a>
-                            <ul class="dropdown-menu dropdown-large">
-                                {% set current_path = app.request.get('_route') %}
-                                <li><a href="{{ path('projects') }}" class="nav-link  {% if current_path == 'projects' %}  active {% endif %}">My Project(s)</a></li>
-                                <li><a href="{{ path('my_providers') }}" class="nav-link {% if current_path == 'my_providers' %}  active {% endif %}" >My Provider(s)</a></li>
-                                <li><a href="{{ path('installations') }}" class="nav-link {% if current_path == 'installations' %}  active {% endif %}" >My Installation(s)</a></li>
-                            </ul>
-                        </li>
+
+                            {% for categories in menu %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Other Resources
+                                    <i class="bi {{ categories.icon }} m-1"></i> {{ categories.title }}
                                 </a>
                                 <ul class="dropdown-menu dropdown-large">
-                                    <li><a href="{{ path('providers') }}" class="nav-link {% if current_path == 'providers' %}  active {% endif %}" >Providers</a></li>
-                                    <li><a href="{{ path('metrics-definitions') }}" class="nav-link {% if current_path == 'metrics-definitions' %}  active {% endif %}" >Metrics Definitions</a></li>
-                                    <li><a href="{{ path('metrics-units') }}" class="nav-link {% if current_path == 'metrics-units' %}  active {% endif %}" >Metrics Units</a></li>
-                                    <li><a href="{{ path('metrics-types') }}" class="nav-link {% if current_path == 'metrics-types' %}  active {% endif %}" >Units Types</a></li>
+                                    {% set current_path = app.request.get('_route') %}
+                                    {% for items in categories %}
+                                        {% for item in items %}
+                                            <li><a href="{{ path(item.route) }}" class="nav-link  {% if current_path == item.route %}  active {% endif %}">{{ item.title }}</a></li>
+                                        {% endfor %}
+                                     {% endfor %}
+
 
                                 </ul>
                             </li>
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Metrics
-                            </a>
-                            <ul class="dropdown-menu dropdown-large">
-                                <li><a href="{{ path('metrics') }}" class="nav-link {% if current_path == 'metrics' %}  active {% endif %}">Browse Metrics</a></li>
-{#                                <li><a href="{{ path('add_metrics') }}" class="nav-link {% if current_path == 'add_metrics' %}  active {% endif %}">Add Metrics</a></li>#}
-                            </ul>
-                        </li>
+                            {% endfor %}
 
 
                         <li class="offset-4 text-end ml-5 nav-item dropdown">

@@ -3,16 +3,28 @@ parameters:
     #############################################################################################
     #SF3
     #############################################################################################
-    home:
-        title: Home
-        description: 'Generic information'
-        icon: fa-home
+    my_ressources:
+        title: 'My Resources'
+        description: 'Information about resources linked to the user'
+        icon: bi-basket-fill
         items:
-            - { title: Home, name: home}
+            - { title: 'My Project(s)', route: projects}
+            - { title: 'My Provider(s)', route: my_providers}
+            - { title: 'My Installation(s)', route: installations }
 
-    accounting:
-        title: EOSC Accounting System UI
-        icon: fa-chart-area
-        description: 'EOSC Accounting System UI'
-        items:
-            - {title: 'EOSC Accounting System UI', name: metrics }
+    other_ressources:
+      title: 'Other Resources'
+      description: 'Information about global resources'
+      icon: bi-boxes
+      items:
+        - { title: 'Providers', route: providers}
+        - { title: 'Metrics Definitions', route: metrics-definitions}
+        - { title: 'Unit Types', route: unit-types }
+        - { title: 'Metric Types', route: metric-types }
+    metrics:
+      title: 'Metrics'
+      description: 'Browse, update, delete metrics'
+      icon: bi-clipboard-data
+      items:
+        - { title: 'Browse Metrics', route: metrics}
+

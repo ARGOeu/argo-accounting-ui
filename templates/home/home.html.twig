@@ -21,68 +21,28 @@
     </div>
     {% else %}
         <div class="row">
+            {%  for categories in menu %}
             <div class="m-1 col">
-                <div class="card">
 
+                <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <h4>My Resources</h4>
+                            <h4><i class="bi {{ categories.icon }} m-1"></i> {{  categories.title}}</h4>
                         </div>
                     </div>
                     <div class="card-body">
 
                         <ul>
-
-                            <li><a href="{{ path('projects') }}" class="nav-link">My Project(s)</a></li>
-                            <li><a href="{{ path('my_providers') }}" class="nav-link" >My Provider(s)</a></li>
-                            <li><a href="{{ path('installations') }}" class="nav-link" >My Installation(s)</a></li>
+                            {% for items in categories %}
+                                {% for item in items %}
+                                    <li><a href="{{ path(item.route) }}" class="nav-link">{{ item.title }}</a></li>
+                                {% endfor %}
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
             </div>
-            <div class="m-1 col">
-                <div class="card">
-
-                    <div class="card-header">
-                        <div class="card-title">
-                            <h4>Other Resources</h4>
-                        </div>
-                    </div>
-                    <div class="card-body">
-
-                        <ul>
-                            <li><a href="{{ path('providers') }}" class="nav-link" >Provider(s)</a></li>
-                            <li><a href="{{ path('metrics-definitions') }}" class="nav-link" >Metrics Definitions</a></li>
-                            <li><a href="{{ path('metrics-units') }}" class="nav-link" >Metrics Units</a></li>
-                            <li><a href="{{ path('metrics-types') }}" class="nav-link" >Unit Types</a></li>
-
-                        </ul>
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="m-1 col">
-                <div class="card">
-
-                    <div class="card-header">
-                        <div class="card-title">
-                            <h4>Metrics</h4>
-                        </div>
-                    </div>
-                    <div class="card-body">
-
-                        <ul>
-
-                            <li>  <a href="{{ path('metrics') }}" class="nav-link">Browse Metrics</a></li>
-{#                            <li>  <a href="{{ path('add_metrics') }}" class="nav-link">Add Metrics</a></li>#}
-
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-
+            {% endfor %}
         </div>
     {% endif %}
 

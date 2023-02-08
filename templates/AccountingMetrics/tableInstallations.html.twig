@@ -218,7 +218,7 @@
                                         {% endif %}
 
                                         {% if permissions[nameP]['Metric']['READ'] is defined and permissions[nameP]['Metric']['READ']=='ALWAYS' %}
-                                            <a class="btn btn-primary" href=" {{ path('metrics_project', { 'type': 'installations','id': installation.id, 'project_id':nameP }) }}" title="Browse Metrics for this project">
+                                            <a class="btn btn-primary" href=" {{ path('metrics_by_entity', { 'type': 'installations','id': installation.id, 'project_id':nameP }) }}" title="Browse Metrics for this project">
                                                 <i class="bi bi-cast" style="font-size: large"></i>
                                             </a>
 

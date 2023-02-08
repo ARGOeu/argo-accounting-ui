@@ -112,7 +112,7 @@
                             {% endif %}
 
                         {% if browse==true %}
-                            <a class="btn btn-primary" href=" {{ path('metrics_project', { 'type': 'projects','id': data.id , 'project_id':data.id}) }}" title="Browse Metrics for this project">
+                            <a class="btn btn-primary" href=" {{ path('metrics_by_entity', { 'type': 'projects','id': data.id , 'project_id':data.id}) }}" title="Browse Metrics for this project">
                                 <i class="bi bi-cast" style="font-size: large"></i>
                             </a>
                         {% endif %}
