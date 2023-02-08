@@ -215,7 +215,7 @@
 
                                         <a class="btn btn-primary" data-bs-toggle="modal" title=" Browse more details"
                                            data-bs-target="#provider_{{ data.id }}">
-                                            <i class="bi bi-plus-circle-fill" style="font-size: large"></i>
+                                            <i class="bi bi-search"></i>
                                         </a>
 
                                         {% if data.creator_id is defined %}
@@ -230,7 +230,7 @@
                                             {% if access_delete=='ALWAYS' or (access_delete=='ENTITY' and data.creator_id==userId) %}
                                                 <a class="btn btn-primary" data-bs-toggle="modal"
                                                    data-bs-target="#delete_{{ data.id }}" title="Delete Provider">
-                                                    <i class="bi bi-x-circle" style="font-size: large"></i>
+                                                    <i class="bi bi-trash-fill" style="font-size: large"></i>
 
                                                 </a>
                                             {% endif %}

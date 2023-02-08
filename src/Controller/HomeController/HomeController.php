@@ -464,20 +464,43 @@ class HomeController extends AbstractController
 
 
     /**
-     * @Route("/ajax/addMetric",  name="add_one_metric")
+     * @Route("/ajax/modifyMetric",  name="modify_one_metric")
      *
      * ajax calls to add a signel metric
      * @return Response
      */
-    public function addOneMetric(AccountingService $api, Request $request)
+    public function modifyOneMetric(AccountingService $api, Request $request)
     {
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
         $body =$request->request->all();
         unset($body['installation_id']);
+        unset($body['type']);
+
+        if ($request->get('type')==='add')
+            $response=$api->addRessource('/installations/'.$request->get('installation_id').'/metrics',$body,$bearerToken);
+
+        if ($request->get('type')==='update') {
+            unset($body['id']);
+            $response = $api->updateRessource('/installations/'.$request->get('installation_id').'/metrics/'.$request->get('id'),$body,$bearerToken);
+        }
 
 
-        $response=$api->addRessource('/installations/'.$request->get('installation_id').'/metrics',$body,$bearerToken);
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * @Route("/ajax/deleteMetric",  name="delete_one_metric")
+     *
+     * ajax calls to add a signel metric
+     * @return Response
+     */
+    public function deleteOneMetric(AccountingService $api, Request $request)
+    {
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $response=$api->deleteRessource('/installations/'.$request->get('installation_id').'/metrics/'.$request->get('id'),$bearerToken);
         return new JsonResponse($response);
     }
 
