@@ -2,186 +2,315 @@
 
 {% block stylesheets %}
 
-{%  endblock %}
+{% endblock %}
 
 {% block body %}
 
-        <div class="card mt-2">
+    {% if message is defined and message!='' %}
+        <div class="card m-1 col-4 mb-2" id="message">
+            <div class="card-header {% if status < 210 %} bg-success{% else %} bg-danger {% endif %}">
+                {% if status < 210 %}
+                    <h3 class="card-title text-white "><i class="bi bi-check-circle m-1"></i> Update done</h3>
+                {% else %}
+                    <h3 class="card-title text-white "><i class="bi bi-exclamation-triangle m-1"></i>Update failed</h3>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h4>Status {{ status }} - {{ message }}</h4>
+            </div>
+        </div>
+        <hr/>
+    {% endif %}
+
+    <div class="card mt-2">
 
 
-            <div class="card-header">
-                <h3 class="card-title"> <i class="bi bi-bar-chart"></i> Metrics Table
-{#                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_metric" title="Add a metric to the project">#}
-{#                        <i class="bi bi-plus-circle" style="font-size: large"></i>#}
-{#                        <i class="bi bi-bar-chart" style="font-size: large"></i>#}
-{#                    </a>#}
-                </h3>
+        {% set ProjectName='' %}
+        {% set ProviderName='' %}
+        {% set ProjectId='' %}
+        {% set Provider='' %}
+        {% set InstallationName='' %}
+        {% set create=false %}
+        {% set update=false %}
+        {% set delete=false %}
 
 
 
-                <div class="modal fade" id="add_metric" tabindex="-1" >
-                    <div class="modal-dialog modal-dialog-scrollable">
-                        <div class="modal-content">
+        {% for project in permissions['content'] %}
+            {% if  project.id == parameters.project_id %}
+                {% for permissions in project['permissions'] %}
+                    {% if permissions.collection=='Metric' %}
+                        {% for permission in permissions['access_permissions'] %}
+                            {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
+                                {% set ProjectName=project.acronym %}
+                                {% set ProjectId=parameters.project_id  %}
+                                {% set create=true %}
+                            {% endif %}
+                            {% if permission.operation=='UPDATE' and permission.access_type=='ALWAYS' %}
+                                {% set update=true %}
+                            {% endif %}
+                            {% if permission.operation=='DELETE' and permission.access_type=='ALWAYS' %}
+                                {% set delete=true %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
 
-                            <div class="modal-header  bg-light">
-                                <h5 class="modal-title text-center">Add a new Metric </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form class="form_add_metric_project" id="form_add_metric">
 
+            {% endif %}
+
+            {% if (parameters.type=='providers') %}
+                {% for provider in project['providers'] %}
+                    {% if  provider.id == parameters.id %}
+                        {% set Provider=provider.id %}
+                        {% set ProviderName=provider.name %}
+
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+        {% endfor %}
+
+        {% if (parameters.type=='installations') %}
+            {% for installations in tabInstallations %}
+                {% for installation in installations %}
+                    {% if installation.id == parameters.id %}
+                        {% set ProjectName=parameters.project_id %}
+                        {% set ProviderName=installation.organisation %}
+                        {% set InstallationName=installation.installation %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+
+
+        <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-bar-chart"></i> Metrics Table
+                <div class="ms-2 d-none spinner-border text-primary" id="loader_add_provider" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                {%if create==true %}
+                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_metric"
+                   title="Add a metric to the project">
+                    <i class="bi bi-plus-circle m-1" style="font-size: large"></i>
+                    <i class="bi bi-bar-chart m-1" style="font-size: large"></i> Add Metric
+                </a>
+                {%endif %}
+            </h3>
+
+
+            <div class="modal fade" id="add_metric" tabindex="-1">
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+
+                        <div class="modal-header  bg-light">
+                            <h5 class="modal-title text-center">Add a new Metric </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form_add_metric" id="form_add_metric">
+
+                                <h3>Infrastructure</h3>
+                                <div class="form-group m-2">
+                                    <label for="project">Project</label>
+                                    <input type="text" class="form-control" name="project" value="{{ ProjectName }}"     disabled/>
+                                </div>
+
+
+                                {% if (parameters.type=='projects') %}
+
+                                    <input name="type" type="hidden" value="project"/>
                                     <div class="form-group m-2">
-                                        <label for="project">Project</label>
-                                        <select class="form-control" name="project" id="project_id" >
-                                            {%  for permission in permissions['content'] %}
-                                                {% if parameters.project_id is defined and permission.id==parameters.project_id  %}
-                                                    <option value="{{  permission.id}}" selected>{{ permission.acronym }}</option>
-                                                {% endif %}
-                                            {% endfor  %}
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group m-2">
-                                        <label for="provider">Provider</label>
-                                        <select class="form-control providers" name="providers" >
-                                            {%  for permission in permissions['content'] %}
-                                                {% if parameters.project_id is defined and permission.id==parameters.project_id  %}
+                                        <label for="project">Provider</label>
+                                        <select class="form-select" name="providers">
+                                            <option value="0">--Select a provider--</option>
+                                            {% for permission in permissions['content'] %}
+                                                {% if permission.id == parameters.project_id %}
                                                     {% for provider in permission['providers'] %}
-                                                        {% if (parameters.type!='providers') or (parameters.type=='providers' and parameters.id== provider.id) %}
-                                                            <option value="{{ provider.id}}" >{{ provider.name }}</option>
-                                                        {% endif %}
+                                                        <option value="{{ provider.id }}_{{ permission.id }}">{{ provider.name }}</option>
                                                     {% endfor %}
+                                                {% endif %}
 
-                                            {% endif %}
-                                            {% endfor  %}
+                                            {% endfor %}
                                         </select>
                                     </div>
 
+
+                                    {% for permission in permissions['content'] %}
+                                        {% if permission.id == parameters.project_id %}
+                                            {% for provider in permission['providers'] %}
+                                            <div class="form-group m-2 d-none installations" id="installations_{{ provider.id }}_{{ permission.id }}">
+                                                <label for="Installations">Installation</label>
+                                                <select  class="form-select" name="installation" >
+                                                    {%  for installations in tabInstallations %}
+                                                        {% for installation in installations %}
+                                                            {% if installation.project==permission.id  and installation.organisation==provider.id %}
+                                                                <option type="text" class="form-control" value="{{ installation.id }}" >{{ installation.installation}}</option>
+                                                            {% endif %}
+                                                        {%endfor %}
+                                                    {%endfor %}
+                                                </select>
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                {% endif %}
+
+
+                                {% if (parameters.type=='providers') %}
+
+                                    <input name="type" type="hidden" value="providers"/>
                                     <div class="form-group m-2">
-                                        <label for="installation">Installations</label>
-                                        {%  if parameters.type=='providers' %}
-                                        {%  for permission in permissions['content'] %}
-                                            {% if parameters.project_id is defined and permission.id==parameters.project_id  %}
-                                                {% for provider in permission['providers'] %}
+                                        <label for="project">Provider</label>
+                                        <input type="text" class="form-control" name="provider"
+                                               value="{{ ProviderName }}" disabled/>
+                                    </div>
 
-                                                        <select class="form-control" name="installations" >
-                                                            {%  for installations in tabInstallations %}
-                                                                {%  for installation in installations %}
-                                                                    {% if installation.organisation == parameters.id %}
-                                                                    <option value="{{  installation.id}}" disabled>{{ installation.installation }}</option>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            {% endfor %}
-                                                        </select>
-                                                {% endfor %}
-                                            {% endif %}
+                                    <div class="form-group m-2">
+                                        <label for="project">Installation</label>
+                                        <select type="text" class="form-select" name="installation" >
+                                            {%  for installations in tabInstallations %}
+                                                {% for installation in installations %}
+
+                                                    {% if installation.project==ProjectId and installation.organisation==Provider %}
+                                                    <option type="text" class="form-control" value="{{ installation.id }}" >{{ installation.installation}}</option>
+                                                    {% endif %}
+
+                                                {%endfor %}
+                                            {%endfor %}
+                                        </select>
+                                    </div>
+
+                                {% endif %}
+
+                                {% if (parameters.type=='installations') %}
+                                    <input name="type" type="hidden" value="installations"/>
+
+                                    <div class="form-group m-2">
+                                        <label for="project">Provider</label>
+                                        <input type="text" class="form-control" name="provider"
+                                               value="{{ ProviderName }}" disabled/>
+                                    </div>
+
+                                    <div class="form-group m-2">
+                                        <label for="project">Installation</label>
+                                        <input type="text" class="form-control" name="installation"
+                                               value="{{ InstallationName }}" disabled/>
+                                        <input type="hidden" class="form-control" name="installation_id"
+                                               value="{{ parameters.id}}" disabled/>
+                                    </div>
+                                {% endif %}
+
+                                <hr/>
+                                <h3>Metric</h3>
+
+
+                                <div class="form-group m-2">
+                                    <label for="time_period_start">Period</label>
+                                    <input type="text" class="form-control" name="period">
+                                </div>
+
+
+                                <div class="form-group m-2">
+
+
+                                    <label for="time_period_start">Metric definition</label>
+                                    <select name="metric_definition" class="form-select">
+                                        {% for definitions in tabMetricsDef %}
+                                            {% for definition in definitions %}
+                                                <option type="text" class="form-control"   value="{{ definition.metric_definition_id }}">{{ definition.metric_name }} : {{ definition.unit_type }} - {{ definition.metric_type }}   </option>
+                                            {% endfor %}
                                         {% endfor %}
-                                        {% endif %}
-                                        {%  if parameters.type=='installations' %}
-
-                                                        <select class="form-control" name="installations" >
-                                                            {%  for installations in tabInstallations %}
-                                                                {%  for installation in installations %}
-                                                                    {% if installation.id == parameters.id %}
-                                                                        <option value="{{  installation.id}}" disabled>{{ installation.installation }}</option>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            {% endfor %}
-                                                        </select>
-                                        {% endif %}
-                                    </div>
+                                    </select>
+                                </div>
 
 
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                <div class="form-group m-2">
+                                    <label for="value">Value</label>
+                                    <input type="text" class="form-control" name="value">
 
-                                    <div class="ms-2 d-none spinner-border text-primary" id="loader_add" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
+                                </div>
 
 
-                                </form>
+                                <button type="submit" class="btn btn-primary">Submit</button>
 
-                            </div>
+                                <div class="ms-2 d-none spinner-border text-primary" id="loader_add" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+
+
+                            </form>
 
                         </div>
+
                     </div>
                 </div>
             </div>
+        </div>
 
 
-
-            <div class="card-body">
-                {% set count_pro=0 %}
-                {% set count_ins=0 %}
-                {%  for permission in permissions['content'] %}
-
-                    {% if parameters.project_id is defined and permission.id==parameters.project_id  %}
-
-                            <div class="btn-group" role="group" >
-                                <button type="button" class="btn btn-light border-secondary"><i class="bi bi-gear"></i> </button>
-                                <button type="button" class="btn btn-light border-secondary ">Project</button>
-                                <button type="button" class="btn btn-light border-secondary ">{{ permission.acronym }}</button>
-                            </div><hr/>
-
-                    {% endif %}
-
-                        {% for provider in permission['providers'] %}
-
-                            {% if parameters.id is defined and  provider.id==parameters.id  and count_pro ==0 %}
-                                {% set count_pro =1  %}
-                                    <div class="btn-group" role="group" >
-                                        <button type="button" class="btn btn-light border-secondary"><i class="bi bi-gear"></i> </button>
-                                        <button type="button" class="btn btn-light border-secondary ">Provider</button>
-                                        <button type="button" class="btn btn-light border-secondary ">{{ provider.name }}</button>
-                                    </div>
-                                <hr/>
-                            {% endif %}
-
-                            {% for installation in provider['installations'] %}
-                                {% if parameters.id is defined and  installation.id==parameters.id  and count_ins ==0 %}
-                                    {% set count_ins =1  %}
-                                    <div class="btn-group" role="group" >
-                                        <button type="button" class="btn btn-light border-secondary"><i class="bi bi-gear"></i> </button>
-                                        <button type="button" class="btn btn-light border-secondary ">Installation</button>
-                                        <button type="button" class="btn btn-light border-secondary ">{{ installation.installation }}</button>
-                                    </div>
-                                    <hr/>
-                                {% endif %}
-
-                            {% endfor %}
-                        {% endfor %}
-
-                    {% endfor %}
+        <div class="card-body">
+            {% set count_pro=0 %}
+            {% set count_ins=0 %}
 
 
-                    {% if tabMetricsDetails|length > 0 %}
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-light border-secondary"><i class="bi bi-gear"></i></button>
+                <button type="button" class="btn btn-light border-secondary "><span
+                            class="fw-bold">Project : </span> {{ ProjectName }}</button>
+                {% if ProviderName!='' %}
+                    <button type="button" class="btn btn-light border-secondary "><span
+                                class="fw-bold">Provider : </span> {{ ProviderName }}</button>
+                {% endif %}
+                {% if InstallationName!='' %}
+                    <button type="button" class="btn btn-light border-secondary "><span
+                                class="fw-bold">Installation : </span> Installation : {{ InstallationName }}</button>
+                {% endif %}
+            </div>
+            <hr/>
 
-                    <table class="dataTable table  border border-dark" id="TableMetricsDetails">
 
-                        <thead>
-                        <tr>
+            {% if tabMetricsDetails|length > 0 %}
 
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Value</th>
-                            <th>Project</th>
-                            <th>Provider</th>
+                <table class="dataTable table  border border-dark" id="TableMetricsDetails">
+
+                    <thead>
+                    <tr>
+
+                        <th>Start</th>
+                        <th>End</th>
+
+                        <th>Project</th>
+                        <th>Provider</th>
+                        <th>Installation</th>
+                        <th>Value</th>
+                        <th>Unit Type</th>
+                        <th>Metric Type</th>
+                        <th>Actions</th>
 
 
-                        </tr>
-                        </thead>
+                    </tr>
+                    </thead>
 
-                        <tbody>
+                    <tbody>
 
-                        {% for tabMetricsDetail in tabMetricsDetails %}
+                    {% for tabMetricsDetail in tabMetricsDetails %}
                         {% for data in tabMetricsDetail %}
 
 
 
                             <tr>
-
-
+                                {% set installationName='N.A' %}
+                                {% for installations in tabInstallations %}
+                                    {% for installation in installations %}
+                                        {% if installation.id == data.installation_id %}
+                                            {% set installationName=installation.installation %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
 
                                 {% if data.time_period_start is defined %}
                                     <td class="start">{{ data.time_period_start }} </td>
@@ -195,33 +324,231 @@
                                     <td></td>
                                 {% endif %}
 
+
+                                <td>{{ data.project }}</td>
+                                <td class="provider">{{ data.provider }}</td>
+
+
+
+                                <td>{{ installationName }}</td>
+
                                 {% if data.value  is defined %}
                                     <td class="value">{{ data.value }} </td>
                                 {% else %}
                                     <td></td>
                                 {% endif %}
 
-                                <td>{{ data.project }}</td>
-                                <td class="provider">{{ data.provider }}</td>
 
+                                <td>{{ data.metric_definition.unit_type }}</td>
+                                <td>{{ data.metric_definition.metric_type }}</td>
+
+                                <td>
+
+                                    <div class="btn-group dropstart">
+
+                                        <div class="btn-group btn-group-sm" role="group" aria-labelledby="Actions">
+
+
+
+                                            {% if update==true %}
+                                                <a class="btn btn-primary"  data-bs-toggle="modal" data-bs-target="#update_metric_{{ data.id }}" title="Update Metrics for this project">
+                                                    <i class="bi bi-pencil-square" style="font-size: large"></i>
+                                                </a>
+
+                                                <!-- Modal update -->
+                                                <div class="modal fade" id="update_metric_{{ data.id }}" tabindex="-1"
+                                                     aria-labelledby="update_metric_{{  data.id }}_Label">
+                                                    <div class="modal-dialog modal-dialog-scrollable">
+                                                        <div class="modal-content">
+
+
+
+                                                            <div class="modal-header  bg-light">
+                                                                <h5 class="modal-title text-center">Update Metric</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form class="form_update_metric">
+
+                                                                    <input type="hidden" value="{{ data.id }}" name="id"/>
+                                                                    <input type="hidden" value="update" name="type"/>
+                                                                    <input type="hidden" value="{{ data.installation_id }}" name="installation_id"/>
+
+                                                                    <div class="form-group m-2">
+                                                                        <label for="project">Installation</label>
+                                                                        <input type="text" class="form-control" name="provider"
+                                                                               value="{{ installationName }}" disabled/>
+                                                                    </div>
+
+
+                                                                    <hr/>
+                                                                    <h3>Metric</h3>
+
+
+                                                                    <div class="form-group m-2">
+                                                                        <label for="period">Period</label>
+                                                                        <input type="text" class="form-control" name="period" value="{{ data.time_period_start }} - {{ data.time_period_end }}" />
+                                                                        <input type="hidden" class="form-control" name="period_ref" value="{{ data.time_period_start }} - {{ data.time_period_end }}" />
+
+                                                                    </div>
+
+                                                                    <div class="form-group m-2">
+                                                                        <label for="value">Value</label>
+                                                                        <input type="text" class="form-control" name="value" value="{{ data.value }}" />
+                                                                        <input type="hidden" class="form-control"   name="value_ref" value="{{data.value }}"/>
+                                                                    </div>
+
+
+                                                                    <div class="form-group m-2">
+
+
+                                                                        <label for="time_period_start">Metric definition</label>
+                                                                        <input type="hidden" class="form-control"   name="metric_definition_id_ref" value="{{ data.metric_definition.metric_definition_id }}"/>
+
+
+                                                                        <select name="metric_definition" class="form-select">
+                                                                            {% for definitions in tabMetricsDef %}
+                                                                                {% for definition in definitions %}
+                                                                                    {% if definition.metric_definition_id==data.metric_definition.metric_definition_id %}
+                                                                                    <option type="text" class="form-control"   value="{{ definition.metric_definition_id }}" selected>{{ definition.metric_name }} : {{ definition.unit_type }} - {{ definition.metric_type }}   </option>
+                                                                                    {% else %}
+                                                                                        <option type="text" class="form-control"   value="{{ definition.metric_definition_id }}">{{ definition.metric_name }} : {{ definition.unit_type }} - {{ definition.metric_type }}   </option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endfor %}
+                                                                        </select>
+
+                                                                    </div>
+                                                                    <br/>
+
+                                                                    <button type="submit" class="btn btn-danger" value="submit">
+                                                                        Update Metric
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-primary"
+                                                                            data-bs-dismiss="modal"
+                                                                            aria-label="Close">Close
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if delete==true %}
+                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_metric_{{ data.id }}"  title="Delete Metrics for this project">
+                                                    <i class="bi bi-trash-fill" style="font-size: large"></i>
+                                                </a>
+
+                                                <!-- Modal delete  -->
+                                                <div class="modal fade" id="delete_metric_{{ data.id }}" tabindex="-1"
+                                                     aria-labelledby="delete_metric_{{  data.id }}_Label">
+                                                    <div class="modal-dialog modal-dialog-scrollable">
+                                                        <div class="modal-content">
+
+
+
+                                                                <div class="modal-header  bg-light">
+                                                                    <h5 class="modal-title text-center">Delete Metric</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                            aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form class="form_delete_metric">
+
+                                                                        <input type="hidden" value="{{ data.id }}" name="id"/>
+                                                                        <input type="hidden" value="{{ data.installation_id }}" name="installation_id"/>
+
+                                                                        <div class="form-group m-2">
+                                                                            <label for="project">Installation</label>
+                                                                            <input type="text" class="form-control" name="provider"
+                                                                                   value="{{ installationName }}" disabled/>
+                                                                        </div>
+
+
+                                                                        <hr/>
+                                                                        <h3>Metric</h3>
+
+
+                                                                        <div class="form-group m-2">
+                                                                            <label for="time_period_start">Period</label>
+                                                                            <input type="text" class="form-control" name="period" value="{{ data.time_period_start }} - {{ data.time_period_end }}" disabled/>
+                                                                        </div>
+
+                                                                        <div class="form-group m-2">
+                                                                            <label for="time_period_start">Value</label>
+                                                                            <input type="text" class="form-control" name="value" value="{{ data.value }}" disabled/>
+                                                                        </div>
+
+
+                                                                        <div class="form-group m-2">
+
+
+                                                                            <label for="time_period_start">Metric definition</label>
+
+                                                                            {% for definitions in tabMetricsDef %}
+                                                                                {% for definition in definitions %}
+                                                                                    {% if definition.metric_definition_id==data.metric_definition.metric_definition_id %}
+                                                                                        <input type="text" class="form-control"   value="{{ definition.metric_name }} : {{ definition.unit_type }} - {{ definition.metric_type }}" disabled  />
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endfor %}
+
+                                                                        </div>
+                                                                        <br/><br/>
+
+                                                                        <span class="mb-1 alert alert-danger">You are going to delete the metric described previously !</span>
+                                                                        <br/>
+                                                                        <br/>
+                                                                        <button type="submit" class="btn btn-danger" value="submit">
+                                                                            Delete Metric
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-primary"
+                                                                                data-bs-dismiss="modal"
+                                                                                aria-label="Close">Close
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            {% endif %}
+
+
+
+
+                                        </div>
+                                    </div>
+
+                                </td>
 
                             </tr>
                         {% endfor %}
-                        {% endfor %}
+                    {% endfor %}
 
-                        </tbody>
+                    </tbody>
 
-                    </table>
+                </table>
 
 
-                {% else %}
-                    <div class="mt-4 p-2"><span
-                                class="alert alert-info">No metrics registered for this configuration</span>
-                    </div>
-                {% endif %}
-
-            </div>
+            {% else %}
+                <div class="mt-4 p-2"><span
+                            class="alert alert-info">No metrics registered for this configuration</span>
+                </div>
+            {% endif %}
         </div>
+
+    </div>
+
+
 
 
 {% endblock %}
@@ -229,19 +556,183 @@
 {% block javascripts %}
     <script>
         $("#TableMetricsDetails").dataTable({
-            "order": [[0, 'asc']]
+            "order": [[0, 'desc']]
         })
 
+        $(function () {
+            $('input[name="period"]').daterangepicker({
+                timePicker: true,
+                startDate: moment().startOf('hour').add(-48, 'hour'),
+                endDate: moment().startOf('hour').add(-24, 'hour'),
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
+            });
+        });
 
-        $(document).on('change', '.providers', function (event) {
+        $(document).on('change', "select[name='providers']", function (event) {
 
-            var projectId = $('#project_id > option:selected').val().trim();
-            var providerId = $('.providers > option:selected').val().trim();
+            var providerId = $("select[name='providers'] > option:selected").val().trim();
 
-            $("select[name='installations']").addClass('d-none');
-            $('.'+projectId+'-'+providerId).removeClass('d-none');
+           $("div.installations").addClass('d-none');
+            $('div#installations_'  + providerId).removeClass('d-none');
+
+        });
+
+
+
+      
+        
+
+        $(document).on('submit','.form_delete_metric',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+            let id=  $(this).find('input[name="id"]').val().trim();
+            let installation_id=  $(this).find('input[name="installation_id"]').val().trim();
+
+
+            let url = "{{ url('delete_one_metric') }}";
+            var dataUrl='installation_id='+installation_id+'&id='+id;
+
+
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+                crossDomain: true,
+
+                beforeSend: function () {
+                    $('#loader_add').removeClass('d-none');
+                }});
+
+            request.done(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+
+                $('#loader_add').addClass('d-none');
+
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
+
+
+            });
+            request.fail(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
+
+            });
 
 
         });
+
+            $(document).on('submit','.form_add_metric,.form_update_metric',function(event) {
+            event.preventDefault(); // cancel default behavior
+
+            let type=  $(this).find('input[name="type"]').val().trim();
+            let period=  $(this).find('input[name="period"]').val().trim();
+            let metric_definition_id= $("select[name='metric_definition'] > option:selected").val().trim();
+            let value=  $(this).find('input[name="value"]').val().trim();
+            let url = "{{ url('modify_one_metric') }}";
+            let dataUrl="";
+      
+            
+            var start = period.split(' - ')[0].replace(' ', 'T');
+            var end = period.split(' - ')[1].replace(' ', 'T');
+            var time_period_start = start + 'Z';
+            var time_period_end = end + 'Z';
+
+
+                if (type==='update') {
+
+                    let id=  $(this).find('input[name="id"]').val().trim();
+                let period_ref=  $(this).find('input[name="period_ref"]').val().trim();
+                let metric_definition_id_ref=  $(this).find('input[name="metric_definition_id_ref"]').val().trim();
+                let value_ref=  $(this).find('input[name="value_ref"]').val().trim();
+                let installation_id = $(this).find('input[name="installation_id"]').val().trim();
+                 dataUrl = 'type=update&installation_id=' + installation_id+'&id='+id;
+                    
+                var start_ref = period_ref.split(' - ')[0].replace(' ', 'T');
+                var end_ref = period_ref.split(' - ')[1].replace(' ', 'T');
+
+                var time_period_start_ref = start_ref + 'Z';
+                var time_period_end_ref = end_ref + 'Z';
+                
+
+                if (value !== value_ref) {
+                    dataUrl = dataUrl + '&value=' + value;
+                }
+
+                if (time_period_start_ref  !== time_period_start) {
+                    dataUrl = dataUrl + '&time_period_start=' + time_period_start;
+                }
+
+                if (time_period_end_ref  !== time_period_end) {
+                    dataUrl = dataUrl + '&time_period_end=' + time_period_end;
+                }
+
+                if (metric_definition_id_ref !== metric_definition_id) {
+                    dataUrl = dataUrl + '&metric_definition_id=' + metric_definition_id;
+                }
+
+            }
+             else {
+
+                let installation_id = "";
+
+
+                if (type === 'installations') {
+                    installation_id = $(this).find('input[name="installation_id"]').val().trim();
+                } else {
+                    installation_id = $("select[name='installation'] > option:selected").val().trim();
+                }
+               
+                dataUrl = 'type=add&installation_id=' + installation_id + '&metric_definition_id=' + metric_definition_id + '&time_period_start=' + time_period_start + '&time_period_end=' + time_period_end + '&value=' + value;
+
+            }
+             
+            let request = $.ajax({
+                type: "POST",
+                url: url,
+                data: dataUrl,
+                crossDomain: true,
+
+                beforeSend: function () {
+                    $('#loader_add').removeClass('d-none');
+                }});
+
+            request.done(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+
+                $('#loader_add').addClass('d-none');
+
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
+
+
+            });
+            request.fail(function (output_json) {
+
+                var output = jQuery.parseJSON(output_json);
+                var status = output.code;
+                var message = output.message;
+
+                $.redirect(window.location.href, {'status': status, 'message': message});
+
+            });
+
+
+        });
+
+
+
     </script>
 {% endblock %}

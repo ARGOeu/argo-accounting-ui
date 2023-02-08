@@ -100,19 +100,19 @@
 
                             {% if associates==true %}
                                 <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_provider_{{ data.id }}" title="Associates a new provider">
-                                    <i class="bi bi-plus-circle" style="font-size: large"></i>
+                                    <i class="bi bi-cloud-plus" style="font-size: large"></i>
                                 </a>
                             {% endif %}
 
 
                             {% if dissociates==true %}
                                 <a  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dissociates_provider_{{ data.id }}" title="Dissociates provider(s)">
-                                    <i class="bi bi-x-circle" style="font-size: large"></i>
+                                    <i class="bi bi-trash-fill" style="font-size: large"></i>
                                 </a>
                             {% endif %}
 
                         {% if browse==true %}
-                            <a class="btn btn-primary" href=" {{ path('metrics_project', { 'type': 'projects','id': data.id , 'project_id':data.id}) }}" title="Browse Metrics for this project">
+                            <a class="btn btn-primary" href=" {{ path('metrics_by_entity', { 'type': 'projects','id': data.id , 'project_id':data.id}) }}" title="Browse Metrics for this project">
                                 <i class="bi bi-cast" style="font-size: large"></i>
                             </a>
                         {% endif %}

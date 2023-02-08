@@ -165,7 +165,7 @@
                     {%  if data.creator_id is defined %}
                         {% if access_delete=='ALWAYS' or (access_delete=='ENTITY' and data.creator_id==userId)%}
                             <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#delete_{{ data.metric_definition_id}}" title="Delete Metric Definition">
-                                <i class="bi bi-x-circle" style="font-size: large"></i>
+                                <i class="bi bi-trash-fill" style="font-size: large"></i>
 
                             </a>
                         {% endif %}

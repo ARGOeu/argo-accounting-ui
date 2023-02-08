@@ -273,7 +273,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metrics-units",  name="metrics-units")
+     * @Route("/unit-types",  name="unit-types")
      *
      * list all metrics units
      * @return Response
@@ -338,7 +338,7 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/metrics-types",  name="metrics-types")
+     * @Route("/metric-types",  name="metric-types")
      *
      * list all metrics-types
      * @return Response
@@ -464,20 +464,43 @@ class HomeController extends AbstractController
 
 
     /**
-     * @Route("/ajax/addMetric",  name="add_one_metric")
+     * @Route("/ajax/modifyMetric",  name="modify_one_metric")
      *
      * ajax calls to add a signel metric
      * @return Response
      */
-    public function addOneMetric(AccountingService $api, Request $request)
+    public function modifyOneMetric(AccountingService $api, Request $request)
     {
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
 
         $body =$request->request->all();
         unset($body['installation_id']);
+        unset($body['type']);
+
+        if ($request->get('type')==='add')
+            $response=$api->addRessource('/installations/'.$request->get('installation_id').'/metrics',$body,$bearerToken);
+
+        if ($request->get('type')==='update') {
+            unset($body['id']);
+            $response = $api->updateRessource('/installations/'.$request->get('installation_id').'/metrics/'.$request->get('id'),$body,$bearerToken);
+        }
 
 
-        $response=$api->addRessource('/installations/'.$request->get('installation_id').'/metrics',$body,$bearerToken);
+
+        return new JsonResponse($response);
+    }
+
+    /**
+     * @Route("/ajax/deleteMetric",  name="delete_one_metric")
+     *
+     * ajax calls to add a signel metric
+     * @return Response
+     */
+    public function deleteOneMetric(AccountingService $api, Request $request)
+    {
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $response=$api->deleteRessource('/installations/'.$request->get('installation_id').'/metrics/'.$request->get('id'),$bearerToken);
         return new JsonResponse($response);
     }
 
@@ -590,7 +613,7 @@ class HomeController extends AbstractController
 
 
     /**
-     * @Route("/metricsProject",  name="metrics_project")
+     * @Route("/metricsbyEntities",  name="metrics_by_entity")
      *
      * form to get metrics provider list
      * @param LavoisierService $lavoisierService
@@ -599,6 +622,9 @@ class HomeController extends AbstractController
 
     public function listMetricsbyEntity(AccountingService $api, Request $request)
     {
+
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
         $parameters=[];
 
@@ -609,6 +635,7 @@ class HomeController extends AbstractController
             return new RedirectResponse('/login');
         }
         $tabInstallations=$api->getRessources('installations',$bearerToken);
+        $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
 
         if ($request->get('type') === 'providers')
         {
@@ -632,8 +659,12 @@ class HomeController extends AbstractController
         return $this->render("AccountingMetrics/tableMetricsDetails.html.twig", [
             'tabMetricsDetails' => $tabMetricsDetails,
             'tabInstallations'=>$tabInstallations,
+            'tabMetricsDef'=>$tabMetricsDef,
             'permissions'=>$permissions,
-            'parameters'=>$parameters
+            'parameters'=>$parameters,
+            "status"=>$status,
+            "message"=>$message
+
         ]);
 
     }
