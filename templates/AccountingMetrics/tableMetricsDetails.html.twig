@@ -38,12 +38,12 @@
 
         {% for project in permissions['content'] %}
             {% if  project.id == parameters.project_id %}
+                {% set ProjectName=project.acronym %}
+                {% set ProjectId=parameters.project_id  %}
                 {% for permissions in project['permissions'] %}
                     {% if permissions.collection=='Metric' %}
                         {% for permission in permissions['access_permissions'] %}
                             {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
-                                {% set ProjectName=project.acronym %}
-                                {% set ProjectId=parameters.project_id  %}
                                 {% set create=true %}
                             {% endif %}
                             {% if permission.operation=='UPDATE' and permission.access_type=='ALWAYS' %}
@@ -64,7 +64,21 @@
                     {% if  provider.id == parameters.id %}
                         {% set Provider=provider.id %}
                         {% set ProviderName=provider.name %}
-
+                        {% for permissions in provider['permissions'] %}
+                            {% if permissions.collection=='Metric' %}
+                                {% for permission in permissions['access_permissions'] %}
+                                    {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
+                                        {% set create=true %}
+                                    {% endif %}
+                                    {% if permission.operation=='UPDATE' and permission.access_type=='ALWAYS' %}
+                                        {% set update=true %}
+                                    {% endif %}
+                                    {% if permission.operation=='DELETE' and permission.access_type=='ALWAYS' %}
+                                        {% set delete=true %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
                 {% endfor %}
             {% endif %}
