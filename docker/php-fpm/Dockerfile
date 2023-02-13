@@ -14,7 +14,7 @@ RUN mv .env.template .env
 
 
 
-RUN /usr/local/bin/php composer.phar install
+RUN /usr/local/bin/php composer.phar install --ignore-platform-req=ext-http
 RUN yarn install --ignore-engines \
     && yarn encore prod ;
 
