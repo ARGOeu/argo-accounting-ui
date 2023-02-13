@@ -38,12 +38,12 @@
 
         {% for project in permissions['content'] %}
             {% if  project.id == parameters.project_id %}
+                {% set ProjectName=project.acronym %}
+                {% set ProjectId=parameters.project_id  %}
                 {% for permissions in project['permissions'] %}
                     {% if permissions.collection=='Metric' %}
                         {% for permission in permissions['access_permissions'] %}
                             {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
-                                {% set ProjectName=project.acronym %}
-                                {% set ProjectId=parameters.project_id  %}
                                 {% set create=true %}
                             {% endif %}
                             {% if permission.operation=='UPDATE' and permission.access_type=='ALWAYS' %}
@@ -64,7 +64,21 @@
                     {% if  provider.id == parameters.id %}
                         {% set Provider=provider.id %}
                         {% set ProviderName=provider.name %}
-
+                        {% for permissions in provider['permissions'] %}
+                            {% if permissions.collection=='Metric' %}
+                                {% for permission in permissions['access_permissions'] %}
+                                    {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
+                                        {% set create=true %}
+                                    {% endif %}
+                                    {% if permission.operation=='UPDATE' and permission.access_type=='ALWAYS' %}
+                                        {% set update=true %}
+                                    {% endif %}
+                                    {% if permission.operation=='DELETE' and permission.access_type=='ALWAYS' %}
+                                        {% set delete=true %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
                 {% endfor %}
             {% endif %}
@@ -258,7 +272,7 @@
 
 
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-light border-secondary"><i class="bi bi-gear"></i></button>
+
                 <button type="button" class="btn btn-light border-secondary "><span
                             class="fw-bold">Project : </span> {{ ProjectName }}</button>
                 {% if ProviderName!='' %}
@@ -282,11 +296,14 @@
 
                         <th>Start</th>
                         <th>End</th>
-
-                        <th>Project</th>
-                        <th>Provider</th>
-                        <th>Installation</th>
+                        {% if parameters.type=='projects' %}
+                            <th>Provider</th>
+                        {% endif %}
+                        {% if parameters.type=='projects' or parameters.type=='providers'  %}
+                            <th>Installation</th>
+                        {% endif %}
                         <th>Value</th>
+                        <th>Metric Name</th>
                         <th>Unit Type</th>
                         <th>Metric Type</th>
                         <th>Actions</th>
@@ -325,12 +342,14 @@
                                 {% endif %}
 
 
-                                <td>{{ data.project }}</td>
-                                <td class="provider">{{ data.provider }}</td>
 
+                                {% if parameters.type=='projects'   %}
+                                    <td class="provider">{{ data.provider }}</td>
+                                {% endif %}
 
-
-                                <td>{{ installationName }}</td>
+                                {% if parameters.type=='projects' or parameters.type=='providers'  %}
+                                    <td>{{ installationName }}</td>
+                                {% endif %}
 
                                 {% if data.value  is defined %}
                                     <td class="value">{{ data.value }} </td>
@@ -341,6 +360,7 @@
 
                                 <td>{{ data.metric_definition.unit_type }}</td>
                                 <td>{{ data.metric_definition.metric_type }}</td>
+                                <td>{{ data.metric_definition.metric_name }}</td>
 
                                 <td>
 

@@ -48,8 +48,29 @@
 
 
                 {% for project in permissions['content'] %}
-
+                    {% set browse = false %}
+                    {% for permissions in project['permissions'] %}
+                        {% if permissions.collection=='Metric' %}
+                            {% for permission in permissions['access_permissions'] %}
+                                {% if permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                                    {% set browse=true %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
                     {% for provider in project['providers'] %}
+
+
+
+                        {% for permissions in provider['permissions'] %}
+                            {% if permissions.collection=='Metric' %}
+                                {% for permission in permissions['access_permissions'] %}
+                                    {% if permission.operation=='READ' and permission.access_type=='ALWAYS' %}
+                                        {% set browse=true %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
 
                         <tr>
                             <td>{{ project.acronym }}</td>
@@ -117,9 +138,12 @@
 
                                     </div>
 
+                                   {% if browse==true %}
                                     <a class="btn btn-primary" href=" {{ path('metrics_by_entity', { 'type': 'providers','id': provider.id, 'project_id':project.id }) }}" title="Browse Metrics for this provider">
                                         <i class="bi bi-cast" style="font-size: large"></i>
                                     </a>
+                                    {% endif %}
+
                                 </div>
 
                             </td>

@@ -17,10 +17,10 @@ use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_accounting")
+ * @ORM\Table(name="user")
  */
 
-class User implements UserInterface, \Serializable
+class User implements UserInterface
 {
 
 
@@ -173,7 +173,7 @@ class User implements UserInterface, \Serializable
      */
     public function serialize()
     {
-        return serialize([$this->id, $this->username, $this->roles,$this->opRoles, $this->email]);
+        return __serialize([$this->id, $this->username, $this->roles,$this->opRoles, $this->email]);
     }
 
     /**
@@ -181,7 +181,7 @@ class User implements UserInterface, \Serializable
      */
     public function unserialize($serialized)
     {
-        list($this->id, $this->username, $this->roles, $this->opRoles,$this->email) = unserialize($serialized);
+        list($this->id, $this->username, $this->roles, $this->opRoles,$this->email) = __unserialize($serialized);
     }
 
 

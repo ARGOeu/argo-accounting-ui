@@ -127,8 +127,7 @@
         </div>
     </div>
 </div>
-
-
+            {% if access_read=='ALWAYS' %}
 <table class="dataTable table  border border-dark" id="TableDefinitions">
 
     <thead>
@@ -307,7 +306,9 @@
 
     </tbody>
 </table>
-
+            {% else %}
+                <div class="m-1 alert alert-warning">You are not authorized to see the metric definition table !</div>
+            {% endif %}
 </div>
 </div>
 

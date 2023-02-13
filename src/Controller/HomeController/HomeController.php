@@ -279,8 +279,13 @@ class HomeController extends AbstractController
      * @return Response
      */
 
-    public function listMetricsUnits(AccountingService $api): Response
+    public function listMetricsUnits(Request $request, AccountingService $api): Response
     {
+
+
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
+
         $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
         try {
             $api->checkValidityToken($bearerToken);
@@ -289,10 +294,14 @@ class HomeController extends AbstractController
             return new RedirectResponse('/login');
         }
 
+        $permissions=$api->getUserGeneralPermissions($bearerToken);
         $tabMetricsUnits=$api->getRessources('unit-types',$bearerToken);
 
         return $this->render("AccountingMetrics/tableUnits.html.twig", [
             'tabMetricsUnits' => $tabMetricsUnits,
+            'permissions'=>$permissions,
+            "message"=>$message,
+            "status"=> $status,
 
         ]);
 
@@ -344,10 +353,16 @@ class HomeController extends AbstractController
      * @return Response
      */
 
-    public function listMetricsTypes(AccountingService $api)
+    public function listMetricsTypes(Request $request,AccountingService $api)
     {
+        $status = $request->request->get('status');
+        $message = $request->request->get('message');
 
        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+       $permissions=$api->getUserGeneralPermissions($bearerToken);
+
+
+
 
         try {
             $api->checkValidityToken($bearerToken);
@@ -359,7 +374,10 @@ class HomeController extends AbstractController
         $tabMetricsTypes=$api->getRessources('metric-types',$bearerToken);
 
         return $this->render("AccountingMetrics/tableTypes.html.twig", [
-            'tabMetricsTypes' => $tabMetricsTypes
+            'tabMetricsTypes' => $tabMetricsTypes,
+            'permissions'=>$permissions,
+            "message"=>$message,
+            "status"=> $status,
         ]);
 
     }
@@ -602,6 +620,70 @@ class HomeController extends AbstractController
             } // last case : delete
             else {
                 $response=$api->deleteRessource('/metric-definitions/'.$request->get('metric_id'),$bearerToken);
+            }
+
+        }
+
+        return new JsonResponse($response);
+
+
+    }
+
+    /**
+     * @Route("/ajax/modifyMetricType",  name="modify_metric_type" )
+     *
+     * form to get metrics provider list
+     * @return Response
+     */
+
+    public function modifyMetricType(AccountingService $api, Request $request)
+    {
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $body =$request->request->all();
+        unset($body['type']);
+
+
+        if ($request->get('type') === 'add') {
+            $response=$api->addRessource('/metric-types',$body,$bearerToken );
+        } else {
+            if ($request->get('type') === 'update') {
+                unset($body['id']);
+                $response=$api->updateRessource('/metric-types/'.$request->get('id'),$body,$bearerToken );
+            } // last case : delete
+            else {
+                $response=$api->deleteRessource('/metric-types/'.$request->get('id'),$bearerToken);
+            }
+        }
+        return new JsonResponse($response);
+
+    }
+
+
+    /**
+     * @Route("/ajax/modifyUnit",  name="modify_unit" )
+     *
+     * form to get metrics provider list
+     * @return Response
+     */
+
+    public function modifyUnit(AccountingService $api, Request $request)
+    {
+
+        $bearerToken = $this->container->get('security.token_storage')->getToken()->getAccessToken();
+        $body =$request->request->all();
+        unset($body['type']);
+
+
+        if ($request->get('type') === 'add') {
+            $response=$api->addRessource('/unit-types',$body,$bearerToken );
+        } else {
+            if ($request->get('type') === 'update') {
+                unset($body['id']);
+                $response=$api->updateRessource('/unit-types/'.$request->get('id'),$body,$bearerToken );
+            } // last case : delete
+            else {
+                $response=$api->deleteRessource('/unit-types/'.$request->get('id'),$bearerToken);
             }
 
         }

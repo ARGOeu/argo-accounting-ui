@@ -34,6 +34,7 @@ nginx-image-build:
     - docker build --pull -t "$IMAGE_NGINX" -f ./docker/nginx/Dockerfile .
     - docker push "$IMAGE_NGINX"
 
+
 deploy-to-wok-dev:
   image: docker.io/appuio/oc:v3.11
   stage: deploy
@@ -46,7 +47,6 @@ deploy-to-wok-dev:
     oc patch deployment nginx-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"nginx-dev\", \"image\":\"$IMAGE_NGINX\"}]}}}}"
   only:
     - develop
-
 
 deploy-to-wok:
   image: docker.io/appuio/oc:v3.11
