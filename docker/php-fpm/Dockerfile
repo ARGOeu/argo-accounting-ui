@@ -3,9 +3,8 @@ LABEL maintainer="CNRS/CCIN2P3 DevOps Team"
 
 RUN apk add git
 RUN apk add --no-cache --update --virtual buildDeps autoconf
-RUN apk add --no-cache --virtual .php-build zlib-dev  libpng-dev libjpeg-turbo-dev freetype-dev php-sqlite3
-RUN pecl install raphf
-RUN docker-php-ext-enable raphf
+RUN apk add --no-cache --virtual .php-build zlib-dev  libpng-dev libjpeg-turbo-dev freetype-dev php-sqlite3 php-http-all-dev
+
 
 WORKDIR /var/www/html
 ADD . /var/www/html
