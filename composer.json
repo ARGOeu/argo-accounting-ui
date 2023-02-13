@@ -10,6 +10,7 @@
         "ext-http": "*",
         "ext-iconv": "*",
         "ext-simplexml": "*",
+        "amphp/http-client": "^4.2.1",
         "ccin2p3/lavoisiercli": "master",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.7",
