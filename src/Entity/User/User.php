@@ -17,7 +17,7 @@ use Doctrine\Common\Util\ClassUtils;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_accounting")
+ * @ORM\Table(name="user")
  */
 
 class User implements UserInterface, \Serializable
