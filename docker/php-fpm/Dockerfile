@@ -3,7 +3,7 @@ LABEL maintainer="CNRS/CCIN2P3 DevOps Team"
 
 RUN apk add git
 RUN apk add --no-cache --update --virtual buildDeps autoconf
-RUN apk add --no-cache --virtual .php-build zlib-dev  libpng-dev libjpeg-turbo-dev freetype-dev php-sqlite3 php-http-all-dev
+RUN apk add --no-cache --virtual .php-build zlib-dev  libpng-dev libjpeg-turbo-dev freetype-dev php-sqlite3
 
 RUN pecl install raphf propro
 RUN docker-php-ext-enable raphf propro
