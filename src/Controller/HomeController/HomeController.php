@@ -251,15 +251,13 @@ class HomeController extends AbstractController
         catch (ClientException $exception) {
             return new RedirectResponse('/login');
         }
-        $tabProjects=$api->getRessources('projects',$bearerToken);
-        $tabInstallations=$api->getRessources('installations',$bearerToken);
+
         $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
-        $permissions=$api->getUserPermissions($bearerToken);
+        $permissions=$api->getUserPermissions($bearerToken,false);
 
         if (count($permissions)>=1) {
             return $this->render("AccountingMetrics/tableInstallations.html.twig", [
-                'tabInstallations' => $tabInstallations,
-                'tabProjects' => $tabProjects,
+
                 'tabMetricsDef' => $tabMetricsDef,
                 "permissions" => $permissions,
                 "message" => $message,
