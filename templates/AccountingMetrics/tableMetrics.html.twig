@@ -192,10 +192,32 @@
 
 
             </div>
+            <div class="card-body">
+                <hr class="border border-secondary border-1 opacity-50">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="period_radio" id="option1" value="0" checked>
+                    <label class="form-check-label" for="option1">
+                        Browse all metrics
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="period_radio" id="option2">
+                    <label class="form-check-label" for="option2">
+                        Limit metrics by selecting the data range
+                        <input  type="text" class="m-1 form-text" id="period" name="period"  style="width: 250px"/>
+                    </label>
+
+                </div>
+
+
+
+            </div>
+
 
 
 
             <div class="card-footer text-center">
+
                 {% if listIds |length > 0 %}
                     <input type="submit" class="btn btn-primary" id="submit_metrics" value="Browse Metrics"/>
                 {% else %}
@@ -215,6 +237,17 @@
             "order": [[0, 'asc']]
         })
 
+        $(function() {
+            $('input[name="period"]').daterangepicker({
+                timePicker: true,
+                startDate: moment().startOf('hour').add(-365, 'days'),
+                endDate: moment().startOf('hour'),
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
+            });
+        });
+
         $(document).on('click', '#submit_metrics', function (event) {
 
 
@@ -224,6 +257,8 @@
             var listProjectsAlreadySelected=[];
             var listProvidersAlreadySelected=[];
             var listIds=[];
+
+
 
 
             $( "button.installations" ).each(function( index ) {
@@ -380,15 +415,57 @@
                 parameters.operator = "OR";
                 parameters.criteria=[];
 
+            var parameters_period_data= [];
 
-                if (Object.keys(temp_project).length>0)
-                    parameters.criteria=parameters_projects;
+            if ($('#option2').is(':checked')) {
 
-                if (Object.keys(temp_provider).length>0)
-                    parameters.criteria=parameters_providers;
+                let period = $('input[name="period"]').val().trim();
 
-                  if (Object.keys(temp_installation).length>0)
-                    parameters.criteria=parameters_installations;
+                var start = period.split(' - ')[0].replace(' ', 'T');
+                var end = period.split(' - ')[1].replace(' ', 'T');
+
+                var time_period_start = start + 'Z';
+                var time_period_end = end + 'Z';
+
+
+                var parameters_period = {};
+                parameters_period.type = "filter";
+                parameters_period.operator = "AND";
+                parameters_period.criteria = [];
+
+                var period_start = {};
+                period_start.type = "query";
+                period_start.field = "time_period_start";
+                period_start.operand = "gte";
+                period_start.values = time_period_start;
+
+                var period_end = {};
+                period_end.type = "query";
+                period_end.field = "time_period_end";
+                period_end.operand = "lt";
+                period_end.values = time_period_end;
+
+                parameters_period.criteria.push(period_start);
+                parameters_period.criteria.push(period_end);
+
+                parameters_period_data.push(parameters_period);
+
+            }
+
+
+
+            if (Object.keys(temp_project).length>0)
+                $.merge(parameters.criteria,parameters_projects);
+
+            if (Object.keys(temp_provider).length>0)
+                $.merge(parameters.criteria,parameters_providers);
+
+
+            if (Object.keys(temp_installation).length>0)
+                $.merge(parameters.criteria,parameters_installations);
+
+             if (Object.keys(parameters_period_data).length>0)
+                 $.merge(parameters.criteria,parameters_period_data);
 
 
             console.log(JSON.stringify(parameters));
