@@ -37,6 +37,7 @@
 
 
         {% for project in permissions['content'] %}
+
             {% if  project.id == parameters.project_id %}
                 {% set ProjectName=project.acronym %}
                 {% set ProjectId=parameters.project_id  %}
@@ -55,7 +56,6 @@
                         {% endfor %}
                     {% endif %}
                 {% endfor %}
-
 
             {% endif %}
 
@@ -79,21 +79,37 @@
                                 {% endfor %}
                             {% endif %}
                         {% endfor %}
+
                     {% endif %}
                 {% endfor %}
+
             {% endif %}
 
         {% endfor %}
 
         {% if (parameters.type=='installations') %}
-            {% for installations in tabInstallations %}
-                {% for installation in installations %}
+            {% for project in permissions['content'] %}
+            {% for provider in project['providers'] %}
+            {% for installation in provider['installations'] %}
+
                     {% if installation.id == parameters.id %}
                         {% set ProjectName=parameters.project_id %}
-                        {% set ProviderName=installation.organisation %}
+                        {% set ProviderName=installation.infrastructure %}
                         {% set InstallationName=installation.installation %}
                     {% endif %}
+
+                {% for permissions in installation['permissions'] %}
+                    {% if permissions.collection=='Metric' %}
+                        {% for permission in permissions['access_permissions'] %}
+                            {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
+                                {% set create=true %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 {% endfor %}
+
+                {% endfor %}
+            {% endfor %}
             {% endfor %}
         {% endif %}
 
@@ -601,8 +617,8 @@
 
 
 
-      
-        
+
+
 
         $(document).on('submit','.form_delete_metric',function(event) {
             event.preventDefault(); // cancel default behavior
@@ -660,8 +676,8 @@
             let value=  $(this).find('input[name="value"]').val().trim();
             let url = "{{ url('modify_one_metric') }}";
             let dataUrl="";
-      
-            
+
+
             var start = period.split(' - ')[0].replace(' ', 'T');
             var end = period.split(' - ')[1].replace(' ', 'T');
             var time_period_start = start + 'Z';
@@ -676,13 +692,13 @@
                 let value_ref=  $(this).find('input[name="value_ref"]').val().trim();
                 let installation_id = $(this).find('input[name="installation_id"]').val().trim();
                  dataUrl = 'type=update&installation_id=' + installation_id+'&id='+id;
-                    
+
                 var start_ref = period_ref.split(' - ')[0].replace(' ', 'T');
                 var end_ref = period_ref.split(' - ')[1].replace(' ', 'T');
 
                 var time_period_start_ref = start_ref + 'Z';
                 var time_period_end_ref = end_ref + 'Z';
-                
+
 
                 if (value !== value_ref) {
                     dataUrl = dataUrl + '&value=' + value;
@@ -711,11 +727,11 @@
                 } else {
                     installation_id = $("select[name='installation'] > option:selected").val().trim();
                 }
-               
+
                 dataUrl = 'type=add&installation_id=' + installation_id + '&metric_definition_id=' + metric_definition_id + '&time_period_start=' + time_period_start + '&time_period_end=' + time_period_end + '&value=' + value;
 
             }
-             
+
             let request = $.ajax({
                 type: "POST",
                 url: url,
