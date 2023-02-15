@@ -104,6 +104,12 @@
                             {% if permission.operation=='CREATE' and permission.access_type=='ALWAYS' %}
                                 {% set create=true %}
                             {% endif %}
+                            {% if permission.operation=='UPDATE' and permission.access_type=='ALWAYS' %}
+                                {% set update=true %}
+                            {% endif %}
+                            {% if permission.operation=='DELETE' and permission.access_type=='ALWAYS' %}
+                                {% set delete=true %}
+                            {% endif %}
                         {% endfor %}
                     {% endif %}
                 {% endfor %}
