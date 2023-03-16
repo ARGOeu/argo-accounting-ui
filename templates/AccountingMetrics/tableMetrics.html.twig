@@ -433,22 +433,44 @@
                 parameters_period.operator = "AND";
                 parameters_period.criteria = [];
 
-                var period_start = {};
-                period_start.type = "query";
-                period_start.field = "time_period_start";
-                period_start.operand = "gte";
-                period_start.values = time_period_start;
+                var period_start_1 = {};
+                period_start_1.type = "query";
+                period_start_1.field = "time_period_start";
+                period_start_1.operand = "gte";
+                period_start_1.values = time_period_start;
 
-                var period_end = {};
-                period_end.type = "query";
-                period_end.field = "time_period_end";
-                period_end.operand = "lt";
-                period_end.values = time_period_end;
+                var period_start_2 = {};
+                period_start_2.type = "query";
+                period_start_2.field = "time_period_start";
+                period_start_2.operand = "lt";
+                period_start_2.values = time_period_end;
 
-                parameters_period.criteria.push(period_start);
-                parameters_period.criteria.push(period_end);
+                parameters_period.criteria.push(period_start_1);
+                parameters_period.criteria.push(period_start_2);
+
+                var parameters_period_end = {};
+                parameters_period_end.type = "filter";
+                parameters_period_end.operator = "AND";
+                parameters_period_end.criteria = [];
+                
+                var period_end_1 = {};
+                period_end_1.type = "query";
+                period_end_1.field = "time_period_end";
+                period_end_1.operand = "lt";
+                period_end_1.values = time_period_end;
+
+                var period_end_2 = {};
+                period_end_2.type = "query";
+                period_end_2.field = "time_period_end";
+                period_end_2.operand = "gte";
+                period_end_2.values = time_period_start;
+
+                parameters_period_end.criteria.push(period_end_1);
+                parameters_period_end.criteria.push(period_end_2);
+           
 
                 parameters_period_data.push(parameters_period);
+                parameters_period_data.push(parameters_period_end);
 
             }
 
@@ -470,7 +492,7 @@
 
             console.log(JSON.stringify(parameters));
 
-      $.redirect(window.location.href, {'parameters': JSON.stringify(parameters), 'listIds':JSON.stringify(listIds)});
+    //  $.redirect(window.location.href, {'parameters': JSON.stringify(parameters), 'listIds':JSON.stringify(listIds)});
 
         });
 
