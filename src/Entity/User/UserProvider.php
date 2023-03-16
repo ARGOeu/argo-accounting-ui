@@ -52,20 +52,25 @@ class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInter
         else
             $opRoles=$data;
 
-        if ($email==='cyril.lorphelin@cc.in2p3.fr')
+        if ($email=='cyril.lorphelin@cc.in2p3.fr')
             $roles= ['ROLE_ADMIN'];
         else
             $roles= ['ROLE_USER'];
 
+        $existingUser=$this->em->getRepository(\App\Entity\User\User::class)->findOneBy(array('id'=>$id));
 
-
+        if ($existingUser!=null)
+        {
+            $user=$existingUser;
+        }
+        else {
             $user = new \App\Entity\User\User();
             $user->SetId($id);
             $user->setEmail($email);
             $user->setUsername($name);
             $user->setRoles($roles);
             $user->setopRoles($opRoles);
-
+        }
 
 
             try {
@@ -89,6 +94,7 @@ class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInter
                 sprintf('Instances of "%s" are not supported.', get_class($user))
             );
         }
+
         return $this->loadUserByIdentifier($user->getId());
     }
 
