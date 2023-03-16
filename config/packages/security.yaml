@@ -12,8 +12,8 @@ security:
 
     firewalls:
         secured_area:
+            switch_user: ~
             oauth:
-                switch_user: ~
                 resource_owners:
                     aai_eosc: "/oauth/callback"
                 login_path:        /connect/aai_eosc
