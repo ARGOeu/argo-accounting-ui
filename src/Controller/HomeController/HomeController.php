@@ -254,18 +254,20 @@ class HomeController extends AbstractController
 
         $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
         $permissions=$api->getUserPermissions($bearerToken,false);
+        $tabResources=$api->getRessources('resources',$bearerToken);
+
+
 
         if (count($permissions)>=1) {
             return $this->render("AccountingMetrics/tableInstallations.html.twig", [
-
                 'tabMetricsDef' => $tabMetricsDef,
                 "permissions" => $permissions,
+                "tabResources" => $tabResources,
                 "message" => $message,
                 "status" => $status
             ]);
         } else {
             return $this->render("AccountingMetrics/noPermissions.html.twig");
-
         }
 
     }
