@@ -277,9 +277,10 @@
                                     </ul>
 
                                 </td>
-                                <td>
-                                    {% if installation.resource  is defined %}
-                                        {{ installation.resource }}
+                                <td>{%  if tabPrefRes[installation.id] is defined %}
+                                        {{ tabPrefRes[installation.id] }}
+                                        {% else %}
+                                        N.A
                                     {% endif %}
                                 </td>
 
@@ -448,14 +449,25 @@
                                                             <option value="0">-- Not defined --</option>
                                                             {% for resources  in tabResources %}
                                                                 {% for resource in resources %}
-                                                                    <option value="{{ resource.id }}">{{ resource.name }}</option>
+                                                                    {% if tabPrefRes[installation.id] is defined and resource.id== tabPrefRes[installation.id] %}
+                                                                        <option value="{{ resource.id }}" selected>{{ resource.name }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ resource.id }}">{{ resource.name }}</option>
+                                                                    {% endif %}
                                                                 {% endfor %}
                                                             {% endfor %}
                                                             <small id="resourceHelp" class="form-text text-muted">Optional resource (Service) associated with the installation</small>
+                                                            {% if tabPrefRes[installation.id] is defined %}
                                                             <input type="hidden" class="form-control"
                                                                    name="resource_ref"
                                                                    id="resource_ref"
-                                                                   value="{%  if installation.resource is defined %} {{ installation.resource }} {% else %} 0 {% endif %}">
+                                                                   value="{{ tabPrefRes[installation.id]}}">
+                                                            {% else %}
+                                                                <input type="hidden" class="form-control"
+                                                                       name="resource_ref"
+                                                                       id="resource_ref"
+                                                                       value="0">
+                                                                {% endif %}
                                                         </select>
                                                         </div>
 

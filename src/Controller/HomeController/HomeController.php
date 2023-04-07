@@ -255,8 +255,18 @@ class HomeController extends AbstractController
         $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
         $permissions=$api->getUserPermissions($bearerToken,false);
         $tabResources=$api->getRessources('resources',$bearerToken);
+        $tabInstallations=$api->getRessources('installations',$bearerToken);
+        $tabPrefRes=array();
 
+        foreach ($tabInstallations as $installations) {
+            foreach ($installations as $installation) {
+                if (isset($installation["resource"]))
+                $tabPrefRes[$installation["id"]]=$installation["resource"];
+                else
+                    $tabPrefRes[$installation["id"]]='N.A';
+            }
 
+        }
 
         if (count($permissions)>=1) {
             return $this->render("AccountingMetrics/tableInstallations.html.twig", [
@@ -264,7 +274,8 @@ class HomeController extends AbstractController
                 "permissions" => $permissions,
                 "tabResources" => $tabResources,
                 "message" => $message,
-                "status" => $status
+                "status" => $status,
+                "tabPrefRes"=>$tabPrefRes
             ]);
         } else {
             return $this->render("AccountingMetrics/noPermissions.html.twig");
