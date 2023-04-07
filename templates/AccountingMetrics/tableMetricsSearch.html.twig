@@ -29,6 +29,7 @@
                             <th>Unit Type</th>
                             <th>Metric Type</th>
                             <th>Metric Name</th>
+                            <th>Resource</th>
                             <th>Details</th>
 
                         </tr>
@@ -78,6 +79,12 @@
                                 <td>{{ data.metric_definition.unit_type }}</td>
                                 <td>{{ data.metric_definition.metric_type }}</td>
                                 <td>{{ data.metric_definition.metric_name }}</td>
+
+                                {% if data.resource is defined %}
+                                <td>{{ data.resource }}</td>
+                                {% else %}
+                                    <td>N.A</td>
+                                    {% endif %}
 
 
 

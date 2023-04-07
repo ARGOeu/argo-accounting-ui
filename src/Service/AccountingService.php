@@ -172,6 +172,11 @@ class AccountingService extends AbstractController
         if ($resource_type === 'metric-types') {
             $api_url = '/metric-types';
         }
+
+        if ($resource_type === 'resources') {
+            $api_url = '/resources';
+        }
+
         if ($url) {
             $api_url=$resource_type;
         }

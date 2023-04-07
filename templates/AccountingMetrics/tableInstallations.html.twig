@@ -6,14 +6,17 @@
 
 {% block body %}
     <div class="row">
+
         <div class="offset-1 col-10 mt-1 mb-3">
             <h1><i class="bi bi-bar-chart-steps"></i>
-                Installations
+                Installation
                 <div class="ms-2 d-none spinner-border text-primary" id="loader_add_installation" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </h1>
             <hr/>
+
+
 
             {% if message is defined and message!='' %}
                 <div class="card m-1 col-4 mb-2" id="message">
@@ -58,7 +61,7 @@
                                 <div class="form-group m-2">
                                     <label for="project_id" class="m-1">Select your Project</label>
                                     <select class="form-control form-select projects" id="project_id" name="project_id">
-                                            <option value="0">--Select your project--</option>
+                                        <option value="0">--Select your project--</option>
                                         {% for project in permissions['content'] %}
                                             {% set create = false %}
                                             {% for permissionP in project['permissions'] %}
@@ -84,18 +87,15 @@
 
                                 {% for project in permissions['content'] %}
 
-
-
-                                        <div class="form-group m-2 providers  d-none" id="providers_{{ project.id }}">
-                                            <label for="providers" class="m-1">Select a provider</label>
-                                            <select class="form-control form-select"
-                                                    id="providers_select_{{ project.id }}" name="providers">
-                                                {% for provider in project['providers'] %}
-                                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-
+                                    <div class="form-group m-2 providers  d-none" id="providers_{{ project.id }}">
+                                        <label for="providers" class="m-1">Select a provider</label>
+                                        <select class="form-control form-select"
+                                                id="providers_select_{{ project.id }}" name="providers">
+                                            {% for provider in project['providers'] %}
+                                                <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
 
                                 {% endfor %}
 
@@ -136,6 +136,23 @@
 
                                 </div>
 
+                                <div class="form-group m-2">
+
+                                    <label for="resource" class="m-1">Preferable Resource</label>
+                                    <select class="form-control form-select" id="resource"
+                                            name="resource">
+                                        <option value="0">-- Not defined --</option>
+                                        {% for resources  in tabResources %}
+                                            {% for resource in resources %}
+                                                <option value="{{ resource.id }}">{{ resource.name }}</option>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        <small id="resourceHelp" class="form-text text-muted">Optional resource (Service) associated with the installation</small>
+                                    </select>
+
+
+                                </div>
+
 
                                 <button type="submit" class="btn btn-primary">Submit</button>
 
@@ -162,6 +179,7 @@
                     <th>Organization</th>
                     <th>Infrastructure</th>
                     <th>Metric Name: Description (Unit Type - Metric Type)</th>
+                    <th>Preferable resource</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -172,6 +190,7 @@
                 {% set browse = false %}
                 {% set update=false %}
                 {% set delete=false %}
+
 
 
 
@@ -232,6 +251,8 @@
                                 {% endif %}
                             {% endfor %}
 
+
+
                             <tr id="installation_{{ installation.id }}">
 
                                 <td>{{ installation.installation }}</td>
@@ -255,6 +276,12 @@
 
                                     </ul>
 
+                                </td>
+                                <td>{%  if tabPrefRes[installation.id] is defined %}
+                                        {{ tabPrefRes[installation.id] }}
+                                        {% else %}
+                                        N.A
+                                    {% endif %}
                                 </td>
 
                                 <td>
@@ -415,6 +442,34 @@
 
 
                                                         </div>
+                                                        <div class="form-group m-2">
+                                                        <label for="resource" class="m-1">Preferable Resource</label>
+                                                        <select class="form-control form-select" id="resource"
+                                                                name="resource">
+                                                            <option value="0">-- Not defined --</option>
+                                                            {% for resources  in tabResources %}
+                                                                {% for resource in resources %}
+                                                                    {% if tabPrefRes[installation.id] is defined and resource.id== tabPrefRes[installation.id] %}
+                                                                        <option value="{{ resource.id }}" selected>{{ resource.name }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ resource.id }}">{{ resource.name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endfor %}
+                                                            <small id="resourceHelp" class="form-text text-muted">Optional resource (Service) associated with the installation</small>
+                                                            {% if tabPrefRes[installation.id] is defined %}
+                                                            <input type="hidden" class="form-control"
+                                                                   name="resource_ref"
+                                                                   id="resource_ref"
+                                                                   value="{{ tabPrefRes[installation.id]}}">
+                                                            {% else %}
+                                                                <input type="hidden" class="form-control"
+                                                                       name="resource_ref"
+                                                                       id="resource_ref"
+                                                                       value="0">
+                                                                {% endif %}
+                                                        </select>
+                                                        </div>
 
 
                                                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -478,11 +533,15 @@
                 var installation = $(this).find('input[name="installation"]').val().trim();
                 var infra = $(this).find('input[name="infra"]').val().trim();
                 var metric_def = $(this).find('select[name="metric_definition"] > option:selected').val().trim();
+                var resource= $(this).find('select[name="resource"] > option:selected').val().trim();
 
                 if (type === 'add') {
                     projectId = $(this).find('select[name="project_id"] > option:selected').val().trim();
                     provider = $("#providers_select_" + projectId + "> option:selected").val().trim();
                     dataUrl = 'type=' + type + "&project=" + projectId + "&organisation=" + provider + "&installation=" + installation + "&infrastructure=" + infra + "&unit_of_access=" + metric_def;
+                    if (resource!==0) {
+                        dataUrl = dataUrl+"&resource="+resource;
+                    }
                 }
 
                 if (type === 'update') {
@@ -490,7 +549,7 @@
                     var installation_ref = $(this).find('input[name="installation_ref"]').val().trim();
                     var infra_ref = $(this).find('input[name="infra_ref"]').val().trim();
                     var metric_def_ref = $(this).find('input[name="metric_definition_ref"]').val().trim();
-
+                    var resource_ref = $(this).find('input[name="resource_ref"]').val().trim();
                     dataUrl = 'type=' + type + '&installation_id=' + installationId;
 
                     if (installation !== installation_ref) {
@@ -502,6 +561,9 @@
                     }
                     if (metric_def !== metric_def_ref) {
                         dataUrl = dataUrl + "&unit_of_access=" + metric_def;
+                    }
+                    if (resource !== resource_ref) {
+                        dataUrl = dataUrl + "&resource=" + resource;
                     }
                 }
 
