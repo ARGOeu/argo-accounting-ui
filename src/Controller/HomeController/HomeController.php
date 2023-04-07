@@ -254,10 +254,10 @@ class HomeController extends AbstractController
 
         $tabMetricsDef=$api->getRessources('metric-definitions',$bearerToken);
         $permissions=$api->getUserPermissions($bearerToken,false);
-        $tabResources=$api->getRessources('resources',$bearerToken);
+      //  $tabResources=$api->getRessources('resources',$bearerToken);
         $tabInstallations=$api->getRessources('installations',$bearerToken);
         $tabPrefRes=array();
-
+        $tabResources=array();
         foreach ($tabInstallations as $installations) {
             foreach ($installations as $installation) {
                 if (isset($installation["resource"]))
