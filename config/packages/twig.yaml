@@ -4,11 +4,12 @@ twig:
         menu: "%menu%"
         portalUrl: "accounting.eosc-portal.eu"
         webMasterMail: 'cic-information@in2p3.fr'
-        lastRelease: {version: '1.0' , date: '2021-01-10'}
+        lastRelease: {version: '1.2' , date: '2023-05-24'}
         app_environment: '%env(APP_ENV)%'
         maintenance_mode: '%env(MAINTENANCE_MODE)%'
         maintenance_url: '%env(MAINTENANCE_URL)%'
         maintenance_description: '%env(MAINTENANCE_DESCRIPTION)%'
+        api_url: '%env(ACCOUNTING_API_URL)%'
 when@test:
     twig:
         strict_variables: true
