@@ -138,7 +138,7 @@ php:
         upload_max_filesize = 100M
     templatesMountPath: /usr/local/etc/php/conf.d
     env:
-      APP_ENV: "dev"
+      APP_ENV: "prod"
       APP_SECRET: "${APP_SECRET}"
       DATABASE_URL: "sqlite:///%kernel.project_dir%/user"
       EOSC_AAI_ID: "${EOSC_AAI_ID}"

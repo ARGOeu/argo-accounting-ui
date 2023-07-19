@@ -18,3 +18,4 @@ RUN /usr/local/bin/php composer.phar install --ignore-platform-req=ext-http
 RUN yarn install --ignore-engines \
     && yarn encore prod ;
 
+RUN chmod -R 777 /var/www/html/var
