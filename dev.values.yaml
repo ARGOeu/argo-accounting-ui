@@ -1,0 +1,168 @@
+---
+filebrowser:
+  enabled: false
+global:
+  pvc:
+    isManaged: false
+  description: Accounting Portal for eosc - DEV
+  status: test
+  url: accounting-eosc-dev.apps.wok3.in2p3.fr
+  imagePullSecrets:
+    gitlab:
+      email: webmaster@cc.in2p3.fr
+      password: ${GITLAB_REGISTRY}
+      registry: gitlab.in2p3.fr
+      username: gitlab+deploy-token-371
+    gitlab-registry:
+      email: webmaster@cc.in2p3.fr
+      password: ${GITLAB_REGISTRY}
+      registry: gitlab-registry.in2p3.fr
+      username: gitlab+deploy-token-371
+  owner:
+    email: cyril.lorphelin@cc.in2p3.fr
+    firstName: Cyril
+    lastName: Lorphelin
+    organization: CC-IN2P3
+  ingress:
+    allow: any
+nginx:
+  image:
+    url: $IMAGE_NGINX
+  config:
+    env:
+      NGINX_LISTEN_PORT: '8080'
+      NGINX_ROOT_DIR: /var/www/html/public
+      NGINX_SERVER_NAME: _
+      SYMFONY_BUILD_DIR: /var/www/html/public/build
+      SYMFONY_IMG_DIR: /var/www/html/public/build/img
+    templates:
+      default.conf.template: |
+        map $http_user_agent $excluded_uas {
+          ~*kube-probe 0;
+          default 1;
+        }
+
+        log_format main '$http_x_forwarded_for - $realip_remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
+
+        server {
+          listen      ${NGINX_LISTEN_PORT};
+          server_name ${NGINX_SERVER_NAME};
+          root        ${NGINX_ROOT_DIR};
+
+          proxy_read_timeout 300;
+          proxy_connect_timeout 300;
+          proxy_send_timeout 300;
+
+
+
+          access_log /var/log/nginx/access.log main if=$excluded_uas;
+          error_log  /var/log/nginx/error.log warn;
+          client_max_body_size 5g;
+
+          # security headers
+          add_header X-Frame-Options         "SAMEORIGIN" always;
+          add_header X-XSS-Protection        "1; mode=block" always;
+          add_header X-Content-Type-Options  "nosniff" always;
+          add_header Referrer-Policy         "no-referrer-when-downgrade" always;
+          add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'" always;
+
+          # index.php
+          index       index.php;
+
+
+            # index.php fallback
+            location / {
+            try_files $uri /index.php$is_args$args;
+            }
+
+             location ${SYMFONY_BUILD_DIR} {
+                try_files $uri =404;
+            }
+
+            location ${SYMFONY_IMG_DIR} {
+                try_files $uri =404;
+            }
+
+
+
+          # additional config
+          include general.conf;
+
+          # handle the php frontend calls
+          location ~ ^/index\.php(/|$) {
+
+          # default fastcgi_params
+          include                       fastcgi_params;
+
+          # fastcgi settings
+          fastcgi_pass    {{ReleaseName}}-php:9000;
+          fastcgi_split_path_info       ^(.+\.php)(/.*)$;
+          fastcgi_index                 index.php;
+          fastcgi_buffers               8 16k;
+          fastcgi_buffer_size           32k;
+
+          # fastcgi params
+          fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+          fastcgi_param DOCUMENT_ROOT   $realpath_root;
+
+          internal;
+          }
+
+        # 404 other php calls
+          location ~ \.php$ {
+             return 404;
+          }
+        }
+  enabled: true
+  resources:
+    limits:
+      memory: 64Mi
+    requests:
+      memory: 64Mi
+      cpu: 250m
+  initWithIndex: false
+  pvc:
+    disabled: true
+php:
+  pvc:
+    disabled: true
+  image:
+    url: $IMAGE_PHP
+  config:
+    templates:
+      xxx.ini: |
+        include_path = .:/usr/local/lib/php:/var/www/html
+      yyy.ini: |
+        memory_limit = 512M
+        post_max_size = 100M
+        upload_max_filesize = 100M
+    templatesMountPath: /usr/local/etc/php/conf.d
+    env:
+      APP_ENV: "dev"
+      APP_SECRET: "${APP_SECRET}"
+      DATABASE_URL: "sqlite:///%kernel.project_dir%/user"
+      EOSC_AAI_ID: "${EOSC_AAI_ID}"
+      EOSC_AAI_SECRET: "${ EOSC_AAI_SECRET}"
+      EOSC_AAI_INFO: "https://aai-demo.eosc-portal.eu/auth/realms/core/protocol/openid-connect/userinfo"
+      EOSC_AAI_AUTHORIZE: "https://aai-demo.eosc-portal.eu/auth/realms/core/protocol/openid-connect/auth"
+      EOSC_AAI_TOKEN: "https://aai-demo.eosc-portal.eu/auth/realms/core/protocol/openid-connect/token"
+      ACCOUNTING_API_URL: "https://acc.devel.argo.grnet.gr/accounting-system"
+      REFRESH_TOKEN: "${REFRESH_TOKEN}"
+      MAILER_URL: "smtp://wrelay.in2p3.fr:25"
+      MAILER_DSN: "smtp://wrelay.in2p3.fr:25"
+      MAINTENANCE_MODE: "false"
+      MAINTENANCE_DESCRIPTION: "Scheduled maintenance at CC-IN2P3 - June 14th"
+      MAINTENANCE_URL: "https://goc.egi.eu/portal/index.php?Page_Type=Downtime&id=32482"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
+  enabled: true
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      memory: 512Mi
+      cpu: 500m
+  wordpress: false
+webdav:
+  enabled: false
+java:
+  enabled: false

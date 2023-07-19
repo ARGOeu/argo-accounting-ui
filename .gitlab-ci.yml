@@ -1,17 +1,25 @@
-stages:
-  - php
-  - nginx
-  - test
-  - deploy
-
-variables:
-  IMAGE_PHP: $CI_REGISTRY_IMAGE/php-fpm:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
-  IMAGE_NGINX: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
-
 default:
   services:
     - docker:dind
   image: docker:latest
+
+variables:
+  IMAGE_PHP: $CI_REGISTRY_IMAGE/php-fpm:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+  IMAGE_NGINX: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+  HELM_REPO_NAME: "helm-cc"
+  HELM_REPO_URL: "https://helm.cc.in2p3.fr"
+  HELM_CHART_NAME: "webkit"
+  HELM_CHART_VERSION: "4.3.0"
+  HELM_RELEASE_PREFIX: "accounting-eosc"
+  OPENSHIFT_CLIENT_IMAGE_TAG: "stable"
+  OPENSHIFT_CLIENT_IMAGE_URL: "gitlab-registry.in2p3.fr/cc-in2p3-containers/openshift-cli"
+
+stages:
+  - php
+  - nginx
+  - validate
+  - deploy
+
 
 php-image-build:
   stage: php
@@ -19,7 +27,7 @@ php-image-build:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - docker build --pull -t "$IMAGE_PHP" -f ./docker/php-fpm/Dockerfile .
-    - docker cp -a $(docker create "$IMAGE_PHP"):/var/www/html/. php-build
+    - docker cp -a $(docker create "$IMAGE_PHP"):/var/www/html/public/build php-build
     - docker push "$IMAGE_PHP"
   artifacts:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
@@ -35,28 +43,54 @@ nginx-image-build:
     - docker push "$IMAGE_NGINX"
 
 
-deploy-to-wok-dev:
-  image: docker.io/appuio/oc:v3.11
-  stage: deploy
-  services:
-    - docker:dind
-  script: |
-    oc login $WOK_URL --token=$WOK_TOKEN --insecure-skip-tls-verify
-    oc project $WOK_PROJECT
-    oc patch deployment php-acc-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"php-acc-dev\", \"image\":\"$IMAGE_PHP\"}]}}}}"
-    oc patch deployment nginx-dev -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"nginx-dev\", \"image\":\"$IMAGE_NGINX\"}]}}}}"
-  only:
-    - develop
+helm-validate:
+  stage: validate
+  image: "$OPENSHIFT_CLIENT_IMAGE_URL:$OPENSHIFT_CLIENT_IMAGE_TAG"
+  environment:
+    name: $HELM_RELEASE_PREFIX-$HELM_RELEASE
+    url: $URL
+  before_script:
+    - oc login "$OPENSHIFT_CLUSTER_URL" --token="$OPENSHIFT_ACCESS_TOKEN"
+    - oc project "$OPENSHIFT_PROJECT_NAME"
+    - oc version && oc get all
+    - helm version && helm list
+    - helm plugin list
+    - helm repo add "$HELM_REPO_NAME" "$HELM_REPO_URL" && helm search repo "$HELM_REPO_NAME/$HELM_CHART_NAME"
+  script:
+    - envsubst "$(env | cut -f1 -d= | tr '\n' ' ' | sed 's/[^ ][^ ]*/${&}/g')" < ${HELM_RELEASE}.values.yaml > values.yaml
+    - helm diff upgrade $HELM_RELEASE_PREFIX-$HELM_RELEASE "$HELM_REPO_NAME/$HELM_CHART_NAME" --version "$HELM_CHART_VERSION" --values values.yaml --allow-unreleased
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        HELM_RELEASE: "prod"
+        URL : "https://accounting.eosc-portal.eu"
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      variables:
+        HELM_RELEASE: "dev"
+        URL : "https://accounting-eosc-dev.apps.wok3.in2p3.fr"
 
-deploy-to-wok:
-  image: docker.io/appuio/oc:v3.11
+helm-deploy:
   stage: deploy
-  services:
-    - docker:dind
-  script: |
-    oc login $WOK_URL --token=$WOK_TOKEN --insecure-skip-tls-verify
-    oc project $WOK_PROJECT
-    oc patch deployment php-acc -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"php-acc\", \"image\":\"$IMAGE_PHP\"}]}}}}"
-    oc patch deployment nginx -p "{\"spec\": {\"template\": {\"spec\": {\"containers\": [{\"name\": \"nginx\", \"image\":\"$IMAGE_NGINX\"}]}}}}"
-  only:
-    - main
+  image: "$OPENSHIFT_CLIENT_IMAGE_URL:$OPENSHIFT_CLIENT_IMAGE_TAG"
+  environment:
+    name: $HELM_RELEASE_PREFIX-$HELM_RELEASE
+    url: $TODO
+  before_script:
+    - oc login "$OPENSHIFT_CLUSTER_URL" --token="$OPENSHIFT_ACCESS_TOKEN"
+    - oc project "$OPENSHIFT_PROJECT_NAME"
+    - helm repo add "$HELM_REPO_NAME" "$HELM_REPO_URL" && helm search repo "$HELM_REPO_NAME/$HELM_CHART_NAME"
+  script:
+    - envsubst "$(env | cut -f1 -d= | tr '\n' ' ' | sed 's/[^ ][^ ]*/${&}/g')" < ${HELM_RELEASE}.values.yaml > values.yaml
+    - helm upgrade --install $HELM_RELEASE_PREFIX-$HELM_RELEASE "$HELM_REPO_NAME/$HELM_CHART_NAME" --version "$HELM_CHART_VERSION" --values ./values.yaml
+  needs:
+    - helm-validate
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      variables:
+        HELM_RELEASE: "prod"
+        URL : "https://accounting.eosc-portal.eu"
+      when: manual
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      variables:
+        HELM_RELEASE: "dev"
+        URL : "https://accounting-eosc-dev.apps.wok3.in2p3.fr"
