@@ -15,7 +15,7 @@ security:
             switch_user: ~
             oauth:
                 resource_owners:
-                    aai_eosc: "/oauth/callback"
+                    aai_eosc: /oauth/callback
                 login_path:        /connect/aai_eosc
                 use_forward:       true
                 failure_path:      /connect/aai_eosc
@@ -30,6 +30,6 @@ security:
 
 
     access_control:
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/connect/aai_eosc, roles: PUBLIC_ACCESS }
-        - { path: ^/(.+), roles: ROLE_USER }
+        - { path: ^/login, roles: PUBLIC_ACCESS , requires_channel: https }
+        - { path: ^/connect/aai_eosc, roles: PUBLIC_ACCESS , requires_channel: https}
+        - { path: ^/(.+), roles: ROLE_USER , requires_channel: https }
