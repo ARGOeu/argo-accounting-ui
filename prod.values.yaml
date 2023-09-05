@@ -116,10 +116,10 @@ nginx:
   enabled: true
   resources:
     limits:
-      memory: 64Mi
+      memory: 512Mi
     requests:
-      memory: 64Mi
-      cpu: 250m
+      memory: 512Mi
+      cpu: 500m
   initWithIndex: false
   pvc:
     disabled: true
