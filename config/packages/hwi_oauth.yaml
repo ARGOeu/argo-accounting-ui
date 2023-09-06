@@ -15,5 +15,3 @@ hwi_oauth:
             scope:               "openid eduperson_entitlement voperson_id profile email"
 
 
-
-
