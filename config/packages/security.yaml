@@ -15,9 +15,9 @@ security:
             switch_user: ~
             oauth:
                 resource_owners:
-                    aai_eosc: /oauth/callback
+                    aai_eosc: "/oauth/callback"
                 login_path:        /connect/aai_eosc
-                use_forward:       false
+                use_forward:       true
                 failure_path:      /connect/aai_eosc
                 oauth_user_provider:
                     service: spl.user_provider
@@ -30,5 +30,5 @@ security:
 
 
     access_control:
-        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/aai_eosc, roles: PUBLIC_ACCESS }
         - { path: ^/(.+), roles: ROLE_USER  }
