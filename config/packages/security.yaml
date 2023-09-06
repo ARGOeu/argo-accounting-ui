@@ -31,4 +31,5 @@ security:
 
     access_control:
         - { path: ^/connect/aai_eosc, roles: PUBLIC_ACCESS }
+        - { path: ^/oauth/callback, roles: PUBLIC_ACCESS }
         - { path: ^/(.+), roles: ROLE_USER  }
