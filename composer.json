@@ -7,7 +7,6 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-curl": "*",
-        "ext-http": "*",
         "ext-iconv": "*",
         "ext-simplexml": "*",
         "amphp/http-client": "^4.2.1",
@@ -120,7 +119,6 @@
         "symfony/debug-bundle": "6.1.*",
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^6.1",
-        "symfony/profiler-pack": "^1.0",
         "symfony/stopwatch": "6.1.*",
         "symfony/web-profiler-bundle": "6.1.*"
     }

@@ -79,7 +79,7 @@ class UserProvider implements OAuthAwareUserProviderInterface, UserProviderInter
             } catch (ORMException $e) {
            }
 
-
+            dump($user);
             return $user;
 
     }
