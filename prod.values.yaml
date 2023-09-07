@@ -24,7 +24,9 @@ global:
     lastName: Lorphelin
     organization: CC-IN2P3
   ingress:
-    allow: any
+    allow: restricted
+    cidr:
+      - 134.158.230.0/23
 nginx:
   image:
     url: $IMAGE_NGINX
@@ -138,7 +140,7 @@ php:
         upload_max_filesize = 100M
     templatesMountPath: /usr/local/etc/php/conf.d
     env:
-      APP_ENV: "prod"
+      APP_ENV: "dev"
       APP_SECRET: "${APP_SECRET}"
       DATABASE_URL: "sqlite:///%kernel.project_dir%/user"
       EOSC_AAI_ID: "${EOSC_AAI_ID}"
