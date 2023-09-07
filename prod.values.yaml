@@ -140,11 +140,11 @@ php:
         upload_max_filesize = 100M
     templatesMountPath: /usr/local/etc/php/conf.d
     env:
-      APP_ENV: "dev"
+      APP_ENV: "prod"
       APP_SECRET: "${APP_SECRET}"
       DATABASE_URL: "sqlite:///%kernel.project_dir%/user"
       EOSC_AAI_ID: "${EOSC_AAI_ID}"
-      EOSC_AAI_SECRET: "${ EOSC_AAI_SECRET}"
+      EOSC_AAI_SECRET: "${EOSC_AAI_SECRET}"
       MAINTENANCE_MODE: "false"
       MAINTENANCE_DESCRIPTION: "Scheduled maintenance at CC-IN2P3 - June 14th"
       MAINTENANCE_URL: "https://goc.egi.eu/portal/index.php?Page_Type=Downtime&id=32482"
