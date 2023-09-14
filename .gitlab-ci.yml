@@ -9,7 +9,7 @@ variables:
   HELM_REPO_NAME: "helm-cc"
   HELM_REPO_URL: "https://helm.cc.in2p3.fr"
   HELM_CHART_NAME: "webkit"
-  HELM_CHART_VERSION: "4.3.1"
+  HELM_CHART_VERSION: "4.4.5"
   HELM_RELEASE_PREFIX: "accounting-eosc"
   OPENSHIFT_CLIENT_IMAGE_TAG: "stable"
   OPENSHIFT_CLIENT_IMAGE_URL: "gitlab-registry.in2p3.fr/cc-in2p3-containers/openshift-cli"
