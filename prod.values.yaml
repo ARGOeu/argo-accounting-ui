@@ -24,9 +24,7 @@ global:
     lastName: Lorphelin
     organization: CC-IN2P3
   ingress:
-    allow: restricted
-    cidr:
-      - 134.158.230.0/23
+    allow: any
 nginx:
   image:
     url: $IMAGE_NGINX
