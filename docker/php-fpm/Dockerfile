@@ -19,4 +19,3 @@ RUN yarn install --ignore-engines \
     && yarn encore dev
 
 RUN chmod -R 777 /var/www/html/var
-RUN chmod 777 user

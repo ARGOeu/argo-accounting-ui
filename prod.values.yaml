@@ -3,7 +3,9 @@ filebrowser:
   enabled: false
 global:
   pvc:
-    isManaged: false
+    isManaged: true
+    size: 1Gi
+    name: database
   description: Accounting Portal for eosc - PROD
   status: active
   url: accounting.eosc-portal.eu
@@ -125,7 +127,9 @@ nginx:
     disabled: true
 php:
   pvc:
-    disabled: true
+    disabled: false
+    name: database
+    path: /var/data
   image:
     url: $IMAGE_PHP
   config:
@@ -140,7 +144,7 @@ php:
     env:
       APP_ENV: "prod"
       APP_SECRET: "${APP_SECRET}"
-      DATABASE_URL: "sqlite:///%kernel.project_dir%/user"
+      DATABASE_URL: "sqlite:///var/data/user"
       EOSC_AAI_ID: "${EOSC_AAI_ID}"
       EOSC_AAI_SECRET: "${EOSC_AAI_SECRET}"
       MAINTENANCE_MODE: "false"
