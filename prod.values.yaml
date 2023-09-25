@@ -144,7 +144,7 @@ php:
     env:
       APP_ENV: "prod"
       APP_SECRET: "${APP_SECRET}"
-      DATABASE_URL: "sqlite:///var/data/user"
+      DATABASE_URL: "sqlite:////var/data/user"
       EOSC_AAI_ID: "${EOSC_AAI_ID}"
       EOSC_AAI_SECRET: "${EOSC_AAI_SECRET}"
       MAINTENANCE_MODE: "false"
